@@ -1,0 +1,116 @@
+@import "tailwindcss";
+
+/* Tokens. Verde botella + pan de oro: escaparate de barbería clásica. */
+@theme {
+  --color-verde: #0f3d2e;
+  --color-verde-sombra: #082a1f;
+  --color-verde-claro: #1b5a44;
+  --color-oro: #d4b05a;
+  --color-oro-luz: #ecd48a;
+  --color-oro-sombra: #8a6a24;
+  --color-oro-tinta: #705418; /* oro legible sobre fondos claros (≥ 4,5:1) */
+  --color-marfil: #f2ebd8;
+  --color-marfil-tenue: #d9d1bc;
+  --color-azulejo: #efeae0;
+  --color-junta: #e3dccb;
+  --color-pizarra: #1c1f1d;
+  --color-tiza: #ede7d6;
+  --color-tiza-tenue: #b9b3a2;
+  --color-madera: #5a3a24;
+  --color-tinta: #1f2622;
+  --color-tinta-suave: #4a544e;
+
+  --font-rotulo: "Fraunces", "Iowan Old Style", "Palatino Linotype", serif;
+  --font-texto: "Alegreya Sans", "Gill Sans", "Segoe UI", sans-serif;
+}
+
+@layer base {
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: var(--font-texto);
+    color: var(--color-tinta);
+    background: var(--color-azulejo);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+  :focus-visible {
+    outline: 3px solid var(--color-oro);
+    outline-offset: 3px;
+  }
+  ::selection { background: var(--color-oro); color: var(--color-verde-sombra); }
+}
+
+/* Azulejo blanco tipo metro (2:1) con hiladas desplazadas: fondo de las secciones claras. */
+.azulejo {
+  background-color: var(--color-azulejo);
+  background-image:
+    linear-gradient(var(--color-junta) 1px, transparent 1px),
+    conic-gradient(from 270deg at 1px 50%, var(--color-junta) 90deg, transparent 0),
+    conic-gradient(from 270deg at 1px 50%, var(--color-junta) 90deg, transparent 0);
+  background-size: 6rem 3rem, 6rem 6rem, 6rem 6rem;
+  background-position: 0 0, 0 0, 3rem 3rem;
+}
+
+/* Rótulo en pan de oro: letra dorada con sombra pintada, como en los escaparates. */
+.pan-de-oro {
+  font-family: var(--font-rotulo);
+  font-weight: 900;
+  color: var(--color-oro);
+  text-shadow:
+    0 1px 0 var(--color-oro-luz),
+    0.05em 0.05em 0 var(--color-verde-sombra),
+    0.07em 0.07em 0 rgb(0 0 0 / 0.35);
+  letter-spacing: -0.01em;
+  line-height: 0.92;
+}
+
+/* Filete doble de oro, como el marco pintado en la luna del escaparate. */
+.filete {
+  border: 2px solid var(--color-oro);
+  outline: 1px solid var(--color-oro);
+  outline-offset: 5px;
+}
+
+/* Pizarra con marco de madera. */
+.pizarra {
+  background-color: var(--color-pizarra);
+  background-image:
+    radial-gradient(ellipse at 20% 10%, rgb(255 255 255 / 0.05), transparent 55%),
+    radial-gradient(ellipse at 80% 90%, rgb(255 255 255 / 0.04), transparent 50%);
+  color: var(--color-tiza);
+  border: 10px solid var(--color-madera);
+  box-shadow:
+    inset 0 0 0 2px #2a2d2b,
+    0 1px 0 #3d281a,
+    0 18px 30px -18px rgb(0 0 0 / 0.55);
+}
+.tiza { font-family: var(--font-rotulo); font-weight: 400; font-style: italic; }
+
+/* Puntos de guía entre concepto y precio. */
+.guia {
+  flex: 1 1 auto;
+  min-width: 1.5rem;
+  margin: 0 0.5rem;
+  border-bottom: 2px dotted var(--color-tiza-tenue);
+  transform: translateY(-0.35em);
+}
+
+/* Reveals discretos al hacer scroll. Sin soporte o con reduced-motion: se ve sin animar. */
+@media (prefers-reduced-motion: no-preference) {
+  @supports (animation-timeline: view()) {
+    .reveal {
+      animation: reveal-up 1ms linear both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 35%;
+    }
+    .reveal-tarde {
+      animation: reveal-up 1ms linear both;
+      animation-timeline: view();
+      animation-range: entry 10% entry 45%;
+    }
+  }
+}
+@keyframes reveal-up {
+  from { opacity: 0; transform: translateY(1.25rem); }
+  to   { opacity: 1; transform: translateY(0); }
+}

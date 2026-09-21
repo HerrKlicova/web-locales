@@ -1,0 +1,37 @@
+---
+import { enlaceWhatsapp, type Ficha } from '../lib/ficha';
+import Icono from './Icono.astro';
+
+/** Botón fijo abajo en móvil, a partir de la primera pantalla (§8). Mismo lenguaje que el botón del hero. */
+interface Props { ficha: Ficha; texto?: string }
+const { ficha, texto = 'Pedir cita por WhatsApp' } = Astro.props;
+const enlace = enlaceWhatsapp(ficha);
+---
+
+<div
+  class="fixed inset-x-0 bottom-0 z-40 border-t border-oro-sombra/40 bg-verde-sombra/95 p-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] transition-transform duration-300 ease-out md:hidden"
+  data-whatsapp-fijo
+>
+  <a
+    href={enlace}
+    class="flex min-h-14 items-center justify-center gap-3 rounded-sm bg-oro text-xl font-bold text-verde-sombra"
+    target={enlace.startsWith('http') ? '_blank' : undefined}
+    rel={enlace.startsWith('http') ? 'noopener' : undefined}
+  >
+    <Icono nombre="whatsapp" class="size-7" />
+    {texto}
+  </a>
+</div>
+
+<script>
+  // Escondido mientras se ve el hero (ya tiene su botón); aparece al pasar la primera pantalla.
+  const barra = document.querySelector<HTMLElement>('[data-whatsapp-fijo]');
+  const hero = document.querySelector<HTMLElement>('[data-hero]');
+  if (barra && hero && 'IntersectionObserver' in window) {
+    const io = new IntersectionObserver(
+      ([e]) => barra.classList.toggle('translate-y-[120%]', e.isIntersecting),
+      { threshold: 0.35 },
+    );
+    io.observe(hero);
+  }
+</script>

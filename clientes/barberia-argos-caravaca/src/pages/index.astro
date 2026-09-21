@@ -1,0 +1,64 @@
+---
+import Layout from '@plantilla/layouts/Layout.astro';
+import Hero from '@plantilla/components/Hero.astro';
+import Precios from '@plantilla/components/Precios.astro';
+import Horario from '@plantilla/components/Horario.astro';
+import Galeria from '@plantilla/components/Galeria.astro';
+import Resenas from '@plantilla/components/Resenas.astro';
+import Mapa from '@plantilla/components/Mapa.astro';
+import Footer from '@plantilla/components/Footer.astro';
+import BotonWhatsapp from '@plantilla/components/BotonWhatsapp.astro';
+import { schemaLocalBusiness } from '@plantilla/lib/schema';
+import type { Ficha } from '@plantilla/lib/ficha';
+
+import fichaJson from '../../ficha.json';
+import fotoLocal from '../../fotos/local.jpg';
+import fotoLocalMovil from '../../fotos/local-movil.jpg';
+import fotoNavaja from '../../fotos/navaja.jpg';
+import fotoHerramientas from '../../fotos/herramientas.jpg';
+import fotoFachada from '../../fotos/fachada.jpg';
+
+const ficha = fichaJson as unknown as Ficha;
+
+const titulo = `${ficha.nombre} — Barbería en ${ficha.pueblo}`;
+const descripcion = `Barbería clásica en ${ficha.pueblo}: corte a tijera, arreglo de barba y afeitado a navaja con toalla caliente. Pide cita por WhatsApp o llama.`;
+const schema = schemaLocalBusiness(ficha, Astro.site?.href);
+// Demo por defecto (noindex). Producción: PRODUCCION=true npm run build (§9).
+const demo = import.meta.env.PRODUCCION !== 'true';
+---
+
+<Layout titulo={titulo} descripcion={descripcion} demo={demo} schema={schema}>
+  <Hero
+    ficha={ficha}
+    tipoRotulo="Barbería"
+    nombreRotulo="Argos"
+    texto="Corte a tijera, arreglo de barba y afeitado a navaja con toalla caliente. Escríbenos por WhatsApp y te damos hora."
+    imagen={fotoLocal}
+    imagenMovil={fotoLocalMovil}
+    alt="Sillón de barbero antiguo frente al espejo, con paredes verdes y azulejo blanco, en Barbería Argos"
+  />
+
+  <main id="contenido">
+    <div class="azulejo px-4 py-16 sm:px-8 md:py-24">
+      <div class="mx-auto grid max-w-6xl gap-8 lg:grid-cols-[3fr_2fr] lg:items-start">
+        <Precios servicios={ficha.servicios} />
+        <Horario ficha={ficha} />
+      </div>
+    </div>
+
+    <Galeria
+      fotos={[
+        { src: fotoFachada, alt: 'Fachada de madera verde de la barbería en una calle encalada de Caravaca' },
+        { src: fotoNavaja, alt: 'Manos del barbero afeitando la nuca de un cliente con navaja' },
+        { src: fotoHerramientas, alt: 'Navaja, brocha, tijeras y peine sobre la encimera de mármol' },
+      ]}
+    />
+
+    <Resenas resenas={ficha.resenas} maps_url={ficha.maps_url} />
+
+    <Mapa ficha={ficha} />
+  </main>
+
+  <Footer ficha={ficha} />
+  <BotonWhatsapp ficha={ficha} />
+</Layout>

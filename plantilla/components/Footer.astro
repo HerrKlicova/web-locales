@@ -1,0 +1,51 @@
+---
+import { direccionCompleta, enlaceTelefono, enlaceWhatsapp, esHueco, type Ficha } from '../lib/ficha';
+import Icono from './Icono.astro';
+import Legal from './Legal.astro';
+
+interface Props {
+  ficha: Ficha;
+  /** Solo en producción y si el cliente lo acepta (§10). */
+  credito?: { marca: string; url: string } | null;
+}
+const { ficha, credito = null } = Astro.props;
+const telefonoVisible = esHueco(ficha.telefono) ? '[TELÉFONO]' : ficha.telefono;
+const whatsappVisible = esHueco(ficha.whatsapp) ? '[WHATSAPP]' : ficha.whatsapp;
+---
+
+<footer id="contacto" class="bg-verde-sombra px-4 pb-28 pt-4 text-marfil sm:px-8 md:pb-14">
+  <div class="mx-auto max-w-6xl border-t border-verde-claro pt-10">
+    <div class="grid gap-8 md:grid-cols-[1fr_1fr]">
+      <div>
+        <p class="pan-de-oro m-0 text-4xl">{ficha.nombre}</p>
+        <p class="m-0 mt-2 text-marfil-tenue">{direccionCompleta(ficha)}</p>
+        {ficha.anio_apertura && <p class="m-0 mt-1 text-marfil-tenue">En {ficha.pueblo} desde {ficha.anio_apertura}.</p>}
+      </div>
+      <ul class="m-0 list-none space-y-2 p-0 text-lg md:justify-self-end">
+        <li>
+          <a href={enlaceTelefono(ficha)} class="inline-flex min-h-11 items-center gap-3 hover:text-oro">
+            <Icono nombre="telefono" class="size-5 text-oro" />
+            {telefonoVisible}
+          </a>
+        </li>
+        <li>
+          <a href={enlaceWhatsapp(ficha)} class="inline-flex min-h-11 items-center gap-3 hover:text-oro" target="_blank" rel="noopener">
+            <Icono nombre="whatsapp" class="size-5 text-oro" />
+            WhatsApp {whatsappVisible}
+          </a>
+        </li>
+      </ul>
+    </div>
+
+    <Legal ficha={ficha} />
+
+    <p class="m-0 mt-8 text-sm text-marfil-tenue">
+      © {new Date().getFullYear()} {ficha.nombre}.
+      {credito && (
+        <>
+          {' '}Web hecha por <a href={credito.url} class="underline hover:text-oro">{credito.marca}</a>.
+        </>
+      )}
+    </p>
+  </div>
+</footer>

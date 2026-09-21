@@ -1,0 +1,32 @@
+---
+import { direccionCompleta, type Ficha } from '../lib/ficha';
+
+/** Aviso legal, privacidad y cookies. Los huecos [ ] se rellenan en producción (§9). */
+interface Props { ficha: Ficha; titular?: string; nif?: string; email?: string }
+const { ficha, titular = '[TITULAR]', nif = '[NIF]', email = '[EMAIL]' } = Astro.props;
+---
+
+<div class="mt-10 border-t border-verde-claro pt-4 text-sm text-marfil-tenue">
+  <div class="flex flex-wrap gap-x-6 gap-y-2">
+    <details class="group">
+      <summary class="inline-flex min-h-11 cursor-pointer list-none items-center text-base underline decoration-verde-claro underline-offset-4 hover:text-oro">Aviso legal</summary>
+      <div class="mt-3 max-w-[70ch] space-y-2">
+        <p>Titular de esta web: {titular}, con NIF {nif}, con domicilio en {direccionCompleta(ficha)}. Contacto: {email}.</p>
+        <p>El contenido de esta web (textos, fotos y marca) pertenece a su titular. No se permite copiarlo sin permiso.</p>
+      </div>
+    </details>
+    <details class="group">
+      <summary class="inline-flex min-h-11 cursor-pointer list-none items-center text-base underline decoration-verde-claro underline-offset-4 hover:text-oro">Privacidad</summary>
+      <div class="mt-3 max-w-[70ch] space-y-2">
+        <p>Esta web no tiene formularios ni guarda datos personales. Si nos escribes por WhatsApp o nos llamas, tus datos los trata {titular} solo para atender tu petición, según el Reglamento (UE) 2016/679.</p>
+        <p>Puedes pedir acceso, corrección o borrado de tus datos escribiendo a {email}.</p>
+      </div>
+    </details>
+    <details class="group">
+      <summary class="inline-flex min-h-11 cursor-pointer list-none items-center text-base underline decoration-verde-claro underline-offset-4 hover:text-oro">Cookies</summary>
+      <div class="mt-3 max-w-[70ch] space-y-2">
+        <p>Esta web no usa cookies propias ni de seguimiento. Si pulsas «Ver el mapa», se carga un mapa de Google y Google puede usar sus propias cookies.</p>
+      </div>
+    </details>
+  </div>
+</div>

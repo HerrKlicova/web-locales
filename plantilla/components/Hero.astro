@@ -1,0 +1,125 @@
+---
+import { getImage } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
+import { enlaceTelefono, enlaceWhatsapp, esHueco, type Ficha } from '../lib/ficha';
+import Icono from './Icono.astro';
+
+interface Props {
+  ficha: Ficha;
+  /** Palabra pequeña del rótulo ("Barbería") y palabra grande ("Argos"). */
+  tipoRotulo: string;
+  nombreRotulo: string;
+  texto: string;
+  imagen: ImageMetadata; // 16:9, escritorio
+  imagenMovil?: ImageMetadata; // 4:5, móvil
+  alt: string;
+}
+const { ficha, tipoRotulo, nombreRotulo, texto, imagen, imagenMovil = imagen, alt } = Astro.props;
+
+const sizesEscritorio = '(min-width: 1024px) 55vw, 100vw';
+const escAvif = await getImage({ src: imagen, format: 'avif', widths: [900, 1300, 1800], width: 1300 });
+const escWebp = await getImage({ src: imagen, format: 'webp', widths: [900, 1300, 1800], width: 1300 });
+const movAvif = await getImage({ src: imagenMovil, format: 'avif', widths: [480, 780, 1080], width: 780 });
+const movWebp = await getImage({ src: imagenMovil, format: 'webp', widths: [480, 780, 1080], width: 780 });
+
+// El rótulo ocupa el ancho de su marco: Fraunces 900 mide ~0,62 em por letra.
+const tamanoRotulo = Math.min(34, Math.round(100 / (0.63 * nombreRotulo.length)));
+
+const whatsapp = enlaceWhatsapp(ficha);
+const telefono = enlaceTelefono(ficha);
+const telefonoVisible = esHueco(ficha.telefono) ? '[TELÉFONO]' : ficha.telefono;
+---
+
+<header class="bg-verde text-marfil" data-hero>
+  <div class="mx-auto grid max-w-[90rem] lg:min-h-[min(52rem,100dvh)] lg:grid-cols-[minmax(0,5fr)_minmax(0,6fr)]">
+    <!-- Rótulo: la luna del escaparate -->
+    <div class="flex items-center px-4 py-6 sm:px-8 sm:py-10 md:px-12 md:py-14 lg:px-16">
+      <div class="filete w-full px-5 py-6 sm:px-8 sm:py-10 lg:px-12 lg:py-14" data-filete>
+        <h1 class="m-0 [container-type:inline-size]">
+          <span class="tiza block text-[1.75rem] leading-none text-oro sm:text-[2.25rem] lg:text-[2.75rem]">{tipoRotulo}</span>
+          <span class="sr-only">{nombreRotulo}</span>
+          <span
+            class="pan-de-oro mt-2 block"
+            style={`font-size: clamp(3.5rem, ${tamanoRotulo}cqw, 11rem); margin-bottom: 0.16em`}
+            aria-hidden="true"
+            data-rotulo>{nombreRotulo}</span
+          >
+          <span class="mt-2 flex items-center gap-4 text-lg text-marfil sm:text-xl">
+            <span class="h-px flex-1 bg-oro" aria-hidden="true"></span>
+            <span>{ficha.pueblo}</span>
+            <span class="h-px flex-1 bg-oro" aria-hidden="true"></span>
+          </span>
+        </h1>
+
+        <p class="mt-5 max-w-[34ch] text-lg leading-snug text-marfil sm:text-xl" data-entra>{texto}</p>
+
+        <div class="mt-6 flex flex-col gap-3 sm:flex-row sm:flex-wrap" data-entra>
+          <a
+            href={whatsapp}
+            class="inline-flex min-h-12 items-center justify-center gap-2.5 rounded-sm bg-oro px-5 text-lg font-bold text-verde-sombra transition-colors hover:bg-oro-luz"
+            target={whatsapp.startsWith('http') ? '_blank' : undefined}
+            rel={whatsapp.startsWith('http') ? 'noopener' : undefined}
+          >
+            <Icono nombre="whatsapp" class="size-6" />
+            Pedir cita por WhatsApp
+          </a>
+          <a
+            href={telefono}
+            class="inline-flex min-h-12 items-center justify-center gap-2.5 rounded-sm border-2 border-oro px-5 text-lg font-bold text-oro transition-colors hover:bg-oro hover:text-verde-sombra"
+          >
+            <Icono nombre="telefono" class="size-5" />
+            Llamar <span class="font-normal text-marfil">{telefonoVisible}</span>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Foto del local. Visible desde el primer frame: es el LCP. -->
+    <div class="relative overflow-hidden lg:min-h-full">
+      <picture>
+        <source media="(max-width: 767px)" type="image/avif" srcset={movAvif.srcSet.attribute} sizes="100vw" />
+        <source media="(max-width: 767px)" type="image/webp" srcset={movWebp.srcSet.attribute} sizes="100vw" />
+        <source type="image/avif" srcset={escAvif.srcSet.attribute} sizes={sizesEscritorio} />
+        <source type="image/webp" srcset={escWebp.srcSet.attribute} sizes={sizesEscritorio} />
+        <img
+          src={escWebp.src}
+          width={imagen.width}
+          height={imagen.height}
+          alt={alt}
+          loading="eager"
+          fetchpriority="high"
+          decoding="async"
+          class="block aspect-[4/5] h-auto w-full object-cover md:aspect-video lg:absolute lg:inset-0 lg:aspect-auto lg:h-full"
+          data-foto
+        />
+      </picture>
+    </div>
+  </div>
+</header>
+
+<script>
+  import gsap from 'gsap';
+  import { SplitText } from 'gsap/SplitText';
+
+  gsap.registerPlugin(SplitText);
+
+  // Un solo momento orquestado: la entrada del rótulo (§5).
+  // El titular y la foto nunca parten de opacity 0: son el LCP.
+  const mm = gsap.matchMedia();
+  mm.add('(prefers-reduced-motion: no-preference)', () => {
+    const hero = document.querySelector<HTMLElement>('[data-hero]');
+    if (!hero) return;
+    const rotulo = hero.querySelector<HTMLElement>('[data-rotulo]');
+    const foto = hero.querySelector<HTMLElement>('[data-foto]');
+    const entran = hero.querySelectorAll<HTMLElement>('[data-entra]');
+    if (!rotulo) return;
+
+    // aria: 'none' porque el h1 ya lleva el nombre en un span solo para lectores de pantalla.
+    const split = SplitText.create(rotulo, { type: 'chars', charsClass: 'inline-block', aria: 'none' });
+    const tl = gsap.timeline({ defaults: { ease: 'power3.out' } });
+
+    tl.from(split.chars, { yPercent: 22, duration: 0.8, stagger: 0.035 }, 0)
+      .from(foto, { scale: 1.05, duration: 1.4, ease: 'power2.out' }, 0)
+      .from(entran, { y: 14, autoAlpha: 0, duration: 0.6, stagger: 0.1 }, 0.45);
+  });
+</script>

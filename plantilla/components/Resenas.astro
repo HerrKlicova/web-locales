@@ -1,0 +1,52 @@
+---
+import { esHueco, type Resena } from '../lib/ficha';
+import Icono from './Icono.astro';
+
+interface Props {
+  resenas: Resena[];
+  maps_url: string;
+  titulo?: string;
+}
+const { resenas, maps_url, titulo = 'Lo que dicen en Google' } = Astro.props;
+const enlaceGoogle = esHueco(maps_url) ? null : maps_url;
+---
+
+<section id="resenas" aria-labelledby="resenas-titulo" class="azulejo px-4 py-16 sm:px-8 md:py-24">
+  <div class="mx-auto max-w-6xl">
+    <h2 id="resenas-titulo" class="reveal m-0 font-rotulo text-4xl font-black text-verde sm:text-5xl">{titulo}</h2>
+
+    <ul class="reveal mt-8 grid list-none gap-10 p-0 md:mt-10 md:grid-cols-3 md:gap-0 md:divide-x md:divide-marfil-tenue">
+      {
+        resenas.map((r) => (
+          <li class="flex flex-col md:px-8 md:first:pl-0 md:last:pr-0">
+            <div class="flex gap-0.5 text-oro-sombra" role="img" aria-label={`${r.estrellas} de 5 estrellas`}>
+              {Array.from({ length: r.estrellas }).map(() => (
+                <Icono nombre="estrella" class="size-5" />
+              ))}
+            </div>
+            <blockquote class="m-0 mt-4 flex-1 text-xl leading-snug text-tinta before:block before:font-rotulo before:text-5xl before:leading-[0.6] before:text-oro-sombra before:content-['“']">
+              <p class="m-0">{r.texto}</p>
+            </blockquote>
+            <p class="m-0 mt-4 font-bold text-verde">{r.autor}</p>
+          </li>
+        ))
+      }
+    </ul>
+
+    {
+      enlaceGoogle && (
+        <p class="reveal mt-10">
+          <a
+            href={enlaceGoogle}
+            class="inline-flex min-h-11 items-center gap-2 border-b-2 border-verde text-lg font-bold text-verde hover:border-oro-tinta"
+            target="_blank"
+            rel="noopener"
+          >
+            <Icono nombre="google" class="size-5" />
+            Ver todas las reseñas en Google
+          </a>
+        </p>
+      )
+    }
+  </div>
+</section>

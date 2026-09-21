@@ -1,0 +1,59 @@
+---
+import { enlaceWhatsapp, type Ficha } from '../lib/ficha';
+import { indicesDia } from '../lib/horario';
+import Icono from './Icono.astro';
+
+interface Props {
+  ficha: Ficha;
+  titulo?: string;
+}
+const { ficha, titulo = 'Horario' } = Astro.props;
+const whatsapp = enlaceWhatsapp(ficha);
+---
+
+<section id="horario" aria-labelledby="horario-titulo" class="reveal-tarde">
+  <div class="filete bg-verde px-5 py-8 text-marfil sm:px-8">
+    <div class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
+      <h2 id="horario-titulo" class="m-0 font-rotulo text-4xl font-black text-oro sm:text-5xl">{titulo}</h2>
+      <p class="m-0 text-lg font-bold text-oro" data-hoy hidden></p>
+    </div>
+    <dl class="mt-6 divide-y divide-verde-claro text-lg">
+      {
+        ficha.horario.map((h) => (
+          <div class="flex items-baseline justify-between gap-4 py-2.5" data-dias={indicesDia(h.dias).join(',')}>
+            <dt>{h.dias}</dt>
+            <dd class="m-0 text-right font-bold tabular-nums">{h.horas}</dd>
+          </div>
+        ))
+      }
+    </dl>
+    <a
+      href={whatsapp}
+      class="mt-7 inline-flex min-h-12 w-full items-center justify-center gap-2.5 rounded-sm bg-oro px-5 text-lg font-bold text-verde-sombra transition-colors hover:bg-oro-luz"
+      target={whatsapp.startsWith('http') ? '_blank' : undefined}
+      rel={whatsapp.startsWith('http') ? 'noopener' : undefined}
+    >
+      <Icono nombre="whatsapp" class="size-6" />
+      Pedir cita por WhatsApp
+    </a>
+  </div>
+</section>
+
+<script>
+  // Marca el día de hoy y lo resume junto al título. Sin JS la lista se lee igual.
+  const hoy = (new Date().getDay() + 6) % 7; // 0 = lunes
+  const filas = document.querySelectorAll<HTMLElement>('#horario [data-dias]');
+  filas.forEach((fila) => {
+    const dias = (fila.dataset.dias ?? '').split(',').filter(Boolean).map(Number);
+    if (dias.includes(hoy)) {
+      fila.classList.add('text-oro');
+      fila.setAttribute('aria-current', 'date');
+      const aviso = document.querySelector<HTMLElement>('#horario [data-hoy]');
+      const horas = fila.querySelector('dd')?.textContent?.trim() ?? '';
+      if (aviso && horas) {
+        aviso.textContent = /cerrado/i.test(horas) ? 'Hoy: cerrado' : `Hoy: ${horas}`;
+        aviso.hidden = false;
+      }
+    }
+  });
+</script>

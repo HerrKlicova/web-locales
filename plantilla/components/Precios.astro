@@ -1,0 +1,36 @@
+---
+import type { Servicio } from '../lib/ficha';
+
+interface Props {
+  titulo?: string;
+  servicios: Servicio[];
+  nota?: string;
+}
+const { titulo = 'Precios', servicios, nota } = Astro.props;
+---
+
+<section id="precios" aria-labelledby="precios-titulo" class="reveal">
+  <div class="pizarra px-5 py-8 sm:px-10 sm:py-10">
+    <h2 id="precios-titulo" class="tiza m-0 text-center text-4xl leading-none text-tiza sm:text-5xl">
+      {titulo}
+    </h2>
+    <div class="mx-auto mt-2 h-px w-24 bg-tiza-tenue" aria-hidden="true"></div>
+
+    <dl class="mt-8 space-y-4 text-xl sm:text-2xl">
+      {
+        servicios.map((s) => (
+          <div class="flex items-baseline">
+            <dt class="tiza max-w-[70%] leading-snug">
+              {s.nombre}
+              {s.nota && <small class="block font-texto text-base not-italic text-tiza-tenue">{s.nota}</small>}
+            </dt>
+            <span class="guia" aria-hidden="true" />
+            <dd class="m-0 font-texto font-bold tabular-nums whitespace-nowrap">{s.precio}</dd>
+          </div>
+        ))
+      }
+    </dl>
+
+    {nota && <p class="tiza mt-8 text-center text-lg text-tiza-tenue">{nota}</p>}
+  </div>
+</section>

@@ -1,0 +1,12 @@
+{
+  "extends": "astro/tsconfigs/base",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@plantilla/*": ["plantilla/*"],
+      "@cliente/*": ["clientes/*"]
+    }
+  },
+  "include": ["plantilla/**/*", "clientes/**/*", ".astro/types.d.ts"],
+  "exclude": ["dist", "node_modules"]
+}

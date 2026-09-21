@@ -1,0 +1,85 @@
+---
+import { direccionCompleta, enlaceComoLlegar, enlaceTelefono, esHueco, type Ficha } from '../lib/ficha';
+import Icono from './Icono.astro';
+
+interface Props { ficha: Ficha; titulo?: string }
+const { ficha, titulo = 'Dónde estamos' } = Astro.props;
+const [lat, lng] = ficha.coordenadas;
+const srcMapa = `https://www.google.com/maps?q=${lat},${lng}&z=16&hl=es&output=embed`;
+const comoLlegar = enlaceComoLlegar(ficha);
+const telefono = enlaceTelefono(ficha);
+const telefonoVisible = esHueco(ficha.telefono) ? '[TELÉFONO]' : ficha.telefono;
+---
+
+<!-- Mapa y pie forman un solo bloque oscuro de cierre. -->
+<section id="donde" aria-labelledby="donde-titulo" class="bg-verde-sombra px-4 pb-10 pt-16 text-marfil sm:px-8 md:pb-14 md:pt-24">
+  <div class="mx-auto grid max-w-6xl gap-8 lg:grid-cols-2 lg:items-start">
+    <div class="reveal">
+      <h2 id="donde-titulo" class="m-0 font-rotulo text-4xl font-black text-oro sm:text-5xl">{titulo}</h2>
+      <address class="mt-5 text-xl not-italic leading-snug">
+        <span class="flex items-start gap-3">
+          <Icono nombre="pin" class="mt-1 size-6 shrink-0 text-oro" />
+          <span>{ficha.nombre}<br />{direccionCompleta(ficha)}</span>
+        </span>
+      </address>
+      <div class="mt-6 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+        <a
+          href={comoLlegar}
+          class="inline-flex min-h-12 items-center justify-center gap-2.5 rounded-sm bg-oro px-5 text-lg font-bold text-verde-sombra transition-colors hover:bg-oro-luz"
+          target="_blank"
+          rel="noopener"
+        >
+          <Icono nombre="ruta" class="size-5" />
+          Cómo llegar
+        </a>
+        <a
+          href={telefono}
+          class="inline-flex min-h-12 items-center justify-center gap-2.5 rounded-sm border-2 border-oro px-5 text-lg font-bold text-oro transition-colors hover:bg-oro hover:text-verde-sombra"
+        >
+          <Icono nombre="telefono" class="size-5" />
+          Llamar <span class="font-normal text-marfil">{telefonoVisible}</span>
+        </a>
+      </div>
+      {
+        !esHueco(ficha.maps_url) && (
+          <p class="mt-4">
+            <a href={ficha.maps_url} class="inline-flex min-h-11 items-center border-b border-oro text-marfil hover:text-oro" target="_blank" rel="noopener">
+              Ver la ficha en Google Maps
+            </a>
+          </p>
+        )
+      }
+    </div>
+
+    <!-- El mapa se carga solo al pulsar: así no pesa en la primera carga. -->
+    <div class="reveal-tarde filete relative aspect-[3/2] bg-verde lg:aspect-[4/3] lg:max-h-[26rem]" data-mapa data-src={srcMapa}>
+      <div class="absolute inset-0 flex flex-col items-center justify-center gap-3 p-4">
+        <Icono nombre="mapa" class="size-10 text-marfil-tenue" />
+        <button
+          type="button"
+          class="inline-flex min-h-12 items-center gap-2 rounded-sm border-2 border-oro px-5 text-lg font-bold text-oro transition-colors hover:bg-oro hover:text-verde-sombra"
+          data-mapa-boton
+        >
+          Ver el mapa
+        </button>
+        <span class="text-sm text-marfil-tenue">Carga un mapa de Google</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  const caja = document.querySelector<HTMLElement>('[data-mapa]');
+  const boton = caja?.querySelector<HTMLButtonElement>('[data-mapa-boton]');
+  if (caja && boton) {
+    boton.addEventListener('click', () => {
+      const iframe = document.createElement('iframe');
+      iframe.src = caja.dataset.src ?? '';
+      iframe.title = 'Mapa de Google con la ubicación';
+      iframe.loading = 'lazy';
+      iframe.referrerPolicy = 'no-referrer-when-downgrade';
+      iframe.className = 'absolute inset-0 h-full w-full border-0';
+      boton.parentElement?.replaceWith(iframe);
+    });
+  }
+</script>

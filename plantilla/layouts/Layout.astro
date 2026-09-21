@@ -1,0 +1,41 @@
+---
+import '@fontsource/fraunces/900.css';
+import '@fontsource/fraunces/400-italic.css';
+import '@fontsource/alegreya-sans/400.css';
+import '@fontsource/alegreya-sans/700.css';
+import '../styles/global.css';
+import fraunces900 from '@fontsource/fraunces/files/fraunces-latin-900-normal.woff2?url';
+
+interface Props {
+  titulo: string;
+  descripcion: string;
+  /** Demo: noindex, sin sitemap, sin formulario (§9). */
+  demo?: boolean;
+  schema?: Record<string, unknown>;
+  colorTema?: string;
+}
+const { titulo, descripcion, demo = true, schema, colorTema = '#0f3d2e' } = Astro.props;
+---
+
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{titulo}</title>
+    <meta name="description" content={descripcion} />
+    {demo && <meta name="robots" content="noindex, nofollow" />}
+    <meta name="theme-color" content={colorTema} />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="preload" as="font" type="font/woff2" href={fraunces900} crossorigin />
+    {schema && <script type="application/ld+json" set:html={JSON.stringify(schema)} />}
+  </head>
+  <body class="min-h-dvh">
+    <a
+      href="#contenido"
+      class="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-50 focus:rounded focus:bg-oro focus:px-4 focus:py-2 focus:font-bold focus:text-verde-sombra"
+      >Ir al contenido</a
+    >
+    <slot />
+  </body>
+</html>
