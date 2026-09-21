@@ -1,5 +1,6 @@
 {
   "slug": "barberia-argos-caravaca",
+  "demo_token": "cxgxs2",
   "nombre": "Barbería Argos",
   "tipo": "BarberShop",
   "pueblo": "Caravaca de la Cruz",
@@ -8,26 +9,74 @@
   "telefono": "[TELÉFONO]",
   "whatsapp": "[WHATSAPP]",
   "maps_url": "",
-  "coordenadas": [38.1067, -1.8622],
+  "coordenadas": [
+    38.1067,
+    -1.8622
+  ],
   "horario": [
-    { "dias": "Lunes", "horas": "Cerrado" },
-    { "dias": "Martes a viernes", "horas": "9:30–14:00 y 17:00–20:30" },
-    { "dias": "Sábado", "horas": "9:00–14:00" },
-    { "dias": "Domingo", "horas": "Cerrado" }
+    {
+      "dias": "Lunes",
+      "horas": "Cerrado"
+    },
+    {
+      "dias": "Martes a viernes",
+      "horas": "9:30–14:00 y 17:00–20:30"
+    },
+    {
+      "dias": "Sábado",
+      "horas": "9:00–14:00"
+    },
+    {
+      "dias": "Domingo",
+      "horas": "Cerrado"
+    }
   ],
   "servicios": [
-    { "nombre": "Corte clásico a tijera", "precio": "13 €" },
-    { "nombre": "Corte a máquina", "precio": "10 €" },
-    { "nombre": "Arreglo de barba", "precio": "8 €" },
-    { "nombre": "Afeitado a navaja con toalla caliente", "precio": "12 €" },
-    { "nombre": "Corte y barba", "precio": "19 €" },
-    { "nombre": "Corte de niño (hasta 12 años)", "precio": "9 €" },
-    { "nombre": "Jubilados, de martes a jueves", "precio": "10 €" }
+    {
+      "nombre": "Corte clásico a tijera",
+      "precio": "13 €"
+    },
+    {
+      "nombre": "Corte a máquina",
+      "precio": "10 €"
+    },
+    {
+      "nombre": "Arreglo de barba",
+      "precio": "8 €"
+    },
+    {
+      "nombre": "Afeitado a navaja con toalla caliente",
+      "precio": "12 €"
+    },
+    {
+      "nombre": "Corte y barba",
+      "precio": "19 €"
+    },
+    {
+      "nombre": "Corte de niño (hasta 12 años)",
+      "precio": "9 €"
+    },
+    {
+      "nombre": "Jubilados, de martes a jueves",
+      "precio": "10 €"
+    }
   ],
   "resenas": [
-    { "texto": "[RESEÑA DE GOOGLE 1 — copiar tal cual]", "autor": "[NOMBRE]", "estrellas": 5 },
-    { "texto": "[RESEÑA DE GOOGLE 2 — copiar tal cual]", "autor": "[NOMBRE]", "estrellas": 5 },
-    { "texto": "[RESEÑA DE GOOGLE 3 — copiar tal cual]", "autor": "[NOMBRE]", "estrellas": 5 }
+    {
+      "texto": "[RESEÑA DE GOOGLE 1 — copiar tal cual]",
+      "autor": "[NOMBRE]",
+      "estrellas": 5
+    },
+    {
+      "texto": "[RESEÑA DE GOOGLE 2 — copiar tal cual]",
+      "autor": "[NOMBRE]",
+      "estrellas": 5
+    },
+    {
+      "texto": "[RESEÑA DE GOOGLE 3 — copiar tal cual]",
+      "autor": "[NOMBRE]",
+      "estrellas": 5
+    }
   ],
   "anio_apertura": null,
   "fotos_cedidas": false,

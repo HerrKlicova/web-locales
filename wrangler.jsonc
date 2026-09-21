@@ -1,0 +1,12 @@
+{
+  // Proyecto de demos (§9): un Worker de estáticos que sirve dist/demo/.
+  // Cada cliente cuelga de /<slug>-<token>/. Se despliega con scripts/demo.mjs.
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "webs-locales-demo",
+  "compatibility_date": "2026-09-01",
+  "assets": {
+    "directory": "./dist/demo",
+    "html_handling": "auto-trailing-slash",
+    "not_found_handling": "404-page"
+  }
+}
