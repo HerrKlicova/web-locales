@@ -248,12 +248,21 @@ const tarjeta = a.id === 'pilates' ? 'listones' : '';
         // Se carga con antelación para que el recorrido esté en memoria al llegar.
         ScrollTrigger.create({ trigger: tramo, start: 'top 250%', once: true, onEnter: cargar });
 
+        // Un solo salto de vídeo en curso por clip: mientras busca un fotograma no se le pide otro;
+        // al terminar, salta al último objetivo. Así el vídeo no se atasca en móviles lentos.
+        const objetivo = new Map<HTMLVideoElement, number>();
+        const buscar = (v: HTMLVideoElement) => {
+          const t = objetivo.get(v);
+          if (t === undefined || v.seeking) return;
+          if (Math.abs(v.currentTime - t) > 0.02) v.currentTime = t;
+        };
+        vids.forEach((v) => v.addEventListener('seeked', () => buscar(v)));
         const estado = { p: 0 };
         const aplicar = () => {
           vids.forEach((v) => {
             if (!v.duration) return;
-            const t = estado.p * Math.max(0, v.duration - 0.08);
-            if (Math.abs(v.currentTime - t) > 0.02) v.currentTime = t;
+            objetivo.set(v, estado.p * Math.max(0, v.duration - 0.08));
+            buscar(v);
           });
           if (encendida) encendida.style.opacity = String(gsap.utils.clamp(0, 1, (estado.p - 0.82) / 0.14));
           if (pista) pista.style.opacity = estado.p > 0.08 ? '0' : '1';
