@@ -165,3 +165,9 @@ export const RECORRIDOS: Partial<Record<Actividad['id'], Clip[]>> = {
     { mp4: 'video/barre-magenta-1080.mp4', mp4Movil: 'video/barre-magenta-720.mp4', poster: 'video/barre-magenta-poster.jpg', alt: 'El mismo recorrido con la luz magenta encendida' },
   ],
 };
+
+/* Bucles: clip que se reproduce en el marco izquierdo de la portada durante `segundos` y luego deja paso a las fotos. */
+export const BUCLES: Partial<Record<Actividad['id'], Clip & { segundos: number }>> = {
+  pilates: { ...RECORRIDOS.pilates![0], segundos: 14 },
+  barre: { ...RECORRIDOS.barre![1], segundos: 12 },
+};
