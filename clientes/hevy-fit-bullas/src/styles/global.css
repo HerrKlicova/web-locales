@@ -84,15 +84,20 @@ html[data-sala="training"] { --fondo: #0a111d; --fondo-alto: #111b2b; --borde: #
 /* Reveals discretos al hacer scroll. Sin soporte o con reduced-motion: se ve sin animar. */
 @media (prefers-reduced-motion: no-preference) {
   @supports (animation-timeline: view()) {
+    /* El atajo `animation` va en :where() (especificidad 0) y la línea de tiempo aparte: si el
+       minificador los fundiera en un solo `animation: … view()`, Chrome descartaría la declaración. */
+    :where(.reveal, .reveal-tarde, .escalonado > *) { animation: reveal-up 1ms linear both; }
     .reveal {
-      animation: reveal-up 1ms linear both;
       animation-timeline: view();
       animation-range: entry 0% entry 30%;
+    }
+    .reveal-tarde {
+      animation-timeline: view();
+      animation-range: entry 10% entry 45%;
     }
     /* Reveal escalonado: las tarjetas de una misma fila entran una detrás de otra
        desplazando el rango, no el tiempo (en scroll-driven no hay delay). */
     .escalonado > * {
-      animation: reveal-up 1ms linear both;
       animation-timeline: view();
       animation-range: entry 0% entry 30%;
     }
@@ -123,6 +128,25 @@ html[data-sala="training"] { --fondo: #0a111d; --fondo-alto: #111b2b; --borde: #
 .diapo[data-activa] { opacity: 1; }
 @media (prefers-reduced-motion: reduce) {
   .diapo { transition: none; }
+}
+
+/* Banda de vídeo: la luz se enciende con el scroll. El clip encendido se funde sobre el cálido
+   mientras la banda entra en pantalla. Sin soporte de scroll-timeline se ve ya encendida. */
+.banda-encendida { opacity: 1; }
+@media (prefers-reduced-motion: no-preference) {
+  @supports (animation-timeline: view()) {
+    /* La línea de tiempo la da la banda (el vídeo vive dentro de un overflow: hidden, que sería su scroller). */
+    [data-banda] { view-timeline-name: --banda; view-timeline-axis: block; }
+    :where(.banda-encendida) { animation: encender 1ms linear both; }
+    .banda-encendida {
+      animation-timeline: --banda;
+      animation-range: entry 20% entry 100%;
+    }
+  }
+}
+@keyframes encender {
+  from { opacity: 0; }
+  to   { opacity: 1; }
 }
 
 /* Pestañas de horarios: la activa se enciende con la luz de su sala. */

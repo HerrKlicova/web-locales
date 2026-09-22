@@ -19,10 +19,12 @@ interface Props {
   horario?: HorarioActividad;
   /** Enlace a la página propia de la sala (portada). En la página de la sala no se muestra. */
   enlace?: string;
-  /** Vídeo en el marco izquierdo; con dos clips, el primero se funde al segundo (cambio de luz). */
-  videos?: Clip[];
+  /** Clip del marco izquierdo: se reproduce unos segundos y el marco sigue con fotos. */
+  video?: Clip;
+  /** Banda de vídeo a todo el ancho al principio de la sala; el segundo clip se funde con el scroll. */
+  banda?: [Clip, Clip];
 }
-const { ficha, actividad: a, fotos, horario, enlace, videos } = Astro.props;
+const { ficha, actividad: a, fotos, horario, enlace, video, banda } = Astro.props;
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 const whatsapp = enlaceWhatsapp(ficha, `Hola, quiero información sobre ${a.nombre} en Hevy Fit.`);
 // Barre: fotos con arco, como los arcos de luz del estudio. Pilates: marco de listones de madera.
@@ -31,6 +33,27 @@ const tarjeta = a.id === 'pilates' ? 'listones' : '';
 ---
 
 <section id={a.id} data-sala={a.id} aria-labelledby={`${a.id}-titulo`} class={`luz-${a.luz} px-4 py-16 sm:px-8 md:py-24`}>
+  <!-- Banda: la sala se enciende con el scroll. El clip con la luz encendida se funde sobre el de luz cálida
+       a medida que la banda entra en pantalla (CSS scroll-driven; sin soporte se ve ya encendida). -->
+  {
+    banda && (
+      <div class="relative -mx-4 -mt-16 mb-12 h-[52dvh] min-h-[18rem] overflow-hidden sm:-mx-8 md:-mt-24 md:mb-16 md:h-[68dvh] md:max-h-[44rem]" data-banda>
+        {banda.map((v, i) => (
+          <video
+            class:list={['absolute inset-0 h-full w-full object-cover object-[center_55%]', i === 1 && 'banda-encendida']}
+            data-src={`${base}/${v.mp4}`}
+            data-src-movil={`${base}/${v.mp4Movil}`}
+            poster={`${base}/${v.poster}`}
+            aria-label={v.alt}
+            muted
+            playsinline
+            loop
+            preload="none"
+          />
+        ))}
+      </div>
+    )
+  }
   <div class="mx-auto max-w-6xl">
     <div class="reveal max-w-[44rem]">
       <div class="led w-16" aria-hidden="true"></div>
@@ -50,29 +73,28 @@ const tarjeta = a.id === 'pilates' ? 'listones' : '';
     <div class="mt-10 grid gap-5 md:mt-12 lg:grid-cols-[3fr_2fr] lg:gap-8">
       <!-- Dos marcos; en cada uno las fotos de la sala van pasando con un fundido (pase de fotos, §5: solo opacity). -->
       <ul class="reveal m-0 grid list-none grid-cols-2 gap-3 self-start p-0 md:gap-4" data-pase>
-        {videos && (
-          <li class:list={['relative aspect-[3/4] overflow-hidden bg-(--fondo-alto)', marco]} data-video data-cambio={videos.length > 1 ? '7' : undefined}>
-            {videos.map((v, i) => (
-              <video
-                class="diapo absolute inset-0 h-full w-full object-cover"
-                data-activa={i === 0 ? '' : undefined}
-                data-src={`${base}/${v.mp4}`}
-                data-src-movil={`${base}/${v.mp4Movil}`}
-                poster={`${base}/${v.poster}`}
-                aria-label={v.alt}
-                muted
-                playsinline
-                loop={i === videos.length - 1}
-                preload="none"
-              />
-            ))}
-          </li>
-        )}
         {
-          [0, 1].filter((m) => !videos || m === 1).map((marcoIdx) => {
-            const pila = fotos.filter((_, i) => i % 2 === marcoIdx).slice(0, 6);
+          [0, 1].map((marcoIdx) => {
+            // El marco izquierdo lleva el vídeo (si lo hay) y tres fotos; el derecho, seis fotos.
+            const pila = fotos.filter((_, i) => i % 2 === marcoIdx).slice(0, video && marcoIdx === 0 ? 3 : 6);
+            const conVideo = video && marcoIdx === 0;
             return (
-              <li class:list={['foto-zoom relative aspect-[3/4] overflow-hidden', marco]} data-marco>
+              <li class:list={['foto-zoom relative aspect-[3/4] overflow-hidden bg-(--fondo-alto)', marco]} data-marco>
+                {conVideo && (
+                  <video
+                    class="diapo absolute inset-0 h-full w-full object-cover"
+                    data-activa=""
+                    data-segundos={video.segundos ?? 8}
+                    data-src={`${base}/${video.mp4}`}
+                    data-src-movil={`${base}/${video.mp4Movil}`}
+                    poster={`${base}/${video.poster}`}
+                    aria-label={video.alt}
+                    muted
+                    playsinline
+                    loop
+                    preload="none"
+                  />
+                )}
                 {pila.map((f, i) => (
                   <Picture
                     src={f.src}
@@ -82,7 +104,7 @@ const tarjeta = a.id === 'pilates' ? 'listones' : '';
                     sizes="(min-width: 1024px) 30vw, 50vw"
                     loading="lazy"
                     decoding="async"
-                    pictureAttributes={{ class: 'diapo absolute inset-0 block h-full', 'data-activa': i === 0 ? '' : undefined }}
+                    pictureAttributes={{ class: 'diapo absolute inset-0 block h-full', 'data-activa': i === 0 && !conVideo ? '' : undefined }}
                     class="block h-full w-full object-cover"
                   />
                 ))}
@@ -143,77 +165,73 @@ const tarjeta = a.id === 'pilates' ? 'listones' : '';
 </section>
 
 <script>
-  // Vídeo de la sala: se carga al acercarse la sección, se reproduce solo mientras está en pantalla
-  // y, si hay dos clips, el primero se funde al segundo pasados unos segundos (la sala se enciende).
+  // Pase de cada marco: el vídeo (si lo hay) se reproduce sus segundos y después van pasando las fotos
+  // con un fundido; al dar la vuelta, vuelve el vídeo. Los dos marcos van desfasados. Todo se carga al
+  // acercarse la sección, se para al salir de pantalla y no corre con movimiento reducido.
   const sinMovimiento = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const movil = window.matchMedia('(max-width: 767px)').matches;
+  const fuente = (v: HTMLVideoElement) => (movil ? v.dataset.srcMovil : v.dataset.src) ?? '';
+
   if (!sinMovimiento) {
-    const movil = window.matchMedia('(max-width: 767px)').matches;
-    document.querySelectorAll<HTMLElement>('[data-video]').forEach((caja) => {
-      const vids = [...caja.querySelectorAll<HTMLVideoElement>('video')];
+    document.querySelectorAll<HTMLElement>('[data-pase]').forEach((pase) => {
+      const marcos = [...pase.querySelectorAll<HTMLElement>('[data-marco]')];
+      const vids = [...pase.querySelectorAll<HTMLVideoElement>('video')];
       let cargado = false;
       const cargar = () => {
         if (cargado) return;
         cargado = true;
-        vids.forEach((v) => {
-          v.src = (movil ? v.dataset.srcMovil : v.dataset.src) ?? '';
-          v.load();
-        });
+        vids.forEach((v) => { v.src = fuente(v); v.load(); });
       };
-      const activo = () => vids.find((v) => v.hasAttribute('data-activa'));
-      const reproducir = () => { cargar(); activo()?.play().catch(() => {}); };
-      const pausar = () => vids.forEach((v) => v.pause());
-      if (vids.length > 1) {
-        const [primero, segundo] = vids;
-        const cambio = Number(caja.dataset.cambio ?? 7);
-        primero.addEventListener('timeupdate', () => {
-          if (primero.currentTime < cambio || segundo.hasAttribute('data-activa')) return;
-          segundo.play().then(() => {
-            segundo.setAttribute('data-activa', '');
-            primero.removeAttribute('data-activa');
-            window.setTimeout(() => primero.pause(), 1200);
-          }).catch(() => {});
-        });
-      }
-      if ('IntersectionObserver' in window) {
-        new IntersectionObserver(([e]) => (e.isIntersecting ? reproducir() : pausar()), { threshold: 0.2, rootMargin: '200px 0px' }).observe(caja);
-      } else {
-        reproducir();
-      }
-    });
-  }
-
-  // Cada pocos segundos pasa a la siguiente foto del marco. Los dos marcos van desfasados.
-  // Solo corre mientras la sección está en pantalla y nunca con movimiento reducido.
-  const reducido = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  if (!reducido) {
-    document.querySelectorAll<HTMLElement>('[data-pase]').forEach((pase) => {
-      const marcos = [...pase.querySelectorAll<HTMLElement>('[data-marco]')];
       let temporizadores: number[] = [];
       const arrancar = () => {
+        cargar();
         marcos.forEach((marco, m) => {
           const diapos = [...marco.querySelectorAll<HTMLElement>('.diapo')];
           if (diapos.length < 2) return;
           let i = Math.max(0, diapos.findIndex((d) => d.hasAttribute('data-activa')));
-          const paso = () => {
-            diapos.forEach((d) => d.removeAttribute('data-activa'));
-            i = (i + 1) % diapos.length;
-            diapos[i].setAttribute('data-activa', '');
+          const mostrar = () => {
+            diapos.forEach((d) => {
+              d.removeAttribute('data-activa');
+              if (d instanceof HTMLVideoElement) d.pause();
+            });
+            const d = diapos[i];
+            d.setAttribute('data-activa', '');
+            let dura = 4800;
+            if (d instanceof HTMLVideoElement) {
+              d.currentTime = 0;
+              d.play().catch(() => {});
+              dura = Number(d.dataset.segundos ?? 8) * 1000;
+            }
+            temporizadores.push(window.setTimeout(() => { i = (i + 1) % diapos.length; mostrar(); }, dura));
           };
-          const arranque = window.setTimeout(() => {
-            paso();
-            temporizadores.push(window.setInterval(paso, 4800));
-          }, m * 2400 + 3600);
-          temporizadores.push(arranque);
+          temporizadores.push(window.setTimeout(mostrar, m * 2400));
         });
       };
       const parar = () => {
-        temporizadores.forEach((t) => { window.clearTimeout(t); window.clearInterval(t); });
+        temporizadores.forEach((t) => window.clearTimeout(t));
         temporizadores = [];
+        vids.forEach((v) => v.pause());
       };
       if ('IntersectionObserver' in window) {
-        new IntersectionObserver(([e]) => (e.isIntersecting ? arrancar() : parar()), { threshold: 0.2 }).observe(pase);
+        new IntersectionObserver(([e]) => (e.isIntersecting ? arrancar() : parar()), { threshold: 0.2, rootMargin: '200px 0px' }).observe(pase);
       } else {
         arrancar();
+      }
+    });
+
+    // Banda: los dos clips en bucle; el fundido entre ellos lo lleva el scroll (CSS).
+    document.querySelectorAll<HTMLElement>('[data-banda]').forEach((banda) => {
+      const vids = [...banda.querySelectorAll<HTMLVideoElement>('video')];
+      let cargado = false;
+      const reproducir = () => {
+        if (!cargado) { cargado = true; vids.forEach((v) => { v.src = fuente(v); v.load(); }); }
+        vids.forEach((v) => v.play().catch(() => {}));
+      };
+      const pausar = () => vids.forEach((v) => v.pause());
+      if ('IntersectionObserver' in window) {
+        new IntersectionObserver(([e]) => (e.isIntersecting ? reproducir() : pausar()), { threshold: 0, rootMargin: '300px 0px' }).observe(banda);
+      } else {
+        reproducir();
       }
     });
   }

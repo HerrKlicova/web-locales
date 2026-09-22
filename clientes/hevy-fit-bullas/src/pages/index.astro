@@ -11,7 +11,7 @@ import BarraFija from '../components/BarraFija.astro';
 import CambioSala from '../components/CambioSala.astro';
 import { schemaLocalBusiness } from '@plantilla/lib/schema';
 import { HORARIOS, type FichaHevy } from '../lib/datos';
-import { FOTOS, VIDEOS } from '../lib/fotos';
+import { BANDAS, FOTOS, VIDEOS } from '../lib/fotos';
 
 import fichaJson from '../../ficha.json';
 import fotoRecepcionIzquierda from '../../fotos/recepcion-izquierda.jpg';
@@ -49,7 +49,8 @@ const demo = import.meta.env.PRODUCCION !== 'true';
           actividad={a}
           horario={HORARIOS.find((h) => h.id === a.id)}
           fotos={FOTOS[a.id]}
-          videos={VIDEOS[a.id]}
+          video={VIDEOS[a.id]}
+          banda={BANDAS[a.id]}
           enlace={`${base}/${a.id}/`}
         />
       ))
