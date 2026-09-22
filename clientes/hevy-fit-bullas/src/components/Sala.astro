@@ -19,12 +19,14 @@ interface Props {
   horario?: HorarioActividad;
   /** Enlace a la página propia de la sala (portada). En la página de la sala no se muestra. */
   enlace?: string;
+  /** Texto del botón del enlace; por defecto "Ver la sala". */
+  textoEnlace?: string;
   /** Recorrido: vídeo que avanza con el scroll en un tramo fijo al principio de la sala (páginas de sala). */
   recorrido?: Clip[];
   /** Bucle: clip en el marco izquierdo, que se reproduce unos segundos y deja paso a las fotos (portada). */
   video?: Clip & { segundos: number };
 }
-const { ficha, actividad: a, fotos, horario, enlace, recorrido, video } = Astro.props;
+const { ficha, actividad: a, fotos, horario, enlace, textoEnlace = 'Ver la sala', recorrido, video } = Astro.props;
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 const whatsapp = enlaceWhatsapp(ficha, `Hola, quiero información sobre ${a.nombre} en Hevy Fit.`);
 // Barre: fotos con arco, como los arcos de luz del estudio. Pilates: marco de listones de madera.
@@ -75,9 +77,12 @@ const tarjeta = a.id === 'pilates' ? 'listones' : '';
         {a.texto} <span class="texto-luz font-bold">{a.sala}.</span>
       </p>
       {enlace && (
-        <p class="mt-4">
-          <a href={enlace} class="texto-luz inline-flex min-h-11 items-center border-b-2 border-current font-bold hover:text-hueso">
-            Ver la sala: fotos, tarifas y horario
+        <p class="mt-6">
+          <a
+            href={enlace}
+            class="texto-luz inline-flex min-h-13 items-center justify-center rounded-full border-2 border-current px-7 text-lg font-bold transition-colors hover:bg-(--luz) hover:text-noche"
+          >
+            {textoEnlace}
           </a>
         </p>
       )}

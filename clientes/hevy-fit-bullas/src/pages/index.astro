@@ -11,7 +11,7 @@ import BarraFija from '../components/BarraFija.astro';
 import CambioSala from '../components/CambioSala.astro';
 import { schemaLocalBusiness } from '@plantilla/lib/schema';
 import { HORARIOS, type FichaHevy } from '../lib/datos';
-import { BUCLES, FOTOS } from '../lib/fotos';
+import { BUCLES, FOTOS, RECORRIDOS } from '../lib/fotos';
 
 import fichaJson from '../../ficha.json';
 import fotoRecepcionIzquierda from '../../fotos/recepcion-izquierda.jpg';
@@ -51,6 +51,7 @@ const demo = import.meta.env.PRODUCCION !== 'true';
           fotos={FOTOS[a.id]}
           video={BUCLES[a.id]}
           enlace={`${base}/${a.id}/`}
+          textoEnlace={RECORRIDOS[a.id] ? 'Recorre la sala' : 'Ver la sala'}
         />
       ))
     }
