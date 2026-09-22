@@ -36,8 +36,8 @@ const tarjeta = a.id === 'pilates' ? 'listones' : '';
        reducido queda el fotograma de portada y la página sigue con normalidad. -->
   {
     recorrido && (
-      <div class="relative mb-6 h-dvh" data-recorrido>
-        <div class="mx-auto flex h-full max-w-6xl items-center justify-center gap-10 px-4 sm:px-8 lg:justify-between">
+      <div class="relative mb-6 h-[320dvh]" data-recorrido>
+        <div class="sticky top-0 mx-auto flex h-dvh max-w-6xl items-center justify-center gap-10 px-4 sm:px-8 lg:justify-between">
           <div class="hidden lg:block lg:w-2/5" aria-hidden="true">
             <div class="led w-16"></div>
             <p class="rotulo m-0 mt-5 text-5xl">{a.nombre}</p>
@@ -218,68 +218,63 @@ const tarjeta = a.id === 'pilates' ? 'listones' : '';
 </script>
 
 <script>
-  import gsap from 'gsap';
-  import { ScrollTrigger } from 'gsap/ScrollTrigger';
-
-  // Recorrido con el scroll: el tramo se queda fijo y el tiempo del vídeo sigue al avance del scroll,
-  // suavizado. Con dos clips, el segundo (la luz encendida) aparece en el último cuarto del recorrido.
+  // Recorrido con el scroll: el visor va pegado (position: sticky) mientras la pista de 320dvh pasa por
+  // debajo, y el tiempo del vídeo sigue al avance dentro de la pista. Se pide como mucho un salto de
+  // fotograma por clip a la vez (si el decodificador va lento, se salta al último objetivo al terminar).
+  // Con dos clips, el segundo (la luz encendida) aparece en el último tramo.
   const recorridos = document.querySelectorAll<HTMLElement>('[data-recorrido]');
-  if (recorridos.length) {
-    gsap.registerPlugin(ScrollTrigger);
-    ScrollTrigger.config({ ignoreMobileResize: true });
-    const mm = gsap.matchMedia();
-    mm.add('(prefers-reduced-motion: no-preference)', () => {
-      const movil = window.matchMedia('(max-width: 767px)').matches;
-      recorridos.forEach((tramo) => {
-        const vids = [...tramo.querySelectorAll<HTMLVideoElement>('video')];
-        const encendida = tramo.querySelector<HTMLVideoElement>('[data-encendida]');
-        const pista = tramo.querySelector<HTMLElement>('[data-pista]');
-        let cargado = false;
-        const cargar = () => {
-          if (cargado) return;
-          cargado = true;
-          vids.forEach((v) => {
-            v.src = (movil ? v.dataset.srcMovil : v.dataset.src) ?? '';
-            v.preload = 'auto';
-            v.addEventListener('loadedmetadata', () => ScrollTrigger.refresh(), { once: true });
-            v.load();
-          });
-        };
-        // Se carga con antelación para que el recorrido esté en memoria al llegar.
-        ScrollTrigger.create({ trigger: tramo, start: 'top 250%', once: true, onEnter: cargar });
-
-        // Un solo salto de vídeo en curso por clip: mientras busca un fotograma no se le pide otro;
-        // al terminar, salta al último objetivo. Así el vídeo no se atasca en móviles lentos.
-        const objetivo = new Map<HTMLVideoElement, number>();
-        const buscar = (v: HTMLVideoElement) => {
-          const t = objetivo.get(v);
-          if (t === undefined || v.seeking) return;
-          if (Math.abs(v.currentTime - t) > 0.02) v.currentTime = t;
-        };
-        vids.forEach((v) => v.addEventListener('seeked', () => buscar(v)));
-        const estado = { p: 0 };
-        const aplicar = () => {
-          vids.forEach((v) => {
-            if (!v.duration) return;
-            objetivo.set(v, estado.p * Math.max(0, v.duration - 0.08));
-            buscar(v);
-          });
-          if (encendida) encendida.style.opacity = String(gsap.utils.clamp(0, 1, (estado.p - 0.82) / 0.14));
-          if (pista) pista.style.opacity = estado.p > 0.08 ? '0' : '1';
-        };
-        ScrollTrigger.create({
-          trigger: tramo,
-          start: 'top top',
-          end: '+=220%',
-          pin: true,
-          pinSpacing: true,
-          invalidateOnRefresh: true,
-          onUpdate: (self) => {
-            gsap.to(estado, { p: self.progress, duration: 0.35, ease: 'power1.out', overwrite: true, onUpdate: aplicar });
-          },
+  const sinMovimientoRec = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (recorridos.length && !sinMovimientoRec) {
+    const movil = window.matchMedia('(max-width: 767px)').matches;
+    const clamp = (x: number) => Math.min(1, Math.max(0, x));
+    recorridos.forEach((tramo) => {
+      const vids = [...tramo.querySelectorAll<HTMLVideoElement>('video')];
+      const encendida = tramo.querySelector<HTMLVideoElement>('[data-encendida]');
+      const pista = tramo.querySelector<HTMLElement>('[data-pista]');
+      let cargado = false;
+      const cargar = () => {
+        if (cargado) return;
+        cargado = true;
+        vids.forEach((v) => {
+          v.src = (movil ? v.dataset.srcMovil : v.dataset.src) ?? '';
+          v.preload = 'auto';
+          v.load();
         });
-      });
-      window.addEventListener('load', () => ScrollTrigger.refresh(), { once: true });
+      };
+      // Los clips se cargan cuando la sala está a pantalla y media.
+      if ('IntersectionObserver' in window) {
+        const io = new IntersectionObserver(([e]) => { if (e.isIntersecting) { cargar(); io.disconnect(); } }, { rootMargin: '150% 0px' });
+        io.observe(tramo);
+      } else {
+        cargar();
+      }
+
+      let objetivo = 0;
+      let pendiente = false;
+      const progreso = () => {
+        const r = tramo.getBoundingClientRect();
+        return clamp(-r.top / Math.max(1, tramo.offsetHeight - window.innerHeight));
+      };
+      const pintar = () => {
+        pendiente = false;
+        vids.forEach((v) => {
+          if (!v.duration || v.seeking) return;
+          const t = objetivo * Math.max(0, v.duration - 0.08);
+          if (Math.abs(v.currentTime - t) > 0.03) v.currentTime = t;
+        });
+        if (encendida) encendida.style.opacity = String(clamp((objetivo - 0.82) / 0.14));
+        if (pista) pista.style.opacity = objetivo > 0.05 ? '0' : '1';
+      };
+      const programar = () => {
+        if (pendiente) return;
+        pendiente = true;
+        requestAnimationFrame(pintar);
+      };
+      const alScroll = () => { objetivo = progreso(); programar(); };
+      vids.forEach((v) => v.addEventListener('seeked', programar));
+      window.addEventListener('scroll', alScroll, { passive: true });
+      window.addEventListener('resize', alScroll, { passive: true });
+      alScroll();
     });
   }
 </script>
