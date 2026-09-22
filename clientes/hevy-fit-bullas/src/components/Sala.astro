@@ -44,23 +44,29 @@ const tarjeta = a.id === 'pilates' ? 'listones' : '';
     </div>
 
     <div class="mt-10 grid gap-5 md:mt-12 lg:grid-cols-[3fr_2fr] lg:gap-8">
-      <ul class="reveal m-0 grid list-none grid-cols-2 gap-3 self-start p-0 md:gap-4">
+      <!-- Dos marcos; en cada uno las fotos de la sala van pasando con un fundido (pase de fotos, §5: solo opacity). -->
+      <ul class="reveal m-0 grid list-none grid-cols-2 gap-3 self-start p-0 md:gap-4" data-pase>
         {
-          fotos.slice(0, 2).map((f, i) => (
-            <li class:list={['foto-zoom relative aspect-[3/4] overflow-hidden', marco]}>
-              <Picture
-                src={f.src}
-                alt={f.alt}
-                formats={['avif', 'webp']}
-                widths={[360, 540, 760, 1000]}
-                sizes="(min-width: 1024px) 30vw, 50vw"
-                loading="lazy"
-                decoding="async"
-                pictureAttributes={{ class: 'block h-full' }}
-                class="block h-full w-full object-cover"
-              />
-            </li>
-          ))
+          [0, 1].map((marcoIdx) => {
+            const pila = fotos.filter((_, i) => i % 2 === marcoIdx).slice(0, 6);
+            return (
+              <li class:list={['foto-zoom relative aspect-[3/4] overflow-hidden', marco]} data-marco>
+                {pila.map((f, i) => (
+                  <Picture
+                    src={f.src}
+                    alt={f.alt}
+                    formats={['avif', 'webp']}
+                    widths={[360, 540, 760, 1000]}
+                    sizes="(min-width: 1024px) 30vw, 50vw"
+                    loading="lazy"
+                    decoding="async"
+                    pictureAttributes={{ class: 'diapo absolute inset-0 block h-full', 'data-activa': i === 0 ? '' : undefined }}
+                    class="block h-full w-full object-cover"
+                  />
+                ))}
+              </li>
+            );
+          })
         }
       </ul>
 
@@ -103,7 +109,7 @@ const tarjeta = a.id === 'pilates' ? 'listones' : '';
 
     {
       horario && (
-        <div class="reveal mt-12 md:mt-16">
+        <div class="reveal mt-12 md:mt-16" data-horario>
           <h3 class="m-0 text-xl font-bold">Horario semanal de {a.nombre}</h3>
           <div class="mt-5">
             <RejillaHorario ficha={ficha} horario={horario} />
@@ -113,3 +119,41 @@ const tarjeta = a.id === 'pilates' ? 'listones' : '';
     }
   </div>
 </section>
+
+<script>
+  // Cada pocos segundos pasa a la siguiente foto del marco. Los dos marcos van desfasados.
+  // Solo corre mientras la sección está en pantalla y nunca con movimiento reducido.
+  const reducido = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (!reducido) {
+    document.querySelectorAll<HTMLElement>('[data-pase]').forEach((pase) => {
+      const marcos = [...pase.querySelectorAll<HTMLElement>('[data-marco]')];
+      let temporizadores: number[] = [];
+      const arrancar = () => {
+        marcos.forEach((marco, m) => {
+          const diapos = [...marco.querySelectorAll<HTMLElement>('.diapo')];
+          if (diapos.length < 2) return;
+          let i = Math.max(0, diapos.findIndex((d) => d.hasAttribute('data-activa')));
+          const paso = () => {
+            diapos.forEach((d) => d.removeAttribute('data-activa'));
+            i = (i + 1) % diapos.length;
+            diapos[i].setAttribute('data-activa', '');
+          };
+          const arranque = window.setTimeout(() => {
+            paso();
+            temporizadores.push(window.setInterval(paso, 4800));
+          }, m * 2400 + 3600);
+          temporizadores.push(arranque);
+        });
+      };
+      const parar = () => {
+        temporizadores.forEach((t) => { window.clearTimeout(t); window.clearInterval(t); });
+        temporizadores = [];
+      };
+      if ('IntersectionObserver' in window) {
+        new IntersectionObserver(([e]) => (e.isIntersecting ? arrancar() : parar()), { threshold: 0.2 }).observe(pase);
+      } else {
+        arrancar();
+      }
+    });
+  }
+</script>

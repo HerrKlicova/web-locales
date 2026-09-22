@@ -118,6 +118,13 @@ html[data-sala="training"] { --fondo: #0a111d; --fondo-alto: #111b2b; --borde: #
   body { transition: none; }
 }
 
+/* Pase de fotos de la portada: solo cambia la opacidad; la primera foto se ve desde el principio. */
+.diapo { opacity: 0; transition: opacity 1000ms ease-out; }
+.diapo[data-activa] { opacity: 1; }
+@media (prefers-reduced-motion: reduce) {
+  .diapo { transition: none; }
+}
+
 /* Pestañas de horarios: la activa se enciende con la luz de su sala. */
 .pestanas [role="tab"][aria-selected="true"] {
   color: var(--color-noche);
