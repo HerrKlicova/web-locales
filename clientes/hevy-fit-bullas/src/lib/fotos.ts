@@ -160,9 +160,5 @@ export const VIDEOS: Partial<Record<Actividad['id'], Clip>> = {
   pilates: { mp4: 'video/pilates-clase-1080.mp4', mp4Movil: 'video/pilates-clase-720.mp4', poster: 'video/pilates-clase-poster.jpg', alt: 'Clase de Pilates en los reformers, vista lateral', segundos: 10 },
   barre: { mp4: 'video/barre-magenta-1080.mp4', mp4Movil: 'video/barre-magenta-720.mp4', poster: 'video/barre-magenta-poster.jpg', alt: 'Recorrido por el estudio de Barre con la luz magenta encendida', segundos: 12 },
 };
-export const BANDAS: Partial<Record<Actividad['id'], [Clip, Clip]>> = {
-  barre: [
-    { mp4: 'video/barre-calido-1080.mp4', mp4Movil: 'video/barre-calido-720.mp4', poster: 'video/barre-calido-poster.jpg', alt: 'Recorrido por el estudio de Barre con luz cálida' },
-    { mp4: 'video/barre-magenta-1080.mp4', mp4Movil: 'video/barre-magenta-720.mp4', poster: 'video/barre-magenta-poster.jpg', alt: 'El mismo recorrido con la luz magenta encendida' },
-  ],
-};
+// Banda de vídeo al principio de una sala: descartada por Eugenio (22/09/2026); el mecanismo sigue en Sala.astro por si se retoma.
+export const BANDAS: Partial<Record<Actividad['id'], [Clip, Clip]>> = {};
