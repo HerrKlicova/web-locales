@@ -17,6 +17,10 @@ interface Props {
 const { titulo, descripcion, demo = true, schema, sala } = Astro.props;
 // En demo la web cuelga de /<slug>-<token>; los estáticos de public/ necesitan ese prefijo.
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+// `Astro.site` solo existe en producción (astro.config): en demo no hay canónica que anunciar.
+const canonica = Astro.site ? new URL(Astro.url.pathname, Astro.site).href : null;
+// Imagen de la tarjeta al compartir el enlace (WhatsApp, sobre todo): el neón de recepción.
+const imagenSocial = Astro.site ? new URL('og.jpg', Astro.site).href : null;
 ---
 
 <!doctype html>
@@ -27,6 +31,22 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
     <title>{titulo}</title>
     <meta name="description" content={descripcion} />
     {demo && <meta name="robots" content="noindex, nofollow" />}
+    {canonica && <link rel="canonical" href={canonica} />}
+    {canonica && <meta property="og:url" content={canonica} />}
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Hevy Fit" />
+    <meta property="og:title" content={titulo} />
+    <meta property="og:description" content={descripcion} />
+    <meta property="og:locale" content="es_ES" />
+    {imagenSocial && (
+      <>
+        <meta property="og:image" content={imagenSocial} />
+        <meta property="og:image:width" content="1200" />
+        <meta property="og:image:height" content="630" />
+        <meta property="og:image:alt" content="Logo de Hevy Fit en neón magenta sobre la pared negra de la recepción" />
+        <meta name="twitter:card" content="summary_large_image" />
+      </>
+    )}
     <meta name="theme-color" content="#0e0a10" />
     <link rel="icon" href={`${base}/favicon.svg`} type="image/svg+xml" />
     <link rel="preload" as="font" type="font/woff2" href={unbounded700} crossorigin />

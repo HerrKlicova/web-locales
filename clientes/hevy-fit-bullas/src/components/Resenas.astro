@@ -2,13 +2,18 @@
 import type { FichaHevy } from '../lib/datos';
 import Icono from './Icono.astro';
 
+/**
+ * Reseñas de Google, copiadas tal cual. Carrusel horizontal con ajuste al soltar (scroll-snap):
+ * sin JS se arrastra con el dedo o con la rueda; con JS aparecen las flechas y los puntos.
+ */
 interface Props { ficha: FichaHevy }
 const { ficha } = Astro.props;
 const valoracion = ficha.valoracion.toLocaleString('es-ES', { minimumFractionDigits: 1 });
+const flecha = 'inline-flex size-11 items-center justify-center rounded-full border-2 border-tinta text-tinta transition-colors hover:bg-tinta hover:text-hueso disabled:opacity-30 disabled:hover:bg-transparent disabled:hover:text-tinta';
 ---
 
-<section id="resenas" aria-labelledby="resenas-titulo" data-sala="noche" class="bg-hueso px-4 py-16 text-tinta sm:px-8 md:py-24">
-  <div class="mx-auto max-w-6xl">
+<section id="resenas" aria-labelledby="resenas-titulo" data-sala="noche" class="bg-hueso py-16 text-tinta md:py-24">
+  <div class="mx-auto max-w-6xl px-4 sm:px-8">
     <div class="reveal flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
       <h2 id="resenas-titulo" class="rotulo m-0 text-3xl sm:text-5xl">Lo que dicen en Google</h2>
       <p class="m-0 flex items-center gap-3 text-lg">
@@ -18,35 +23,105 @@ const valoracion = ficha.valoracion.toLocaleString('es-ES', { minimumFractionDig
         <span class="tabular-nums"><strong>{valoracion}</strong> con {ficha.num_resenas} reseñas</span>
       </p>
     </div>
+  </div>
 
-    <ul class="escalonado mt-10 grid list-none gap-x-10 gap-y-10 p-0 md:mt-14 md:grid-cols-2">
+  <!-- El carril llega hasta el borde para que asome la reseña siguiente, pero la primera
+       arranca alineada con el titular: el relleno lateral se calcula desde el mismo ancho máximo. -->
+  <div class="reveal relative mt-10 md:mt-14" data-carrusel>
+    <ul
+      class="carril m-0 flex list-none gap-6 overflow-x-auto pb-1"
+      data-carril
+      tabindex="0"
+      aria-label="Reseñas de Google, desplazables con las flechas o arrastrando"
+    >
       {
         ficha.resenas.map((r) => (
-          <li class="flex flex-col border-t-2 border-tinta pt-5">
-            <blockquote class="m-0 flex-1 text-lg leading-snug md:text-xl">
-              <p class="m-0">«{r.texto}»</p>
-            </blockquote>
-            <p class="m-0 mt-4 flex items-center gap-3 font-bold">
-              <span class="flex gap-0.5 text-neon-tinta" role="img" aria-label={`${r.estrellas} de 5 estrellas`}>
-                {Array.from({ length: r.estrellas }).map(() => <Icono nombre="estrella" class="size-4" />)}
-              </span>
-              {r.autor}
-            </p>
+          <li class="w-[min(80vw,22rem)] shrink-0 snap-start" data-resena>
+            <div class="flex h-full flex-col border-t-2 border-tinta pt-5">
+              <blockquote class="m-0 flex-1 leading-snug md:text-lg" lang={r.idioma}>
+                <p class="m-0">«{r.texto}»</p>
+              </blockquote>
+              <p class="m-0 mt-4 flex items-center gap-3 font-bold">
+                <span class="flex gap-0.5 text-neon-tinta" role="img" aria-label={`${r.estrellas} de 5 estrellas`}>
+                  {Array.from({ length: r.estrellas }).map(() => <Icono nombre="estrella" class="size-4" />)}
+                </span>
+                {r.autor}
+              </p>
+            </div>
           </li>
         ))
       }
     </ul>
+  </div>
 
-    <p class="reveal mt-10">
-      <a
-        href={ficha.maps_url}
-        class="inline-flex min-h-11 items-center gap-2 border-b-2 border-tinta text-lg font-bold hover:border-neon-tinta hover:text-neon-tinta"
-        target="_blank"
-        rel="noopener"
-      >
-        <Icono nombre="google" class="size-5" />
-        Ver las {ficha.num_resenas} reseñas en Google
-      </a>
-    </p>
+  <div class="mx-auto mt-8 flex max-w-6xl flex-wrap items-center justify-between gap-x-8 gap-y-5 px-4 sm:px-8">
+    <a
+      href={ficha.maps_url}
+      class="inline-flex min-h-11 items-center gap-2 border-b-2 border-tinta text-lg font-bold hover:border-neon-tinta hover:text-neon-tinta"
+      target="_blank"
+      rel="noopener"
+    >
+      <Icono nombre="google" class="size-5" />
+      Ver las {ficha.num_resenas} reseñas en Google
+    </a>
+    <div class="ml-auto flex gap-3" data-mandos hidden>
+      <button type="button" class={flecha} data-atras aria-controls="resenas" aria-label="Reseña anterior">
+        <Icono nombre="flecha-izquierda" class="size-5" />
+      </button>
+      <button type="button" class={flecha} data-adelante aria-controls="resenas" aria-label="Reseña siguiente">
+        <Icono nombre="flecha-derecha" class="size-5" />
+      </button>
+    </div>
   </div>
 </section>
+
+<style>
+  /* Relleno lateral igual al margen del contenido (max-w-6xl = 72rem): la primera reseña
+     queda a plomo con el titular y las siguientes asoman por la derecha. En % y no en vw
+     para no contar el ancho de la barra de desplazamiento de la página. */
+  .carril {
+    padding-inline: max(1rem, calc((100% - 72rem) / 2 + 1rem));
+    scroll-padding-inline-start: max(1rem, calc((100% - 72rem) / 2 + 1rem));
+  }
+  @media (min-width: 640px) {
+    .carril {
+      padding-inline: max(2rem, calc((100% - 72rem) / 2 + 2rem));
+      scroll-padding-inline-start: max(2rem, calc((100% - 72rem) / 2 + 2rem));
+    }
+  }
+  /* Sin barra de desplazamiento: mandan las flechas y el asomo de la reseña siguiente. */
+  .carril { scrollbar-width: none; }
+  .carril::-webkit-scrollbar { display: none; }
+  /* El ajuste al soltar solo con movimiento permitido: con reduced-motion el carril se arrastra sin saltos. */
+  @media (prefers-reduced-motion: no-preference) {
+    .carril { scroll-snap-type: x mandatory; scroll-behavior: smooth; }
+  }
+</style>
+
+<script>
+  // Flechas del carrusel: solo aparecen si hay más ancho del que cabe. Sin JS se arrastra igual.
+  const carrusel = document.querySelector<HTMLElement>('[data-carrusel]');
+  const carril = carrusel?.querySelector<HTMLElement>('[data-carril]');
+  const mandos = document.querySelector<HTMLElement>('[data-mandos]');
+  const atras = mandos?.querySelector<HTMLButtonElement>('[data-atras]');
+  const adelante = mandos?.querySelector<HTMLButtonElement>('[data-adelante]');
+
+  if (carril && mandos && atras && adelante) {
+    const paso = () => {
+      const primera = carril.querySelector<HTMLElement>('[data-resena]');
+      const hueco = parseFloat(getComputedStyle(carril).columnGap || '0') || 0;
+      return (primera?.offsetWidth ?? carril.clientWidth * 0.8) + hueco;
+    };
+    const sobra = () => carril.scrollWidth - carril.clientWidth > 4;
+    const revisar = () => {
+      mandos.hidden = !sobra();
+      atras.disabled = carril.scrollLeft <= 4;
+      adelante.disabled = carril.scrollLeft >= carril.scrollWidth - carril.clientWidth - 4;
+    };
+    atras.addEventListener('click', () => carril.scrollBy({ left: -paso() }));
+    adelante.addEventListener('click', () => carril.scrollBy({ left: paso() }));
+    carril.addEventListener('scroll', revisar, { passive: true });
+    window.addEventListener('resize', revisar, { passive: true });
+    revisar();
+  }
+</script>

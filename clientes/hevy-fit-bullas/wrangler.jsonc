@@ -1,0 +1,25 @@
+{
+  // Web de Hevy Fit en producción (§9): un Worker propio que sirve dist/hevy-fit-bullas/
+  // en hevyfit.com. Se despliega con `node scripts/produccion.mjs hevy-fit-bullas`.
+  // El código del Worker solo añade soporte de peticiones parciales para los vídeos.
+  "$schema": "../../node_modules/wrangler/config-schema.json",
+  "name": "hevy-fit-bullas",
+  "main": "../../scripts/worker-sitio.mjs",
+  "compatibility_date": "2026-09-01",
+  // El dominio bueno es sin www: www.hevyfit.com redirige aquí con un 301.
+  "vars": { "CANONICO": "hevyfit.com" },
+  "assets": {
+    "directory": "../../dist/hevy-fit-bullas",
+    "binding": "ASSETS",
+    "html_handling": "auto-trailing-slash",
+    "not_found_handling": "404-page",
+    // El Worker solo se mete en medio para los vídeos (peticiones Range). Lo demás lo sirve
+    // directamente el servidor de estáticos, y así Cloudflare puede atender /cdn-cgi/rum,
+    // que es donde el beacon de Web Analytics manda las métricas.
+    "run_worker_first": ["/video/*"]
+  },
+  "routes": [
+    { "pattern": "hevyfit.com", "custom_domain": true },
+    { "pattern": "www.hevyfit.com", "custom_domain": true }
+  ]
+}

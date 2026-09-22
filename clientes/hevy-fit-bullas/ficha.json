@@ -1,11 +1,16 @@
 {
   "slug": "hevy-fit-bullas",
   "demo_token": "k7m2qx",
-  "nombre": "Hevy Fit Gym Boutique",
+  "dominio": "https://hevyfit.com",
+  "paginas_internas": [
+    "clasica"
+  ],
+  "analitica_token": "5af49347654949ed8bb7550dde4c0741",
+  "nombre": "Hevy Fit",
   "marca": "Hevy Fit",
   "tipo": "HealthClub",
   "pueblo": "Bullas",
-  "direccion": "Av. Luis de los Reyes, 6, bajo",
+  "direccion": "Av. Luis de los Reyes, bajos 6, 11 y 40",
   "cp": "30180",
   "telefono": "642 52 64 50",
   "telefono2": "642 34 64 59",
@@ -31,7 +36,7 @@
     },
     {
       "dias": "Sábado",
-      "horas": "10:30–14:00"
+      "horas": "10:30–13:00"
     },
     {
       "dias": "Domingo",
@@ -43,7 +48,7 @@
     {
       "id": "pilates",
       "nombre": "Pilates Club",
-      "sala": "Sala de Pilates",
+      "sala": "Estudio de Pilates",
       "luz": "ambar",
       "texto": "Método clásico en grupos reducidos, sobre colchoneta o con aparatos: reformer, tower, cadillac, wunda chair y spine corrector.",
       "tarifas": [
@@ -81,9 +86,9 @@
     {
       "id": "training",
       "nombre": "Training Club",
-      "sala": "Sala de grupos",
+      "sala": "Centro de fuerza y Training Zone",
       "luz": "azul",
-      "texto": "Entrenamiento en grupo guiado por tu entrenador: fuerza, cardio y trabajo funcional con máquinas y peso libre. Para quien entrena solo y acaba dejándolo.",
+      "texto": "Entrenamiento en equipo personalizado por tu entrenador: fuerza, cardio y trabajo funcional con máquinas y peso libre. Para quien entrena solo y acaba dejándolo.",
       "tarifas": [
         {
           "nombre": "2 sesiones a la semana",
@@ -107,7 +112,7 @@
       "nombre": "Barre Club",
       "sala": "Estudio de Barre",
       "luz": "magenta",
-      "texto": "Barra, música y trabajo de postura y fuerza en la sala de los arcos.",
+      "texto": "Fuerza, control y ritmo. Resultado asegurado.",
       "tarifas": [
         {
           "nombre": "1 día a la semana",
@@ -135,7 +140,7 @@
     {
       "id": "fuerza",
       "nombre": "Centro de fuerza",
-      "sala": "Sala de fuerza y cardio",
+      "sala": "Sala de fuerza",
       "luz": "verde",
       "texto": "Acceso libre al gimnasio: peso libre, máquinas y cardio, a tu aire y en tu horario.",
       "tarifas": [
@@ -144,9 +149,13 @@
           "precio": "40 €/mes"
         },
         {
+          "nombre": "Trimestre",
+          "precio": "110 €"
+        },
+        {
           "nombre": "Entrenamiento personal dúo",
           "precio": "114 €/mes",
-          "nota": "por pareja"
+          "nota": "por persona"
         }
       ]
     }
@@ -158,11 +167,6 @@
       "estrellas": 5
     },
     {
-      "texto": "En cuanto a Pilates, todos los profesores han sido estupendos y muy profesionales. Mención especial para Álvaro, ¡que es un crack! No he utilizado otros servicios del gimnasio, por lo que solo puedo hablar de mi experiencia con Pilates, pero ha sido muy buena. Espero poder repetir el próximo verano.",
-      "autor": "Aida Llamas",
-      "estrellas": 5
-    },
-    {
       "texto": "Espectacular… el centro con más variedad en el mundo del fitness. 4 centros en 1 pilates máquinas, centro de fuerza, barrer, zona exclusiva para entrenamiento en grupo, si buscas la excelencia y buen trato este es tu lugar.",
       "autor": "Victor Valera Martinez",
       "estrellas": 5
@@ -171,15 +175,21 @@
       "texto": "Pocas veces se encuentra un gimnasio que consiga reunir profesionalidad, cercanía y una verdadera cultura del alto rendimiento de una manera tan natural. Desde el primer momento se percibe un ambiente familiar y acogedor, donde el trato humano no está reñido con la exigencia ni con la excelencia.",
       "autor": "Carlos Coleto sala",
       "estrellas": 5
+    },
+    {
+      "texto": "Needed a gym for a month whilst we were staying in the area. This place was fabulous, friendly people and always greeted with a smile. Would definitely recommend and if ever back in Bullas we will return! Thank you.",
+      "autor": "Liz Inkle",
+      "estrellas": 5,
+      "idioma": "en"
     }
   ],
   "anio_apertura": 2023,
   "fotos_cedidas": true,
-  "direccion_visual": "Cuatro salas, cuatro luces: neón magenta del logo y del estudio de Barre, ámbar de las lámparas de madera de Pilates, verde del neón de la sala de fuerza y azul de los LED del gimnasio. Fondo negro como las paredes del centro. Unbounded (extendida, como el logo) y Manrope.",
-  "notas": "Datos de Google Business (22/09/2026): nombre 'Hevy Fit Gym Boutique', 4,9 con 157 reseñas, horario y coordenadas. Reseñas copiadas de Google en español; la de Aida Llamas y la de Carlos Coleto están recortadas (son muy largas), no reescritas. Tarifas de Pilates, Barre y Training Club sacadas de los posts de Instagram de septiembre de 2026 (carruseles). Acceso libre 40 € y dúo 114 € por pareja: dato dado por Eugenio. La web hevyfit.es tiene tarifas distintas (cuota básica 38 €, Pilates 40 €…) y título 'Gimnasio en Paracuellos del Jarama': parece desactualizada, no se ha usado. Recepción (fotos de 22/09/2026): al entrar, a la izquierda la pared de listones con espejos y césped (recepcion-izquierda.jpg) y a la derecha el mostrador con el neón (recepcion-derecha.jpg). Confirmado por Eugenio (22/09/2026): solo WhatsApp como contacto (sin botones de llamar), más de 400 m² de instalaciones, apertura en Bullas el 9 de enero de 2023 y más de 16 años de experiencia en total; fuera la mención a las 8 personas por clase de Barre. Horarios de clases: imágenes de Temporada 26/27 (Training Club) y de septiembre (Pilates y Barre), mostrados como horarios fijos. Confirmado por Eugenio (22/09/2026): dúo 114 €/mes por pareja; trimestral de Barre contratando el trimestre; titular Alexandra Klicova, NIF X8625569V.",
+  "direccion_visual": "Cuatro espacios, cuatro luces: neón magenta del logo y del estudio de Barre, ámbar de las lámparas de madera de Pilates, verde del neón de la sala de fuerza y azul de los LED del gimnasio. Fondo negro como las paredes del centro. Unbounded (extendida, como el logo) y Manrope.",
+  "notas": "Datos de Google Business (22/09/2026): nombre 'Hevy Fit Gym Boutique', 4,9 con 157 reseñas, horario y coordenadas. Reseñas copiadas de Google en español; la de Aida Llamas y la de Carlos Coleto están recortadas (son muy largas), no reescritas. Tarifas de Pilates, Barre y Training Club sacadas de los posts de Instagram de septiembre de 2026 (carruseles). Acceso libre 40 € y dúo 114 € por pareja: dato dado por Eugenio. La web hevyfit.es tiene tarifas distintas (cuota básica 38 €, Pilates 40 €…) y título 'Gimnasio en Paracuellos del Jarama': parece desactualizada, no se ha usado. Recepción (fotos de 22/09/2026): al entrar, a la izquierda la pared de listones con espejos y césped (recepcion-izquierda.jpg) y a la derecha el mostrador con el neón (recepcion-derecha.jpg). Confirmado por Eugenio (22/09/2026): solo WhatsApp como contacto (sin botones de llamar), más de 400 m² de instalaciones, apertura en Bullas el 9 de enero de 2023 y más de 16 años de experiencia en total; fuera la mención a las 8 personas por clase de Barre. Horarios de clases: imágenes de Temporada 26/27 (Training Club) y de septiembre (Pilates y Barre), mostrados como horarios fijos. Confirmado por Eugenio (22/09/2026): dúo 114 €/mes por pareja; trimestral de Barre contratando el trimestre; titular Alexandra Klicova, NIF X8625569V. Cambios pedidos por Eugenio (22/09/2026, tarde): el nombre en la web es Hevy Fit a secas (en Google Business sigue siendo 'Hevy Fit Gym Boutique'); dirección Av. Luis de los Reyes, bajos 6, 11 y 40; más de 500 m² y cuatro espacios (no salas); sábado hasta las 13:00 (Google pone 14:00); dúo 114 €/mes por persona, no por pareja; estudio de Pilates (no sala); Training Club se da en el centro de fuerza y la Training Zone (sala abierta con mancuernas junto al gimnasio y al estudio de Pilates; fotos propias pendientes de enviar); sala de fuerza a secas; 'Inscribirme' en vez de 'Reservar'; eventos pasa a llamarse Social Club. Horarios: cada clase lleva punto verde (grupo activo) o rojo (grupo parado, se abre si hay interés); los cambios de grupos activos/inactivos los dictó Eugenio ese día. La reseña de Aida Llamas (habla de los bonos) se retira y entra la de Liz Inkle, real y en inglés, copiada tal cual de Google. Añadido el 22/09/2026 por Eugenio: trimestre de gimnasio 110 €, justo debajo del acceso libre de 40 €/mes. Producción (22/09/2026): dominio hevyfit.com, registrado en Cloudflare en la cuenta de Eugenio (Lagartijagames@gmail.com), zona activa. Web Analytics de Cloudflare con auto_install, así que no hace falta meter ningún script en la web. Sin crédito de marca en el pie, por decisión de Eugenio. Lanzada en producción el 22/09/2026 en hevyfit.com (Worker propio, www redirige al apex). La analítica quedó pendiente: Web Analytics no llega a medir con un Worker por delante.",
   "titular": "Alexandra Klicova",
   "nif": "X8625569V",
   "apertura": "2023-01-09",
   "experiencia_anios": 16,
-  "superficie_m2": 400
+  "superficie_m2": 500
 }

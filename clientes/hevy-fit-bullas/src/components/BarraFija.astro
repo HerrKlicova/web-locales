@@ -10,7 +10,7 @@ const whatsapp = enlaceWhatsapp(ficha, `Hola, quiero información sobre ${ficha.
 ---
 
 <div
-  class="fixed inset-x-0 bottom-0 z-40 flex gap-2 border-t border-noche-borde bg-noche/95 p-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] backdrop-blur transition-transform duration-300 ease-out md:hidden"
+  class="barra-fija fixed inset-x-0 bottom-0 z-40 flex gap-2 border-t border-noche-borde bg-noche/95 p-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] backdrop-blur transition-transform duration-300 ease-out md:hidden"
   data-barra-fija
 >
   <a
@@ -19,7 +19,7 @@ const whatsapp = enlaceWhatsapp(ficha, `Hola, quiero información sobre ${ficha.
     target="_blank"
     rel="noopener"
   >
-    Reservar
+    Inscribirme
   </a>
   <a
     href={whatsapp}
@@ -32,15 +32,22 @@ const whatsapp = enlaceWhatsapp(ficha, `Hola, quiero información sobre ${ficha.
   </a>
 </div>
 
+<style>
+  /* La clase la pone el observador de abajo. En CSS propio y no como utilidad suelta:
+     así no depende de que el rastreador de Tailwind la encuentre dentro del script. */
+  .barra-fija.escondida { transform: translateY(120%); }
+</style>
+
 <script>
   // Escondida mientras se ve el hero (ya tiene sus botones); aparece al pasar la primera pantalla.
   const barra = document.querySelector<HTMLElement>('[data-barra-fija]');
   const hero = document.querySelector<HTMLElement>('[data-hero]');
   if (barra && hero && 'IntersectionObserver' in window) {
-    const io = new IntersectionObserver(
-      ([e]) => barra.classList.toggle('translate-y-[120%]', e.isIntersecting),
-      { threshold: 0.35 },
-    );
+    // El hero ocupa toda la pantalla: basta con que asome un tercio para considerarlo a la vista.
+    const io = new IntersectionObserver(([e]) => barra.classList.toggle('escondida', e.intersectionRatio > 0.3), {
+      threshold: [0, 0.3, 0.6, 1],
+    });
     io.observe(hero);
+    barra.classList.add('escondida');
   }
 </script>

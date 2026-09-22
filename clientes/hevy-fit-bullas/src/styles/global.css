@@ -15,6 +15,8 @@
   --color-ambar: #f0b35a;
   --color-azul: #5ad0ff;
   --color-verde: #b6f04a;
+  --color-activo: #4ade80; /* punto verde: grupo en marcha */
+  --color-inactivo: #f87171; /* punto rojo: grupo parado, se abre si hay interés */
   --color-tinta: #17121a;
   --color-tinta-suave: #4d4553;
 

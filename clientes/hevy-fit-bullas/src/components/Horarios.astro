@@ -1,5 +1,5 @@
 ---
-import { DIAS, DIAS_CORTOS, HORARIOS } from '../lib/datos';
+import { DIAS, DIAS_CORTOS, HORARIOS, LEYENDA } from '../lib/datos';
 
 /** Horario semanal de clases por actividad. Pestañas con JS; sin JS se ven las tres tablas seguidas. */
 ---
@@ -63,8 +63,8 @@ import { DIAS, DIAS_CORTOS, HORARIOS } from '../lib/datos';
                         <span
                           class:list={[
                             'block min-h-12 rounded-md px-3 py-2 text-sm leading-tight',
-                            c.estado === 'formacion'
-                              ? 'border border-dashed border-(--luz) text-hueso'
+                            c.estado === 'inactivo'
+                              ? 'border border-dashed border-(--borde) text-hueso-tenue'
                               : 'bg-(--luz)/25 text-hueso',
                           ]}
                         >
@@ -95,7 +95,7 @@ import { DIAS, DIAS_CORTOS, HORARIOS } from '../lib/datos';
                       <span
                         class:list={[
                           'inline-flex min-h-9 items-center rounded-md px-2.5 text-sm tabular-nums',
-                          c!.estado === 'formacion' ? 'border border-dashed border-(--luz)' : 'bg-(--luz)/25',
+                          c!.estado === 'inactivo' ? 'border border-dashed border-(--borde) text-hueso-tenue' : 'bg-(--luz)/25',
                         ]}
                       >
                         {hora}
@@ -110,18 +110,16 @@ import { DIAS, DIAS_CORTOS, HORARIOS } from '../lib/datos';
 
           <div class="mt-5 flex flex-col gap-2 text-sm text-hueso-tenue sm:flex-row sm:flex-wrap sm:gap-x-8">
             {h.aviso && <p class="m-0">{h.aviso}</p>}
-            {h.leyenda && (
-              <ul class="m-0 flex list-none flex-wrap gap-x-6 gap-y-1 p-0">
-                <li class="inline-flex items-center gap-2">
-                  <span class="inline-block size-3.5 rounded-sm bg-(--luz)/40" aria-hidden="true" />
-                  {h.leyenda.activo}
-                </li>
-                <li class="inline-flex items-center gap-2">
-                  <span class="inline-block size-3.5 rounded-sm border border-dashed border-(--luz)" aria-hidden="true" />
-                  {h.leyenda.formacion}
-                </li>
-              </ul>
-            )}
+            <ul class="m-0 flex list-none flex-wrap gap-x-6 gap-y-1 p-0">
+              <li class="inline-flex items-center gap-2">
+                <span class="inline-block size-3.5 rounded-sm bg-(--luz)/40" aria-hidden="true" />
+                {LEYENDA.activo}
+              </li>
+              <li class="inline-flex items-center gap-2">
+                <span class="inline-block size-3.5 rounded-sm border border-dashed border-(--borde)" aria-hidden="true" />
+                {LEYENDA.inactivo}
+              </li>
+            </ul>
           </div>
           <span class="sr-only">{DIAS_CORTOS.join(', ')}</span>
         </div>

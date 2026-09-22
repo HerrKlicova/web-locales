@@ -1,5 +1,6 @@
 // @ts-check
 import { defineConfig } from 'astro/config';
+import sitemap from '@astrojs/sitemap';
 import tailwindcss from '@tailwindcss/vite';
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
@@ -20,13 +21,26 @@ if (demo && !ficha.demo_token) {
 }
 const rutaDemo = demo ? `${cliente}-${ficha.demo_token}` : null;
 
+// PRODUCCION=true: la web se publica en el dominio del cliente, sin noindex y con sitemap (§9).
+const produccion = process.env.PRODUCCION === 'true';
+if (produccion && !ficha.dominio) {
+  throw new Error(`Falta dominio en clientes/${cliente}/ficha.json (por ejemplo "https://ejemplo.es").`);
+}
+const internas = ficha.paginas_internas ?? [];
+
 export default defineConfig({
   output: 'static',
   srcDir: `./clientes/${cliente}/src`,
   publicDir: `./clientes/${cliente}/public`,
   outDir: rutaDemo ? `./dist/demo/${rutaDemo}` : `./dist/${cliente}`,
   base: rutaDemo ? `/${rutaDemo}` : '/',
-  // Sin sitemap en demo (§9). Se añade la integración solo en producción.
+  site: produccion ? ficha.dominio : undefined,
+  // Sin sitemap en demo (§9): la integración solo entra en producción. Las páginas de trabajo
+  // interno (ficha.paginas_internas, p. ej. una versión antigua para comparar) se quedan fuera;
+  // scripts/produccion.mjs además las borra de dist antes de publicar.
+  integrations: produccion
+    ? [sitemap({ filter: (url) => !internas.some((p) => url.includes(`/${p}/`)) })]
+    : [],
   build: { inlineStylesheets: 'always' },
   vite: {
     // PRODUCCION=true quita el noindex (§9). Se lee en la página como import.meta.env.PRODUCCION.

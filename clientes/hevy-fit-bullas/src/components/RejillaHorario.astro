@@ -1,11 +1,11 @@
 ---
 import { enlaceWhatsapp } from '@plantilla/lib/ficha';
-import { DIAS, type Celda, type FichaHevy, type HorarioActividad } from '../lib/datos';
+import { DIAS, LEYENDA, type Celda, type FichaHevy, type HorarioActividad } from '../lib/datos';
 
 /**
  * Horario semanal de una actividad: rejilla de horas por días en escritorio, lista por día en móvil.
- * Solo se pintan las celdas con clase (hora de inicio y fin dentro); las vacías quedan en blanco.
- * Cada clase es un enlace a WhatsApp con el mensaje ya escrito: preguntar por esa clase es la llamada a la acción.
+ * Cada clase lleva un punto: verde si el grupo está en marcha, rojo si está parado y se abre
+ * cuando hay gente interesada. Cada clase es un enlace a WhatsApp con el mensaje ya escrito.
  */
 interface Props { ficha: FichaHevy; horario: HorarioActividad; duracion?: number }
 const { ficha, horario: h, duracion = 50 } = Astro.props;
@@ -15,14 +15,21 @@ const fin = (hora: string) => {
   const total = hh * 60 + mm + duracion;
   return `${Math.floor(total / 60)}:${String(total % 60).padStart(2, '0')}`;
 };
-const enlace = (dia: string, hora: string) =>
-  enlaceWhatsapp(ficha, `Hola, me interesa ${h.nombre} el ${dia.toLowerCase()} a las ${hora}. ¿Queda plaza?`);
-const nota = (c: NonNullable<Celda>) => c.nota ?? (c.estado === 'formacion' ? 'grupo nuevo' : '');
-
+const activo = (c: NonNullable<Celda>) => c.estado !== 'inactivo';
+const enlace = (c: NonNullable<Celda>, dia: string, hora: string) =>
+  enlaceWhatsapp(
+    ficha,
+    activo(c)
+      ? `Hola, me interesa ${h.nombre} el ${dia.toLowerCase()} a las ${hora}. ¿Queda plaza?`
+      : `Hola, me interesa ${h.nombre} el ${dia.toLowerCase()} a las ${hora}. Ese grupo no está activo, ¿podríais abrirlo?`,
+  );
+/* El contexto va como texto solo para lectores, detrás de la hora, y no como aria-label:
+   así el nombre accesible del enlace contiene su texto visible (WCAG 2.5.3, «Label in Name»). */
+const contexto = (c: NonNullable<Celda>, dia: string) =>
+  `${h.nombre}, ${dia.toLowerCase()}. ${activo(c) ? 'Grupo activo' : 'Grupo inactivo, se abre si hay interés'}. Preguntar por WhatsApp`;
 const clase = (c: NonNullable<Celda>) =>
-  c.estado === 'formacion'
-    ? 'border border-dashed border-(--luz) hover:bg-(--luz)/15'
-    : 'bg-(--luz)/25 hover:bg-(--luz)/40';
+  activo(c) ? 'bg-(--luz)/25 hover:bg-(--luz)/40' : 'border border-(--borde) bg-(--fondo-alto) hover:border-hueso-tenue';
+const punto = (c: NonNullable<Celda>) => (activo(c) ? 'bg-activo' : 'bg-inactivo');
 ---
 
 <div class={`luz-${h.luz}`}>
@@ -44,17 +51,18 @@ const clase = (c: NonNullable<Celda>) =>
               <td class="p-0 align-top">
                 {c && (
                   <a
-                    href={enlace(DIAS[di], f.hora)}
+                    href={enlace(c, DIAS[di], f.hora)}
                     class:list={['flex min-h-14 flex-col justify-center rounded-md px-3 py-1.5 leading-tight text-hueso transition-colors', clase(c)]}
                     target="_blank"
                     rel="noopener"
-                    aria-label={`${h.nombre}, ${DIAS[di]} de ${f.hora} a ${fin(f.hora)}. Preguntar por WhatsApp`}
                   >
-                    <span class="font-bold tabular-nums">
+                    <span class="flex items-center gap-2 font-bold tabular-nums">
+                      <span class:list={['size-2 shrink-0 rounded-full', punto(c)]} aria-hidden="true" />
                       {f.hora}
-                      <span class="font-normal text-hueso-tenue"> – {fin(f.hora)}</span>
+                      <span class="font-normal text-hueso-tenue">– {fin(f.hora)}</span>
                     </span>
-                    {nota(c) && <span class="texto-luz text-sm">{nota(c)}</span>}
+                    {c.nota && <span class:list={['pl-4 text-sm', activo(c) ? 'texto-luz' : 'text-hueso-tenue']}>{c.nota}</span>}
+                    <span class="sr-only">{contexto(c, DIAS[di])}</span>
                   </a>
                 )}
               </td>
@@ -77,17 +85,18 @@ const clase = (c: NonNullable<Celda>) =>
               {clases.length === 0 && <span class="text-hueso-tenue">Sin clases</span>}
               {clases.map(({ hora, c }) => (
                 <a
-                  href={enlace(d, hora)}
+                  href={enlace(c, d, hora)}
                   class:list={['flex min-h-11 flex-col justify-center rounded-md px-3 py-1 leading-tight text-hueso', clase(c)]}
                   target="_blank"
                   rel="noopener"
-                  aria-label={`${h.nombre}, ${d} de ${hora} a ${fin(hora)}. Preguntar por WhatsApp`}
                 >
-                  <span class="font-bold tabular-nums">
+                  <span class="flex items-center gap-2 font-bold tabular-nums">
+                    <span class:list={['size-2 shrink-0 rounded-full', punto(c)]} aria-hidden="true" />
                     {hora}
-                    <span class="font-normal text-hueso-tenue"> – {fin(hora)}</span>
+                    <span class="font-normal text-hueso-tenue">– {fin(hora)}</span>
                   </span>
-                  {nota(c) && <span class="texto-luz text-sm">{nota(c)}</span>}
+                  {c.nota && <span class:list={['pl-4 text-sm', activo(c) ? 'texto-luz' : 'text-hueso-tenue']}>{c.nota}</span>}
+                  <span class="sr-only">{contexto(c, d)}</span>
                 </a>
               ))}
             </dd>
@@ -98,21 +107,17 @@ const clase = (c: NonNullable<Celda>) =>
   </dl>
 
   <div class="mt-5 flex flex-col gap-2 text-sm text-hueso-tenue sm:flex-row sm:flex-wrap sm:gap-x-8">
-    <p class="m-0">Pulsa una clase para preguntarnos por WhatsApp si queda plaza.</p>
+    <ul class="m-0 flex list-none flex-wrap gap-x-6 gap-y-1 p-0">
+      <li class="inline-flex items-center gap-2">
+        <span class="inline-block size-2.5 rounded-full bg-activo" aria-hidden="true" />
+        {LEYENDA.activo}
+      </li>
+      <li class="inline-flex items-center gap-2">
+        <span class="inline-block size-2.5 rounded-full bg-inactivo" aria-hidden="true" />
+        {LEYENDA.inactivo}
+      </li>
+    </ul>
+    <p class="m-0">Pulsa una clase para escribirnos por WhatsApp.</p>
     {h.aviso && <p class="m-0">{h.aviso}</p>}
-    {
-      h.leyenda && (
-        <ul class="m-0 flex list-none flex-wrap gap-x-6 gap-y-1 p-0">
-          <li class="inline-flex items-center gap-2">
-            <span class="inline-block size-3.5 rounded-sm bg-(--luz)/40" aria-hidden="true" />
-            {h.leyenda.activo}
-          </li>
-          <li class="inline-flex items-center gap-2">
-            <span class="inline-block size-3.5 rounded-sm border border-dashed border-(--luz)" aria-hidden="true" />
-            {h.leyenda.formacion}
-          </li>
-        </ul>
-      )
-    }
   </div>
 </div>

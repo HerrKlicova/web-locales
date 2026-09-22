@@ -1,7 +1,7 @@
 ---
 /** Iconos SVG de trazo. Nunca emojis (§3). */
 interface Props {
-  nombre: 'whatsapp' | 'telefono' | 'pin' | 'estrella' | 'ruta' | 'mapa' | 'google' | 'instagram' | 'correo' | 'reloj';
+  nombre: 'whatsapp' | 'telefono' | 'pin' | 'estrella' | 'ruta' | 'mapa' | 'google' | 'instagram' | 'correo' | 'reloj' | 'flecha-izquierda' | 'flecha-derecha';
   class?: string;
 }
 const { nombre, class: clase = 'size-5' } = Astro.props;
@@ -61,5 +61,15 @@ const trazo = {
 {nombre === 'correo' && (
   <svg class={clase} viewBox="0 0 24 24" {...trazo} aria-hidden="true">
     <rect x="3" y="5.5" width="18" height="13" rx="2" /><path d="m3.5 7 8.5 6 8.5-6" />
+  </svg>
+)}
+{nombre === 'flecha-izquierda' && (
+  <svg class={clase} viewBox="0 0 24 24" {...trazo} aria-hidden="true">
+    <path d="M19 12H5" /><path d="m11 6-6 6 6 6" />
+  </svg>
+)}
+{nombre === 'flecha-derecha' && (
+  <svg class={clase} viewBox="0 0 24 24" {...trazo} aria-hidden="true">
+    <path d="M5 12h14" /><path d="m13 6 6 6-6 6" />
   </svg>
 )}

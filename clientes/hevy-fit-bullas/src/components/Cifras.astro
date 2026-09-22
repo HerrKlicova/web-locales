@@ -8,8 +8,8 @@ const { ficha } = Astro.props;
 const cifras = [
   { valor: ficha.valoracion, decimales: 1, prefijo: '', sufijo: '', texto: 'de valoración en Google', luz: 'luz-magenta' },
   { valor: ficha.num_resenas, decimales: 0, prefijo: '', sufijo: '', texto: 'reseñas de socios y visitantes', luz: 'luz-ambar' },
-  { valor: 4, decimales: 0, prefijo: '', sufijo: '', texto: 'salas: Pilates, Training Club, Barre y fuerza', luz: 'luz-azul' },
-  { valor: ficha.superficie_m2, decimales: 0, prefijo: '+', sufijo: ' m²', texto: 'de instalaciones en un mismo local', luz: 'luz-verde' },
+  { valor: 4, decimales: 0, prefijo: '', sufijo: '', texto: 'espacios: Pilates Club, Training Club, Barre Club y gimnasio', luz: 'luz-azul' },
+  { valor: ficha.superficie_m2, decimales: 0, prefijo: '+', sufijo: '', texto: 'm² de instalaciones en un mismo local', luz: 'luz-verde' },
 ];
 const formato = (v: number, d: number) => v.toLocaleString('es-ES', { minimumFractionDigits: d, maximumFractionDigits: d });
 ---
@@ -18,9 +18,9 @@ const formato = (v: number, d: number) => v.toLocaleString('es-ES', { minimumFra
   <ul class="reveal mx-auto grid max-w-6xl list-none grid-cols-2 gap-x-6 gap-y-10 p-0 md:grid-cols-4" data-cifras>
     {
       cifras.map((c) => (
-        <li class={`${c.luz}`}>
+        <li class:list={[c.luz, "min-w-0"]}>
           <div class="led w-10" aria-hidden="true" />
-          <p class="rotulo m-0 mt-4 whitespace-nowrap text-5xl tabular-nums sm:text-6xl">
+          <p class="rotulo m-0 mt-4 whitespace-nowrap text-[2.75rem] tabular-nums sm:text-6xl">
             {c.prefijo}<span data-cifra={c.valor} data-decimales={c.decimales}>{formato(c.valor, c.decimales)}</span>{c.sufijo}
           </p>
           <p class="m-0 mt-2 max-w-[18ch] leading-snug text-hueso-tenue">{c.texto}</p>

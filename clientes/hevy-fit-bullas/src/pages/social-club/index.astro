@@ -1,5 +1,5 @@
 ---
-// Nuestros eventos: historia del centro y hueco para las fotos y vídeos de los eventos.
+// Social Club: lo que organizamos fuera de las clases. Las fotos y los vídeos de cada cita.
 import Layout from '../../layouts/Layout.astro';
 import Cabecera from '../../components/Cabecera.astro';
 import Footer from '../../components/Footer.astro';
@@ -13,11 +13,10 @@ import { FOTOS_EVENTOS } from '../../lib/fotos';
 
 const ficha = fichaJson as unknown as FichaHevy;
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
-const whatsapp = enlaceWhatsapp(ficha, 'Hola, quiero información sobre los eventos de Hevy Fit.');
-const anios = new Date().getFullYear() - 2023;
+const whatsapp = enlaceWhatsapp(ficha, 'Hola, quiero información sobre el Social Club de Hevy Fit.');
 
-const titulo = `Nuestros eventos — ${ficha.marca}, ${ficha.pueblo}`;
-const descripcion = `Eventos de Hevy Fit en Bullas desde la apertura, el 9 de enero de 2023. Fotos y vídeos de todo lo que hemos organizado.`;
+const titulo = `Social Club — ${ficha.marca}, ${ficha.pueblo}`;
+const descripcion = `El Social Club de Hevy Fit en Bullas: cenas, talleres, salidas y entrenamientos al aire libre. Fotos y vídeos de todo lo que organizamos.`;
 const demo = import.meta.env.PRODUCCION !== 'true';
 ---
 
@@ -29,37 +28,20 @@ const demo = import.meta.env.PRODUCCION !== 'true';
       <a href={`${base}/`} class="inline-flex min-h-11 items-center text-hueso-tenue hover:text-hueso">Volver a la portada</a>
     </p>
 
-    <section aria-labelledby="eventos-titulo" class="luz-magenta px-4 py-12 sm:px-8 md:py-20">
+    <section aria-labelledby="social-titulo" class="luz-magenta px-4 py-12 sm:px-8 md:py-20">
       <div class="mx-auto max-w-6xl">
         <div class="reveal max-w-[44rem]">
           <div class="led w-16" aria-hidden="true"></div>
-          <h1 id="eventos-titulo" class="rotulo m-0 mt-5 text-4xl sm:text-6xl">Nuestros eventos</h1>
+          <h1 id="social-titulo" class="rotulo m-0 mt-5 text-4xl sm:text-6xl">Social Club</h1>
           <p class="mt-6 max-w-[52ch] text-lg leading-snug text-hueso-tenue sm:text-xl">
-            Abrimos en Bullas el 9 de enero de 2023, pero llevamos más de {ficha.experiencia_anios} años en esto. Desde el primer
-            día hemos organizado eventos de todo tipo, y aquí iremos guardando las fotos y los vídeos de cada uno.
+            {ficha.experiencia_anios} años de trayectoria dan para mucho más que clases: cenas, talleres, salidas y
+            entrenamientos al aire libre. Aquí guardamos las fotos y los vídeos de cada cita.
           </p>
         </div>
 
-        <ul class="reveal mt-10 grid list-none grid-cols-2 gap-x-6 gap-y-8 p-0 md:grid-cols-3">
-          <li class="luz-magenta">
-            <div class="led w-10" aria-hidden="true"></div>
-            <p class="rotulo m-0 mt-4 text-5xl tabular-nums">2023</p>
-            <p class="m-0 mt-2 text-hueso-tenue">apertura en Bullas, el 9 de enero</p>
-          </li>
-          <li class="luz-ambar">
-            <div class="led w-10" aria-hidden="true"></div>
-            <p class="rotulo m-0 mt-4 text-5xl tabular-nums">+{ficha.experiencia_anios}</p>
-            <p class="m-0 mt-2 text-hueso-tenue">años de experiencia en total</p>
-          </li>
-          <li class="luz-azul">
-            <div class="led w-10" aria-hidden="true"></div>
-            <p class="rotulo m-0 mt-4 text-5xl tabular-nums">{anios}</p>
-            <p class="m-0 mt-2 text-hueso-tenue">{anios === 1 ? 'año' : 'años'} de eventos en el centro</p>
-          </li>
-        </ul>
 
-        <div class="reveal mt-12 md:mt-16">
-          <h2 class="rotulo m-0 text-2xl sm:text-3xl">Los eventos en fotos</h2>
+        <div class="reveal mt-10 md:mt-14">
+          <h2 class="rotulo m-0 text-2xl sm:text-3xl">El Social Club en fotos</h2>
           <ul class="escalonado mt-6 grid list-none grid-cols-2 gap-3 p-0 md:grid-cols-3 md:gap-4">
             {
               FOTOS_EVENTOS.map((f) => (
@@ -79,7 +61,7 @@ const demo = import.meta.env.PRODUCCION !== 'true';
               ))
             }
           </ul>
-          <p class="mt-6 max-w-[60ch] text-hueso-tenue">Iremos añadiendo los vídeos y las fotos de cada evento nuevo.</p>
+          <p class="mt-6 max-w-[60ch] text-hueso-tenue">Iremos añadiendo las fotos y los vídeos de cada cita nueva.</p>
           <a
             href={whatsapp}
             class="mt-4 inline-flex min-h-12 items-center justify-center gap-2.5 rounded-full border-2 border-(--borde) px-6 font-bold text-hueso transition-colors hover:border-hueso"
@@ -87,7 +69,7 @@ const demo = import.meta.env.PRODUCCION !== 'true';
             rel="noopener"
           >
             <Icono nombre="whatsapp" class="size-5" />
-            Preguntar por el próximo evento
+            Preguntar por la próxima cita
           </a>
         </div>
       </div>

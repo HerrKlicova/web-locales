@@ -22,16 +22,16 @@ const resumen = 'inline-flex min-h-11 cursor-pointer list-none items-center unde
   <div class="mx-auto max-w-6xl border-t border-noche-borde pt-10">
     <div class="grid gap-10 md:grid-cols-[1fr_auto]">
       <div>
-        <Logo class="h-16 w-auto" neon />
+        <Logo class="h-24 w-auto sm:h-28" neon />
         <p class="m-0 mt-4 text-hueso-tenue">{ficha.nombre}<br />{direccionCompleta(ficha)}</p>
-        <p class="m-0 mt-1 text-hueso-tenue">En Bullas desde el 9 de enero de 2023. Más de {ficha.experiencia_anios} años de experiencia.</p>
-        <p class="mt-3"><a href={`${base}/eventos/`} class="inline-flex min-h-11 items-center border-b border-noche-borde hover:text-neon">Nuestros eventos</a></p>
+        <p class="m-0 mt-1 text-hueso-tenue">Más de {ficha.experiencia_anios} años de experiencia.</p>
+        <p class="mt-3"><a href={`${base}/social-club/`} class="inline-flex min-h-11 items-center border-b border-noche-borde hover:text-neon">Social Club</a></p>
       </div>
       <ul class="m-0 list-none space-y-1 p-0 text-lg">
         <li>
           <a href={whatsapp} class={enlace} target="_blank" rel="noopener">
             <Icono nombre="whatsapp" class="size-5 text-neon" />
-            WhatsApp {ficha.whatsapp}
+            WhatsApp
           </a>
         </li>
         <li>
@@ -65,7 +65,7 @@ const resumen = 'inline-flex min-h-11 cursor-pointer list-none items-center unde
               Esta web no tiene formularios ni guarda datos personales. Si nos escribes por WhatsApp o por correo, tus datos los trata
               {titular} solo para atender tu petición, según el Reglamento (UE) 2016/679.
             </p>
-            <p>Las reservas se hacen en hevyfitbullas.es, la plataforma de gestión del centro, que tiene su propia política de privacidad.</p>
+            <p>Las inscripciones se gestionan en hevyfitbullas.es, la plataforma del centro, que tiene su propia política de privacidad.</p>
             <p>Puedes pedir acceso, corrección o borrado de tus datos escribiendo a {ficha.email}.</p>
           </div>
         </details>

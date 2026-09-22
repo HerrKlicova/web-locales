@@ -20,6 +20,7 @@ import pilates10 from '../../fotos/pilates/pilates-10.jpg';
 import pilates11 from '../../fotos/pilates/pilates-11.jpg';
 
 import trainingSala from '../../fotos/training-sala.jpg'; // misma foto que fuerza-sala.jpg: va en Training Club por decisión del cliente
+import trainingZone01 from '../../fotos/training-zone/training-zone-01.jpg';
 import recepcionIzquierda from '../../fotos/recepcion-izquierda.jpg';
 import fuerza04 from '../../fotos/fuerza/fuerza-04.jpg';
 import fuerza05 from '../../fotos/fuerza/fuerza-05.jpg';
@@ -27,13 +28,9 @@ import fuerza07 from '../../fotos/fuerza/fuerza-07.jpg';
 import fuerza12 from '../../fotos/fuerza/fuerza-12.jpg';
 
 import barreEstudio from '../../fotos/barre-estudio.jpg';
-import lounge from '../../fotos/lounge.jpg';
 import barreSala from '../../fotos/barre-sala.jpg';
-import barreClase from '../../fotos/barre-clase.jpg';
 import fachadaBarre from '../../fotos/fachada-barre.jpg';
 import barre11 from '../../fotos/barre/barre-11.jpg';
-import barre13 from '../../fotos/barre/barre-13.jpg';
-import barre18 from '../../fotos/barre/barre-18.jpg';
 import barre23 from '../../fotos/barre/barre-23.jpg';
 import barre36 from '../../fotos/barre/barre-36.jpg';
 import barre37 from '../../fotos/barre/barre-37.jpg';
@@ -45,7 +42,6 @@ import barre44 from '../../fotos/barre/barre-44.jpg';
 import barre46 from '../../fotos/barre/barre-46.jpg';
 
 import zonaFuerza from '../../fotos/zona-fuerza.jpg';
-import gimnasio from '../../fotos/gimnasio.jpg';
 import cardio from '../../fotos/cardio.jpg';
 import fuerzaMujer from '../../fotos/fuerza-mujer.jpg';
 import fuerza02 from '../../fotos/fuerza/fuerza-02.jpg';
@@ -54,8 +50,6 @@ import fuerza06 from '../../fotos/fuerza/fuerza-06.jpg';
 import fuerza08 from '../../fotos/fuerza/fuerza-08.jpg';
 import fuerza09 from '../../fotos/fuerza/fuerza-09.jpg';
 import fuerza10 from '../../fotos/fuerza/fuerza-10.jpg';
-import fuerza14 from '../../fotos/fuerza/fuerza-14.jpg';
-import fuerza15 from '../../fotos/fuerza/fuerza-15.jpg';
 
 import eventos01 from '../../fotos/eventos/eventos-01.jpg';
 import eventos02 from '../../fotos/eventos/eventos-02.jpg';
@@ -98,37 +92,31 @@ export const FOTOS: Record<Actividad['id'], Foto[]> = {
     { src: fuerza05, alt: 'Zancada con kettlebell sobre el césped, junto a los espejos redondos' },
     { src: fuerza04, alt: 'Grupo de entrenamiento chocando las manos al terminar la sesión' },
     { src: fuerza07, alt: 'Kettlebell amarilla en el suelo con el grupo en fila sobre el césped' },
+    { src: trainingZone01, alt: 'Sentadilla con saco en la Training Zone, delante de las kettlebells y las mancuernas' },
   ],
   barre: [
     { src: barreEstudio, alt: 'Estudio de Barre con arcos iluminados en rosa y barras de madera' },
-    { src: lounge, alt: 'Rincón de descanso con sillones claros bajo los arcos de luz violeta' },
     { src: barre39, alt: 'Clase de Barre en la barra frente a los arcos, con la luz blanca' },
     { src: barre44, alt: 'Alumna en la barra con el brazo en alto, con luz cálida' },
     { src: barre46, alt: 'Clase de Barre frente al espejo, con la luz rosa de los arcos' },
     { src: barre41, alt: 'Estiramiento en la barra bajo la luz magenta' },
-    { src: barre18, alt: 'Estudio de Barre iluminado en magenta, con la barra y la palmera' },
     { src: barre23, alt: 'Estudio de Barre en violeta, vista desde la entrada' },
     { src: barre11, alt: 'Estudio de Barre con luz cálida, arcos y telas del techo' },
-    { src: barre13, alt: 'Arcos del estudio de Barre con la luz ámbar' },
     { src: barre36, alt: 'Pared con las pelotas de Barre colgadas' },
     { src: barre37, alt: 'Cuadros de bailarinas en la pared del estudio' },
     { src: barre38, alt: 'Escalera y flores en el rincón de descanso del estudio' },
     { src: barre42, alt: 'Grupo de alumnas de Barre frente a los arcos al terminar la clase' },
     { src: barreSala, alt: 'Sala de Barre con luz violeta, barras y material de clase en el suelo' },
-    { src: barreClase, alt: 'Clase de Barre frente al espejo, con la luz rosa de los arcos' },
     { src: fachadaBarre, alt: 'Fachada del estudio de Barre de noche, con el rótulo iluminado' },
   ],
   fuerza: [
     { src: zonaFuerza, alt: 'Barra olímpica con discos de colores sobre la plataforma de la sala de fuerza' },
     { src: fuerza02, alt: 'Sentadilla con barra en la plataforma, junto a las mancuernas' },
     { src: fuerza06, alt: 'Peso muerto con barra y discos verdes' },
-    { src: fuerza14, alt: 'Sentadilla con kettlebell delante de la fila de kettlebells de colores' },
     { src: fuerza03, alt: 'Ejercicio de cadera en la polea' },
-    { src: fuerza15, alt: 'Kettlebells de colores ordenadas en el suelo de la sala de fuerza' },
     { src: fuerza09, alt: 'Mancuernas y máquinas bajo la tira LED azul' },
     { src: fuerza10, alt: 'Máquinas de fuerza con la pantalla y el neón al fondo' },
     { src: fuerza08, alt: 'Máquina de piernas junto al césped' },
-    { src: gimnasio, alt: 'Mancuernas y máquinas de la sala de fuerza bajo el neón azul' },
     { src: cardio, alt: 'Cintas y bicicletas de la zona de cardio con luz azul' },
     { src: fuerzaMujer, alt: 'Sentadilla con barra en la plataforma, junto al jardín vertical' },
   ],
