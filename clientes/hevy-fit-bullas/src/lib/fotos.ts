@@ -158,7 +158,7 @@ export const FOTOS_EVENTOS: Foto[] = [
 export interface Clip { mp4: string; mp4Movil: string; poster: string; alt: string }
 export const RECORRIDOS: Partial<Record<Actividad['id'], Clip[]>> = {
   pilates: [
-    { mp4: 'video/pilates-clase-1080.mp4', mp4Movil: 'video/pilates-clase-720.mp4', poster: 'video/pilates-clase-poster.jpg', alt: 'Clase de Pilates en los reformers, vista lateral' },
+    { mp4: 'video/pilates-clase-1080.mp4', mp4Movil: 'video/pilates-clase-720.mp4', poster: 'video/pilates-clase-poster.jpg', alt: 'Recorrido por la sala de Pilates: reformers, torres y la pared de listones con la silueta iluminada' },
   ],
   barre: [
     { mp4: 'video/barre-calido-1080.mp4', mp4Movil: 'video/barre-calido-720.mp4', poster: 'video/barre-calido-poster.jpg', alt: 'Recorrido por el estudio de Barre con luz cálida' },
