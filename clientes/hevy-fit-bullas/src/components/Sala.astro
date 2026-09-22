@@ -30,13 +30,13 @@ const marco = a.id === 'barre' ? 'arco' : 'rounded-xl';
 const tarjeta = a.id === 'pilates' ? 'listones' : '';
 ---
 
-<section id={a.id} data-sala={a.id} aria-labelledby={`${a.id}-titulo`} class={`luz-${a.luz} px-4 py-16 sm:px-8 md:py-24`}>
+<section id={a.id} data-sala={a.id} aria-labelledby={`${a.id}-titulo`} class:list={[`luz-${a.luz} px-4 py-16 sm:px-8 md:py-24`, recorrido && 'pt-0 md:pt-0']}>
   <!-- Recorrido: el marco se queda fijo una pantalla y el vídeo avanza con el scroll (GSAP ScrollTrigger).
        Con dos clips, el segundo se funde en el último tramo: la luz se enciende. Sin JS o con movimiento
        reducido queda el fotograma de portada y la página sigue con normalidad. -->
   {
     recorrido && (
-      <div class="relative -mx-4 -mt-16 mb-6 h-dvh sm:-mx-8 md:-mt-24" data-recorrido>
+      <div class="relative mb-6 h-dvh" data-recorrido>
         <div class="mx-auto flex h-full max-w-6xl items-center justify-center gap-10 px-4 sm:px-8 lg:justify-between">
           <div class="hidden lg:block lg:w-2/5" aria-hidden="true">
             <div class="led w-16"></div>
@@ -226,6 +226,7 @@ const tarjeta = a.id === 'pilates' ? 'listones' : '';
   const recorridos = document.querySelectorAll<HTMLElement>('[data-recorrido]');
   if (recorridos.length) {
     gsap.registerPlugin(ScrollTrigger);
+    ScrollTrigger.config({ ignoreMobileResize: true });
     const mm = gsap.matchMedia();
     mm.add('(prefers-reduced-motion: no-preference)', () => {
       const movil = window.matchMedia('(max-width: 767px)').matches;
@@ -240,6 +241,7 @@ const tarjeta = a.id === 'pilates' ? 'listones' : '';
           vids.forEach((v) => {
             v.src = (movil ? v.dataset.srcMovil : v.dataset.src) ?? '';
             v.preload = 'auto';
+            v.addEventListener('loadedmetadata', () => ScrollTrigger.refresh(), { once: true });
             v.load();
           });
         };
@@ -253,7 +255,7 @@ const tarjeta = a.id === 'pilates' ? 'listones' : '';
             const t = estado.p * Math.max(0, v.duration - 0.08);
             if (Math.abs(v.currentTime - t) > 0.02) v.currentTime = t;
           });
-          if (encendida) encendida.style.opacity = String(gsap.utils.clamp(0, 1, (estado.p - 0.7) / 0.25));
+          if (encendida) encendida.style.opacity = String(gsap.utils.clamp(0, 1, (estado.p - 0.82) / 0.14));
           if (pista) pista.style.opacity = estado.p > 0.08 ? '0' : '1';
         };
         ScrollTrigger.create({
@@ -261,12 +263,14 @@ const tarjeta = a.id === 'pilates' ? 'listones' : '';
           start: 'top top',
           end: '+=220%',
           pin: true,
-          anticipatePin: 1,
+          pinSpacing: true,
+          invalidateOnRefresh: true,
           onUpdate: (self) => {
             gsap.to(estado, { p: self.progress, duration: 0.35, ease: 'power1.out', overwrite: true, onUpdate: aplicar });
           },
         });
       });
+      window.addEventListener('load', () => ScrollTrigger.refresh(), { once: true });
     });
   }
 </script>
