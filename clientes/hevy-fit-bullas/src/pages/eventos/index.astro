@@ -8,6 +8,8 @@ import Icono from '../../components/Icono.astro';
 import { enlaceWhatsapp } from '@plantilla/lib/ficha';
 import type { FichaHevy } from '../../lib/datos';
 import fichaJson from '../../../ficha.json';
+import { Picture } from 'astro:assets';
+import { FOTOS_EVENTOS } from '../../lib/fotos';
 
 const ficha = fichaJson as unknown as FichaHevy;
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
@@ -56,15 +58,31 @@ const demo = import.meta.env.PRODUCCION !== 'true';
           </li>
         </ul>
 
-        <!-- Hueco para las fotos y los vídeos de los eventos: se rellena cuando lleguen. -->
-        <div class="reveal-tarde mt-12 rounded-2xl border-2 border-dashed border-(--borde) p-8 text-center md:mt-16 md:p-14">
-          <p class="rotulo m-0 text-2xl sm:text-3xl">Fotos y vídeos de los eventos</p>
-          <p class="mx-auto mt-4 max-w-[48ch] text-hueso-tenue">
-            Estamos reuniendo el material de todos los eventos que hemos hecho desde la apertura. Muy pronto podrás verlos aquí.
-          </p>
+        <div class="reveal mt-12 md:mt-16">
+          <h2 class="rotulo m-0 text-2xl sm:text-3xl">Los eventos en fotos</h2>
+          <ul class="escalonado mt-6 grid list-none grid-cols-2 gap-3 p-0 md:grid-cols-3 md:gap-4">
+            {
+              FOTOS_EVENTOS.map((f) => (
+                <li class="foto-zoom overflow-hidden rounded-xl">
+                  <Picture
+                    src={f.src}
+                    alt={f.alt}
+                    formats={['avif', 'webp']}
+                    widths={[360, 540, 760, 1000]}
+                    sizes="(min-width: 768px) 33vw, 50vw"
+                    loading="lazy"
+                    decoding="async"
+                    pictureAttributes={{ class: 'block' }}
+                    class="block aspect-[3/4] h-auto w-full object-cover"
+                  />
+                </li>
+              ))
+            }
+          </ul>
+          <p class="mt-6 max-w-[60ch] text-hueso-tenue">Iremos añadiendo los vídeos y las fotos de cada evento nuevo.</p>
           <a
             href={whatsapp}
-            class="mt-6 inline-flex min-h-12 items-center justify-center gap-2.5 rounded-full border-2 border-(--borde) px-6 font-bold text-hueso transition-colors hover:border-hueso"
+            class="mt-4 inline-flex min-h-12 items-center justify-center gap-2.5 rounded-full border-2 border-(--borde) px-6 font-bold text-hueso transition-colors hover:border-hueso"
             target="_blank"
             rel="noopener"
           >

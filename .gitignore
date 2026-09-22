@@ -6,3 +6,5 @@ dist/
 *.log
 capturas/
 .claude/settings.local.json
+# Material original de los clientes (HEIC, vídeos sin comprimir): pesa demasiado para git. Las fotos listas para la web van en fotos/.
+clientes/*/material/
