@@ -7,7 +7,7 @@ import Sala from '../components/Sala.astro';
 import Footer from '../components/Footer.astro';
 import BarraFija from '../components/BarraFija.astro';
 import { HORARIOS, type FichaHevy } from '../lib/datos';
-import { BANDAS, FOTOS, VIDEOS } from '../lib/fotos';
+import { FOTOS, RECORRIDOS } from '../lib/fotos';
 import fichaJson from '../../ficha.json';
 
 export function getStaticPaths() {
@@ -34,7 +34,7 @@ const demo = import.meta.env.PRODUCCION !== 'true';
       <a href={`${base}/`} class="inline-flex min-h-11 items-center text-hueso-tenue hover:text-hueso">Volver a la portada</a>
     </p>
 
-    <Sala ficha={ficha} actividad={actividad} horario={horario} fotos={fotos} video={VIDEOS[actividad.id]} banda={BANDAS[actividad.id]} />
+    <Sala ficha={ficha} actividad={actividad} horario={horario} fotos={fotos} recorrido={RECORRIDOS[actividad.id]} />
 
     <section aria-labelledby="fotos-titulo" class={`luz-${actividad.luz} px-4 pb-16 sm:px-8 md:pb-24`}>
       <div class="mx-auto max-w-6xl">

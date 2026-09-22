@@ -152,13 +152,16 @@ export const FOTOS_EVENTOS: Foto[] = [
   { src: eventos14, alt: 'Botellas y folletos de Hevy Fit preparados para un evento' },
 ];
 
-/* Vídeos. `VIDEOS`: clip del marco izquierdo de cada sala (se reproduce `segundos` y luego el marco pasa a fotos).
-   `BANDAS`: banda a todo el ancho al principio de la sala; con dos clips, el segundo se funde sobre el primero
-   según se hace scroll (la luz se enciende). Rutas relativas a la base, en public/video/. */
-export interface Clip { mp4: string; mp4Movil: string; poster: string; alt: string; segundos?: number }
-export const VIDEOS: Partial<Record<Actividad['id'], Clip>> = {
-  pilates: { mp4: 'video/pilates-clase-1080.mp4', mp4Movil: 'video/pilates-clase-720.mp4', poster: 'video/pilates-clase-poster.jpg', alt: 'Clase de Pilates en los reformers, vista lateral', segundos: 10 },
-  barre: { mp4: 'video/barre-magenta-1080.mp4', mp4Movil: 'video/barre-magenta-720.mp4', poster: 'video/barre-magenta-poster.jpg', alt: 'Recorrido por el estudio de Barre con la luz magenta encendida', segundos: 12 },
+/* Recorridos: vídeo que avanza con el scroll en un tramo fijo al principio de la sala. Con dos clips,
+   el segundo (la luz encendida) se funde sobre el primero en el último tramo del recorrido.
+   Rutas relativas a la base, en public/video/. */
+export interface Clip { mp4: string; mp4Movil: string; poster: string; alt: string }
+export const RECORRIDOS: Partial<Record<Actividad['id'], Clip[]>> = {
+  pilates: [
+    { mp4: 'video/pilates-clase-1080.mp4', mp4Movil: 'video/pilates-clase-720.mp4', poster: 'video/pilates-clase-poster.jpg', alt: 'Clase de Pilates en los reformers, vista lateral' },
+  ],
+  barre: [
+    { mp4: 'video/barre-calido-1080.mp4', mp4Movil: 'video/barre-calido-720.mp4', poster: 'video/barre-calido-poster.jpg', alt: 'Recorrido por el estudio de Barre con luz cálida' },
+    { mp4: 'video/barre-magenta-1080.mp4', mp4Movil: 'video/barre-magenta-720.mp4', poster: 'video/barre-magenta-poster.jpg', alt: 'El mismo recorrido con la luz magenta encendida' },
+  ],
 };
-// Banda de vídeo al principio de una sala: descartada por Eugenio (22/09/2026); el mecanismo sigue en Sala.astro por si se retoma.
-export const BANDAS: Partial<Record<Actividad['id'], [Clip, Clip]>> = {};

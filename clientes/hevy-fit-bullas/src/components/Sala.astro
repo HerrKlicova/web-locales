@@ -19,12 +19,10 @@ interface Props {
   horario?: HorarioActividad;
   /** Enlace a la página propia de la sala (portada). En la página de la sala no se muestra. */
   enlace?: string;
-  /** Clip del marco izquierdo: se reproduce unos segundos y el marco sigue con fotos. */
-  video?: Clip;
-  /** Banda de vídeo a todo el ancho al principio de la sala; el segundo clip se funde con el scroll. */
-  banda?: [Clip, Clip];
+  /** Recorrido: vídeo que avanza con el scroll en un tramo fijo al principio de la sala. */
+  recorrido?: Clip[];
 }
-const { ficha, actividad: a, fotos, horario, enlace, video, banda } = Astro.props;
+const { ficha, actividad: a, fotos, horario, enlace, recorrido } = Astro.props;
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 const whatsapp = enlaceWhatsapp(ficha, `Hola, quiero información sobre ${a.nombre} en Hevy Fit.`);
 // Barre: fotos con arco, como los arcos de luz del estudio. Pilates: marco de listones de madera.
@@ -33,24 +31,37 @@ const tarjeta = a.id === 'pilates' ? 'listones' : '';
 ---
 
 <section id={a.id} data-sala={a.id} aria-labelledby={`${a.id}-titulo`} class={`luz-${a.luz} px-4 py-16 sm:px-8 md:py-24`}>
-  <!-- Banda: la sala se enciende con el scroll. El clip con la luz encendida se funde sobre el de luz cálida
-       a medida que la banda entra en pantalla (CSS scroll-driven; sin soporte se ve ya encendida). -->
+  <!-- Recorrido: el marco se queda fijo una pantalla y el vídeo avanza con el scroll (GSAP ScrollTrigger).
+       Con dos clips, el segundo se funde en el último tramo: la luz se enciende. Sin JS o con movimiento
+       reducido queda el fotograma de portada y la página sigue con normalidad. -->
   {
-    banda && (
-      <div class="relative -mx-4 -mt-16 mb-12 h-[52dvh] min-h-[18rem] overflow-hidden sm:-mx-8 md:-mt-24 md:mb-16 md:h-[68dvh] md:max-h-[44rem]" data-banda>
-        {banda.map((v, i) => (
-          <video
-            class:list={['absolute inset-0 h-full w-full object-cover object-[center_55%]', i === 1 && 'banda-encendida']}
-            data-src={`${base}/${v.mp4}`}
-            data-src-movil={`${base}/${v.mp4Movil}`}
-            poster={`${base}/${v.poster}`}
-            aria-label={v.alt}
-            muted
-            playsinline
-            loop
-            preload="none"
-          />
-        ))}
+    recorrido && (
+      <div class="relative -mx-4 -mt-16 mb-6 h-dvh sm:-mx-8 md:-mt-24" data-recorrido>
+        <div class="mx-auto flex h-full max-w-6xl items-center justify-center gap-10 px-4 sm:px-8 lg:justify-between">
+          <div class="hidden lg:block lg:w-2/5" aria-hidden="true">
+            <div class="led w-16"></div>
+            <p class="rotulo m-0 mt-5 text-5xl">{a.nombre}</p>
+            <p class="mt-5 max-w-[30ch] text-lg leading-snug text-hueso-tenue">Baja despacio: recorres la sala a tu ritmo.</p>
+          </div>
+          <div class:list={['relative h-[80dvh] w-full max-w-[min(92vw,calc(80dvh*0.75))] overflow-hidden bg-(--fondo-alto)', marco]} data-visor>
+            {recorrido.map((v, i) => (
+              <video
+                class="absolute inset-0 h-full w-full object-cover"
+                style={i > 0 ? 'opacity:0' : undefined}
+                data-encendida={i > 0 ? '' : undefined}
+                data-src={`${base}/${v.mp4}`}
+                data-src-movil={`${base}/${v.mp4Movil}`}
+                poster={`${base}/${v.poster}`}
+                aria-label={v.alt}
+                muted
+                playsinline
+                preload="none"
+              />
+            ))}
+            <p class="pointer-events-none absolute bottom-3 left-3 m-0 rounded-full bg-noche/80 px-3 py-1 text-sm font-bold text-hueso lg:hidden">{a.nombre}</p>
+            <p class="pointer-events-none absolute bottom-3 right-3 m-0 rounded-full bg-noche/80 px-3 py-1 text-sm text-hueso-tenue" data-pista>Baja para recorrer la sala</p>
+          </div>
+        </div>
       </div>
     )
   }
@@ -76,25 +87,10 @@ const tarjeta = a.id === 'pilates' ? 'listones' : '';
         {
           [0, 1].map((marcoIdx) => {
             // El marco izquierdo lleva el vídeo (si lo hay) y tres fotos; el derecho, seis fotos.
-            const pila = fotos.filter((_, i) => i % 2 === marcoIdx).slice(0, video && marcoIdx === 0 ? 3 : 6);
-            const conVideo = video && marcoIdx === 0;
+            const pila = fotos.filter((_, i) => i % 2 === marcoIdx).slice(0, 6);
+            const conVideo = false;
             return (
-              <li class:list={['foto-zoom relative aspect-[3/4] overflow-hidden bg-(--fondo-alto)', marco]} data-marco>
-                {conVideo && (
-                  <video
-                    class="diapo absolute inset-0 h-full w-full object-cover"
-                    data-activa=""
-                    data-segundos={video.segundos ?? 8}
-                    data-src={`${base}/${video.mp4}`}
-                    data-src-movil={`${base}/${video.mp4Movil}`}
-                    poster={`${base}/${video.poster}`}
-                    aria-label={video.alt}
-                    muted
-                    playsinline
-                    loop
-                    preload="none"
-                  />
-                )}
+              <li class:list={['foto-zoom relative aspect-[3/4] overflow-hidden', marco]} data-marco>
                 {pila.map((f, i) => (
                   <Picture
                     src={f.src}
@@ -165,9 +161,8 @@ const tarjeta = a.id === 'pilates' ? 'listones' : '';
 </section>
 
 <script>
-  // Pase de cada marco: el vídeo (si lo hay) se reproduce sus segundos y después van pasando las fotos
-  // con un fundido; al dar la vuelta, vuelve el vídeo. Los dos marcos van desfasados. Todo se carga al
-  // acercarse la sección, se para al salir de pantalla y no corre con movimiento reducido.
+  // Pase de fotos de cada marco, con fundido y los dos marcos desfasados. Solo corre con la sección
+  // en pantalla y nunca con movimiento reducido.
   const sinMovimiento = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const movil = window.matchMedia('(max-width: 767px)').matches;
   const fuente = (v: HTMLVideoElement) => (movil ? v.dataset.srcMovil : v.dataset.src) ?? '';
@@ -219,20 +214,59 @@ const tarjeta = a.id === 'pilates' ? 'listones' : '';
       }
     });
 
-    // Banda: los dos clips en bucle; el fundido entre ellos lo lleva el scroll (CSS).
-    document.querySelectorAll<HTMLElement>('[data-banda]').forEach((banda) => {
-      const vids = [...banda.querySelectorAll<HTMLVideoElement>('video')];
-      let cargado = false;
-      const reproducir = () => {
-        if (!cargado) { cargado = true; vids.forEach((v) => { v.src = fuente(v); v.load(); }); }
-        vids.forEach((v) => v.play().catch(() => {}));
-      };
-      const pausar = () => vids.forEach((v) => v.pause());
-      if ('IntersectionObserver' in window) {
-        new IntersectionObserver(([e]) => (e.isIntersecting ? reproducir() : pausar()), { threshold: 0, rootMargin: '300px 0px' }).observe(banda);
-      } else {
-        reproducir();
-      }
+  }
+</script>
+
+<script>
+  import gsap from 'gsap';
+  import { ScrollTrigger } from 'gsap/ScrollTrigger';
+
+  // Recorrido con el scroll: el tramo se queda fijo y el tiempo del vídeo sigue al avance del scroll,
+  // suavizado. Con dos clips, el segundo (la luz encendida) aparece en el último cuarto del recorrido.
+  const recorridos = document.querySelectorAll<HTMLElement>('[data-recorrido]');
+  if (recorridos.length) {
+    gsap.registerPlugin(ScrollTrigger);
+    const mm = gsap.matchMedia();
+    mm.add('(prefers-reduced-motion: no-preference)', () => {
+      const movil = window.matchMedia('(max-width: 767px)').matches;
+      recorridos.forEach((tramo) => {
+        const vids = [...tramo.querySelectorAll<HTMLVideoElement>('video')];
+        const encendida = tramo.querySelector<HTMLVideoElement>('[data-encendida]');
+        const pista = tramo.querySelector<HTMLElement>('[data-pista]');
+        let cargado = false;
+        const cargar = () => {
+          if (cargado) return;
+          cargado = true;
+          vids.forEach((v) => {
+            v.src = (movil ? v.dataset.srcMovil : v.dataset.src) ?? '';
+            v.preload = 'auto';
+            v.load();
+          });
+        };
+        // Se carga con antelación para que el recorrido esté en memoria al llegar.
+        ScrollTrigger.create({ trigger: tramo, start: 'top 250%', once: true, onEnter: cargar });
+
+        const estado = { p: 0 };
+        const aplicar = () => {
+          vids.forEach((v) => {
+            if (!v.duration) return;
+            const t = estado.p * Math.max(0, v.duration - 0.08);
+            if (Math.abs(v.currentTime - t) > 0.02) v.currentTime = t;
+          });
+          if (encendida) encendida.style.opacity = String(gsap.utils.clamp(0, 1, (estado.p - 0.7) / 0.25));
+          if (pista) pista.style.opacity = estado.p > 0.08 ? '0' : '1';
+        };
+        ScrollTrigger.create({
+          trigger: tramo,
+          start: 'top top',
+          end: '+=220%',
+          pin: true,
+          anticipatePin: 1,
+          onUpdate: (self) => {
+            gsap.to(estado, { p: self.progress, duration: 0.35, ease: 'power1.out', overwrite: true, onUpdate: aplicar });
+          },
+        });
+      });
     });
   }
 </script>
