@@ -1,0 +1,71 @@
+---
+// Versión clásica (fondo negro fijo), conservada para comparar con el recorrido por salas de la portada.
+import Layout from '../../layouts/Layout.astro';
+import Hero from '../../components/Hero.astro';
+import Cifras from '../../components/Cifras.astro';
+import Servicios from '../../components/Servicios.astro';
+import Horarios from '../../components/Horarios.astro';
+import Instalaciones from '../../components/Instalaciones.astro';
+import Resenas from '../../components/Resenas.astro';
+import Donde from '../../components/Donde.astro';
+import Footer from '../../components/Footer.astro';
+import BarraFija from '../../components/BarraFija.astro';
+import { schemaLocalBusiness } from '@plantilla/lib/schema';
+import type { FichaHevy } from '../../lib/datos';
+
+import fichaJson from '../../../ficha.json';
+import fotoHero from '../../../fotos/hero-reformer.jpg';
+import fotoReformers from '../../../fotos/reformers.jpg';
+import fotoCadillac from '../../../fotos/cadillac.jpg';
+import fotoBarre from '../../../fotos/barre-estudio.jpg';
+import fotoLounge from '../../../fotos/lounge.jpg';
+import fotoFuerza from '../../../fotos/zona-fuerza.jpg';
+import fotoFuerzaSala from '../../../fotos/fuerza-sala.jpg';
+import fotoFuncional from '../../../fotos/sala-funcional.jpg';
+import fotoRecepcion from '../../../fotos/recepcion.jpg';
+import fotoFachada from '../../../fotos/fachada-pilates.jpg';
+
+const ficha = fichaJson as unknown as FichaHevy;
+
+const titulo = `${ficha.nombre} — Pilates, Barre y gimnasio en ${ficha.pueblo}`;
+const descripcion = `Gimnasio boutique en ${ficha.pueblo}: Pilates con aparatos, Barre, Training Club y sala de fuerza. Tarifas y horarios de clases. Reserva en hevyfitbullas.es o escribe al ${ficha.telefono}.`;
+
+const schema = {
+  ...schemaLocalBusiness(ficha, Astro.site?.href),
+  email: ficha.email,
+  sameAs: [ficha.instagram, ficha.maps_url],
+  priceRange: '€€',
+};
+const demo = import.meta.env.PRODUCCION !== 'true';
+---
+
+<Layout titulo={titulo} descripcion={descripcion} demo={demo} schema={schema}>
+  <Hero
+    ficha={ficha}
+    imagen={fotoHero}
+    alt="Fila de reformers de madera y cuero negro bajo lámparas cálidas en la sala de Pilates de Hevy Fit"
+  />
+
+  <main id="contenido">
+    <Cifras ficha={ficha} />
+    <Servicios ficha={ficha} />
+    <Horarios />
+    <Instalaciones
+      fotos={[
+        { src: fotoReformers, alt: 'Reformers alineados frente al ventanal, con lámparas de madera encendidas', sala: 'Pilates', luz: 'ambar' },
+        { src: fotoCadillac, alt: 'Cadillac y wunda chair de madera junto a fotos antiguas de Joseph Pilates', sala: 'Pilates', luz: 'ambar' },
+        { src: fotoBarre, alt: 'Estudio de Barre con arcos iluminados en rosa y barras de madera', sala: 'Barre', luz: 'magenta' },
+        { src: fotoLounge, alt: 'Rincón de descanso con sillones claros bajo los arcos de luz violeta', sala: 'Barre', luz: 'magenta' },
+        { src: fotoFuerza, alt: 'Barra olímpica con discos de colores sobre la plataforma de la sala de fuerza', sala: 'Fuerza', luz: 'verde' },
+        { src: fotoFuerzaSala, alt: 'Jaula de sentadillas y máquinas junto al jardín vertical con el neón verde', sala: 'Fuerza', luz: 'verde' },
+        { src: fotoFuncional, alt: 'Sala de grupos con colchonetas, fitballs y jardín vertical', sala: 'Training Club', luz: 'azul' },
+        { src: fotoRecepcion, alt: 'Recepción con sofá claro, camisetas del centro y jardín vertical', sala: 'Recepción', luz: 'magenta' },
+      ]}
+    />
+    <Resenas ficha={ficha} />
+    <Donde ficha={ficha} fachada={fotoFachada} />
+  </main>
+
+  <Footer ficha={ficha} titular={ficha.titular} nif={ficha.nif} />
+  <BarraFija ficha={ficha} />
+</Layout>

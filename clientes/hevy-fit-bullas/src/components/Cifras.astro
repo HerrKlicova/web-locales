@@ -1,0 +1,65 @@
+---
+import type { FichaHevy } from '../lib/datos';
+
+/** Cifras reales: valoración y reseñas de Google, salas del centro y aforo de Barre. */
+interface Props { ficha: FichaHevy }
+const { ficha } = Astro.props;
+
+const cifras = [
+  { valor: ficha.valoracion, decimales: 1, prefijo: '', sufijo: '', texto: 'de valoración en Google', luz: 'luz-magenta' },
+  { valor: ficha.num_resenas, decimales: 0, prefijo: '', sufijo: '', texto: 'reseñas de socios y visitantes', luz: 'luz-ambar' },
+  { valor: 4, decimales: 0, prefijo: '', sufijo: '', texto: 'salas: Pilates, Training Club, Barre y fuerza', luz: 'luz-azul' },
+  { valor: ficha.superficie_m2, decimales: 0, prefijo: '+', sufijo: ' m²', texto: 'de instalaciones en un mismo local', luz: 'luz-verde' },
+];
+const formato = (v: number, d: number) => v.toLocaleString('es-ES', { minimumFractionDigits: d, maximumFractionDigits: d });
+---
+
+<section aria-label="Cifras del centro" data-sala="noche" class="px-4 py-12 sm:px-8 md:py-16">
+  <ul class="reveal mx-auto grid max-w-6xl list-none grid-cols-2 gap-x-6 gap-y-10 p-0 md:grid-cols-4" data-cifras>
+    {
+      cifras.map((c) => (
+        <li class={`${c.luz}`}>
+          <div class="led w-10" aria-hidden="true" />
+          <p class="rotulo m-0 mt-4 whitespace-nowrap text-5xl tabular-nums sm:text-6xl">
+            {c.prefijo}<span data-cifra={c.valor} data-decimales={c.decimales}>{formato(c.valor, c.decimales)}</span>{c.sufijo}
+          </p>
+          <p class="m-0 mt-2 max-w-[18ch] leading-snug text-hueso-tenue">{c.texto}</p>
+        </li>
+      ))
+    }
+  </ul>
+</section>
+
+<script>
+  import gsap from 'gsap';
+
+  // Contador: los números están en el HTML desde el principio; solo se animan si hay movimiento
+  // permitido y cuando entran en pantalla. Sin JS o con reduced-motion se ven fijos.
+  const mm = gsap.matchMedia();
+  mm.add('(prefers-reduced-motion: no-preference)', () => {
+    const bloque = document.querySelector<HTMLElement>('[data-cifras]');
+    if (!bloque || !('IntersectionObserver' in window)) return;
+    const io = new IntersectionObserver(
+      ([e]) => {
+        if (!e.isIntersecting) return;
+        io.disconnect();
+        bloque.querySelectorAll<HTMLElement>('[data-cifra]').forEach((el, i) => {
+          const fin = Number(el.dataset.cifra);
+          const dec = Number(el.dataset.decimales ?? 0);
+          const obj = { v: 0 };
+          gsap.to(obj, {
+            v: fin,
+            duration: 0.9,
+            delay: i * 0.08,
+            ease: 'power2.out',
+            onUpdate: () => {
+              el.textContent = obj.v.toLocaleString('es-ES', { minimumFractionDigits: dec, maximumFractionDigits: dec });
+            },
+          });
+        });
+      },
+      { threshold: 0.4 },
+    );
+    io.observe(bloque);
+  });
+</script>

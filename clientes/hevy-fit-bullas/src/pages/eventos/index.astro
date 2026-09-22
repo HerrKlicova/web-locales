@@ -1,0 +1,81 @@
+---
+// Nuestros eventos: historia del centro y hueco para las fotos y vídeos de los eventos.
+import Layout from '../../layouts/Layout.astro';
+import Cabecera from '../../components/Cabecera.astro';
+import Footer from '../../components/Footer.astro';
+import BarraFija from '../../components/BarraFija.astro';
+import Icono from '../../components/Icono.astro';
+import { enlaceWhatsapp } from '@plantilla/lib/ficha';
+import type { FichaHevy } from '../../lib/datos';
+import fichaJson from '../../../ficha.json';
+
+const ficha = fichaJson as unknown as FichaHevy;
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+const whatsapp = enlaceWhatsapp(ficha, 'Hola, quiero información sobre los eventos de Hevy Fit.');
+const anios = new Date().getFullYear() - 2023;
+
+const titulo = `Nuestros eventos — ${ficha.marca}, ${ficha.pueblo}`;
+const descripcion = `Eventos de Hevy Fit en Bullas desde la apertura, el 9 de enero de 2023. Fotos y vídeos de todo lo que hemos organizado.`;
+const demo = import.meta.env.PRODUCCION !== 'true';
+---
+
+<Layout titulo={titulo} descripcion={descripcion} demo={demo}>
+  <Cabecera ficha={ficha} />
+
+  <main id="contenido">
+    <p class="mx-auto max-w-6xl px-4 pt-4 sm:px-8">
+      <a href={`${base}/`} class="inline-flex min-h-11 items-center text-hueso-tenue hover:text-hueso">Volver a la portada</a>
+    </p>
+
+    <section aria-labelledby="eventos-titulo" class="luz-magenta px-4 py-12 sm:px-8 md:py-20">
+      <div class="mx-auto max-w-6xl">
+        <div class="reveal max-w-[44rem]">
+          <div class="led w-16" aria-hidden="true"></div>
+          <h1 id="eventos-titulo" class="rotulo m-0 mt-5 text-4xl sm:text-6xl">Nuestros eventos</h1>
+          <p class="mt-6 max-w-[52ch] text-lg leading-snug text-hueso-tenue sm:text-xl">
+            Abrimos en Bullas el 9 de enero de 2023, pero llevamos más de {ficha.experiencia_anios} años en esto. Desde el primer
+            día hemos organizado eventos de todo tipo, y aquí iremos guardando las fotos y los vídeos de cada uno.
+          </p>
+        </div>
+
+        <ul class="reveal mt-10 grid list-none grid-cols-2 gap-x-6 gap-y-8 p-0 md:grid-cols-3">
+          <li class="luz-magenta">
+            <div class="led w-10" aria-hidden="true"></div>
+            <p class="rotulo m-0 mt-4 text-5xl tabular-nums">2023</p>
+            <p class="m-0 mt-2 text-hueso-tenue">apertura en Bullas, el 9 de enero</p>
+          </li>
+          <li class="luz-ambar">
+            <div class="led w-10" aria-hidden="true"></div>
+            <p class="rotulo m-0 mt-4 text-5xl tabular-nums">+{ficha.experiencia_anios}</p>
+            <p class="m-0 mt-2 text-hueso-tenue">años de experiencia en total</p>
+          </li>
+          <li class="luz-azul">
+            <div class="led w-10" aria-hidden="true"></div>
+            <p class="rotulo m-0 mt-4 text-5xl tabular-nums">{anios}</p>
+            <p class="m-0 mt-2 text-hueso-tenue">{anios === 1 ? 'año' : 'años'} de eventos en el centro</p>
+          </li>
+        </ul>
+
+        <!-- Hueco para las fotos y los vídeos de los eventos: se rellena cuando lleguen. -->
+        <div class="reveal-tarde mt-12 rounded-2xl border-2 border-dashed border-(--borde) p-8 text-center md:mt-16 md:p-14">
+          <p class="rotulo m-0 text-2xl sm:text-3xl">Fotos y vídeos de los eventos</p>
+          <p class="mx-auto mt-4 max-w-[48ch] text-hueso-tenue">
+            Estamos reuniendo el material de todos los eventos que hemos hecho desde la apertura. Muy pronto podrás verlos aquí.
+          </p>
+          <a
+            href={whatsapp}
+            class="mt-6 inline-flex min-h-12 items-center justify-center gap-2.5 rounded-full border-2 border-(--borde) px-6 font-bold text-hueso transition-colors hover:border-hueso"
+            target="_blank"
+            rel="noopener"
+          >
+            <Icono nombre="whatsapp" class="size-5" />
+            Preguntar por el próximo evento
+          </a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <Footer ficha={ficha} titular={ficha.titular} nif={ficha.nif} />
+  <BarraFija ficha={ficha} />
+</Layout>

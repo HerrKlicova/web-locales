@@ -1,0 +1,10 @@
+---
+import logoSvg from '../assets/logo.svg?raw';
+
+/** Logo vectorial de Hevy Fit, en línea: las letras toman el color del texto y los arcos brillan. */
+interface Props { class?: string; neon?: boolean; titulo?: string }
+const { class: clase = 'w-40', neon = false, titulo = 'Hevy Fit' } = Astro.props;
+const svg = logoSvg.replace('<svg ', `<svg class="${clase}${neon ? ' neon' : ''}" role="img" aria-label="${titulo}" `);
+---
+
+<Fragment set:html={svg} />

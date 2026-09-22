@@ -1,0 +1,23 @@
+---
+/**
+ * La página cambia de sala al hacer scroll: cuando una sección con data-sala cruza el centro de la
+ * pantalla, <html data-sala> toma su valor y el fondo se tiñe con la luz de esa sala (global.css).
+ * Sin JS, el fondo se queda en negro y todo se lee igual.
+ */
+---
+
+<script>
+  const secciones = document.querySelectorAll<HTMLElement>('[data-sala]');
+  if (secciones.length && 'IntersectionObserver' in window) {
+    const io = new IntersectionObserver(
+      (entradas) => {
+        for (const e of entradas) {
+          if (e.isIntersecting) document.documentElement.dataset.sala = e.target.getAttribute('data-sala') ?? 'noche';
+        }
+      },
+      // Solo cuenta la franja central de la pantalla: la sección que la ocupa manda.
+      { rootMargin: '-45% 0px -45% 0px', threshold: 0 },
+    );
+    secciones.forEach((s) => io.observe(s));
+  }
+</script>

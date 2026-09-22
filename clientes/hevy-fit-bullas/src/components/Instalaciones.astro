@@ -1,0 +1,43 @@
+---
+import { Picture } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
+import type { Luz } from '../lib/datos';
+
+interface Foto { src: ImageMetadata; alt: string; sala: string; luz: Luz }
+interface Props { fotos: Foto[] }
+const { fotos } = Astro.props;
+---
+
+<section id="salas" aria-labelledby="salas-titulo" class="px-4 py-16 sm:px-8 md:py-24">
+  <div class="mx-auto max-w-6xl">
+    <div class="reveal max-w-[44rem]">
+      <h2 id="salas-titulo" class="rotulo m-0 text-3xl sm:text-5xl">Las salas</h2>
+      <p class="mt-5 max-w-[52ch] text-lg leading-snug text-hueso-tenue">
+        Madera y lámparas cálidas en Pilates, arcos con luz en Barre, neón y peso libre en la sala de fuerza. Todo en el mismo local.
+      </p>
+    </div>
+
+    <ul class="reveal mt-10 grid list-none grid-cols-2 gap-3 p-0 md:mt-14 md:grid-cols-4 md:gap-4">
+      {
+        fotos.map((f) => (
+          <li class={`luz-${f.luz} foto-zoom relative overflow-hidden rounded-xl`}>
+            <Picture
+              src={f.src}
+              alt={f.alt}
+              formats={['avif', 'webp']}
+              widths={[360, 540, 760]}
+              sizes="(min-width: 768px) 25vw, 50vw"
+              loading="lazy"
+              decoding="async"
+              pictureAttributes={{ class: 'block' }}
+              class="block aspect-[4/5] h-auto w-full object-cover"
+            />
+            <p class="texto-luz pointer-events-none absolute bottom-2 left-2 m-0 rounded-full bg-noche/80 px-2.5 py-1 text-sm font-bold">
+              {f.sala}
+            </p>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</section>

@@ -1,0 +1,136 @@
+---
+import { getImage } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
+import { enlaceWhatsapp } from '@plantilla/lib/ficha';
+import type { FichaHevy } from '../lib/datos';
+import Icono from './Icono.astro';
+import Cabecera from './Cabecera.astro';
+
+/**
+ * Hero con paneo: al entrar por la puerta, la vista gira de izquierda (pared de listones, espejos
+ * y césped) a derecha (mostrador con el neón). Las dos fotos se superponen y la segunda se funde
+ * sobre la primera mientras ambas siguen desplazándose, como un plano con disolvencia.
+ */
+interface Props {
+  ficha: FichaHevy;
+  izquierda: ImageMetadata; // lo que se ve a la izquierda al entrar: listones, espejos y césped
+  derecha: ImageMetadata; // lo que se ve a la derecha: el mostrador y el neón
+}
+const { ficha, izquierda, derecha } = Astro.props;
+
+// Las fotos miden un 112 % del visor para tener recorrido. En móvil, con 60vw el navegador
+// elige la candidata de 720 px (1,85x en un móvil de 390 px, suficiente para una foto en movimiento).
+const sizes = '(min-width: 768px) 112vw, 60vw';
+const foto = async (img: ImageMetadata, format: 'avif' | 'webp') =>
+  getImage({ src: img, format, widths: [480, 720, 960, 1200, 1600], width: 1200, quality: 62 });
+const izqAvif = await foto(izquierda, 'avif');
+const izqWebp = await foto(izquierda, 'webp');
+const derAvif = await foto(derecha, 'avif');
+const derWebp = await foto(derecha, 'webp');
+
+const whatsapp = enlaceWhatsapp(ficha, `Hola, quiero información sobre ${ficha.marca}.`);
+---
+
+<header class="relative text-hueso" data-hero data-sala="noche">
+  <Cabecera ficha={ficha} />
+
+  <!-- La recepción, de izquierda a derecha. La primera foto se ve desde el primer frame: es el LCP. -->
+  <div class="relative h-[62dvh] min-h-[22rem] overflow-hidden md:h-[78dvh] md:max-h-[50rem]" data-visor>
+    <picture class="paneo-a absolute inset-0 block" data-foto-a>
+      <source type="image/avif" srcset={izqAvif.srcSet.attribute} sizes={sizes} />
+      <source type="image/webp" srcset={izqWebp.srcSet.attribute} sizes={sizes} />
+      <img
+        src={izqWebp.src}
+        width={izquierda.width}
+        height={izquierda.height}
+        alt="Pared de listones de madera con espejos redondos, lámparas y césped con kettlebells en la entrada de Hevy Fit"
+        loading="eager"
+        fetchpriority="high"
+        decoding="async"
+        class="block h-full w-[112%] max-w-none object-cover object-[center_58%]"
+      />
+    </picture>
+    <picture class="paneo-b absolute inset-0 block" data-foto-b>
+      <source type="image/avif" srcset={derAvif.srcSet.attribute} sizes={sizes} />
+      <source type="image/webp" srcset={derWebp.srcSet.attribute} sizes={sizes} />
+      <img
+        src={derWebp.src}
+        width={derecha.width}
+        height={derecha.height}
+        alt="Mostrador de recepción de Hevy Fit con el logo en neón magenta y blanco sobre la pared negra"
+        loading="eager"
+        fetchpriority="low"
+        decoding="async"
+        class="block h-full w-[112%] max-w-none object-cover object-[center_30%]"
+      />
+    </picture>
+  </div>
+  <div class="led luz-magenta origin-left" aria-hidden="true" data-led></div>
+
+  <div class="mx-auto max-w-6xl px-4 pb-12 pt-10 sm:px-8 md:pb-16 md:pt-14">
+    <h1 class="rotulo m-0 max-w-[16ch] text-[2.5rem] sm:text-6xl lg:text-[4.25rem]">Pilates, Barre y fuerza en Bullas.</h1>
+    <div class="mt-6 grid gap-6 md:grid-cols-[1fr_auto] md:items-end lg:mt-8">
+      <p class="m-0 max-w-[48ch] text-lg leading-snug text-hueso-tenue sm:text-xl" data-entra>
+        Gimnasio boutique con más de 400 m² y cuatro salas, cada una con su propia luz: Pilates con aparatos,
+        Training Club, estudio de Barre y centro de fuerza. En la avenida Luis de los Reyes, 6.
+      </p>
+      <div class="flex flex-col gap-3 sm:flex-row sm:flex-wrap" data-entra>
+        <a
+          href={ficha.web_reservas}
+          class="inline-flex min-h-13 items-center justify-center rounded-full bg-neon px-7 text-lg font-bold text-noche transition-colors hover:bg-hueso"
+          target="_blank"
+          rel="noopener"
+        >
+          Reservar
+        </a>
+        <a
+          href={whatsapp}
+          class="inline-flex min-h-13 items-center justify-center gap-2.5 rounded-full border-2 border-(--borde) px-6 text-lg font-bold text-hueso transition-colors hover:border-hueso"
+          target="_blank"
+          rel="noopener"
+        >
+          <Icono nombre="whatsapp" class="size-6" />
+          Escribir por WhatsApp
+        </a>
+      </div>
+    </div>
+    <p class="mt-5 max-w-[60ch] text-hueso-tenue" data-entra>
+      Las reservas se hacen en hevyfitbullas.es, la app del centro. Matrícula única de 10 €, válida para todas las actividades.
+    </p>
+  </div>
+</header>
+
+<style>
+  /* Estado inicial: se ve la primera foto (izquierda) y la segunda espera oculta.
+     Con movimiento reducido no hay paneo y se muestra directamente el neón. */
+  .paneo-a { will-change: transform; }
+  .paneo-b { opacity: 0; will-change: transform, opacity; }
+  @media (prefers-reduced-motion: reduce) {
+    .paneo-b { opacity: 1; }
+  }
+</style>
+
+<script>
+  import gsap from 'gsap';
+
+  // Un solo momento orquestado (§5): giro de la recepción de izquierda a derecha con disolvencia
+  // entre las dos fotos, y la tira LED que se enciende. Nada parte de opacity 0 salvo la segunda foto,
+  // que no es el LCP. El titular no se toca; el resto solo se desplaza.
+  const mm = gsap.matchMedia();
+  mm.add('(prefers-reduced-motion: no-preference)', () => {
+    const hero = document.querySelector<HTMLElement>('[data-hero]');
+    const a = hero?.querySelector<HTMLElement>('[data-foto-a]');
+    const b = hero?.querySelector<HTMLElement>('[data-foto-b]');
+    if (!hero || !a || !b) return;
+    const led = hero.querySelector<HTMLElement>('[data-led]');
+    const entran = hero.querySelectorAll<HTMLElement>('[data-entra]');
+
+    const tl = gsap.timeline({ defaults: { ease: 'power1.inOut' } });
+    // La cámara gira hacia la derecha: las dos fotos se desplazan a la izquierda a la misma velocidad.
+    tl.fromTo(a, { xPercent: 0 }, { xPercent: -12, duration: 4 }, 0)
+      .fromTo(b, { xPercent: -2 }, { xPercent: -10, duration: 4 }, 0)
+      .to(b, { opacity: 1, duration: 1.3, ease: 'power2.inOut' }, 1.5)
+      .from(entran, { y: 14, duration: 0.7, stagger: 0.08, ease: 'power3.out' }, 0)
+      .from(led, { scaleX: 0, duration: 1.2 }, 0.3);
+  });
+</script>

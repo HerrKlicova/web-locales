@@ -1,0 +1,65 @@
+---
+import { enlaceWhatsapp } from '@plantilla/lib/ficha';
+import type { FichaHevy } from '../lib/datos';
+import Icono from './Icono.astro';
+
+interface Props { ficha: FichaHevy }
+const { ficha } = Astro.props;
+const whatsapp = enlaceWhatsapp(ficha, 'Hola, quiero información sobre las tarifas de Hevy Fit.');
+---
+
+<section id="tarifas" aria-labelledby="tarifas-titulo" class="px-4 py-16 sm:px-8 md:py-24">
+  <div class="mx-auto max-w-6xl">
+    <div class="reveal max-w-[44rem]">
+      <h2 id="tarifas-titulo" class="rotulo m-0 text-3xl sm:text-5xl">Cuatro salas, cuatro formas de entrenar.</h2>
+      <p class="mt-5 max-w-[52ch] text-lg leading-snug text-hueso-tenue">
+        Cada actividad tiene su cuota. {ficha.matricula}
+      </p>
+    </div>
+
+    <ul class="escalonado mt-10 grid list-none gap-5 p-0 md:mt-14 md:grid-cols-2 md:items-start">
+      {
+        ficha.actividades.map((a) => (
+          <li class={`luz-${a.luz} flex flex-col rounded-2xl border border-noche-borde bg-noche-alta`}>
+            <div class="led rounded-t-2xl" aria-hidden="true" />
+            <div class="flex flex-1 flex-col p-6 sm:p-8">
+              <h3 class="rotulo m-0 text-2xl sm:text-3xl">{a.nombre}</h3>
+              <p class="mt-3 max-w-[46ch] leading-snug text-hueso-tenue">{a.texto} <span class="texto-luz font-bold">{a.sala}.</span></p>
+              <dl class="mt-6 divide-y divide-noche-borde border-t border-noche-borde">
+                {a.tarifas.map((t) => (
+                  <div class="flex items-baseline justify-between gap-4 py-3">
+                    <dt class="leading-snug">
+                      {t.nombre}
+                      {t.nota && <small class="block text-sm text-hueso-tenue">{t.nota}</small>}
+                    </dt>
+                    <dd class="texto-luz m-0 whitespace-nowrap text-right text-lg font-bold tabular-nums">{t.precio}</dd>
+                  </div>
+                ))}
+              </dl>
+            </div>
+          </li>
+        ))
+      }
+    </ul>
+
+    <div class="reveal mt-10 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
+      <a
+        href={ficha.web_reservas}
+        class="inline-flex min-h-13 items-center justify-center rounded-full bg-neon px-7 text-lg font-bold text-noche transition-colors hover:bg-hueso"
+        target="_blank"
+        rel="noopener"
+      >
+        Reservar plaza
+      </a>
+      <a
+        href={whatsapp}
+        class="inline-flex min-h-13 items-center justify-center gap-2.5 rounded-full border-2 border-noche-borde px-6 text-lg font-bold text-hueso transition-colors hover:border-hueso"
+        target="_blank"
+        rel="noopener"
+      >
+        <Icono nombre="whatsapp" class="size-6" />
+        Preguntar por WhatsApp
+      </a>
+    </div>
+  </div>
+</section>

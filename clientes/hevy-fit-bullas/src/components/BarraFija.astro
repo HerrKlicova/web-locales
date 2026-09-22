@@ -1,0 +1,46 @@
+---
+import { enlaceWhatsapp } from '@plantilla/lib/ficha';
+import type { FichaHevy } from '../lib/datos';
+import Icono from './Icono.astro';
+
+/** Barra fija abajo en móvil, a partir de la primera pantalla (§8): reservar y WhatsApp. */
+interface Props { ficha: FichaHevy }
+const { ficha } = Astro.props;
+const whatsapp = enlaceWhatsapp(ficha, `Hola, quiero información sobre ${ficha.marca}.`);
+---
+
+<div
+  class="fixed inset-x-0 bottom-0 z-40 flex gap-2 border-t border-noche-borde bg-noche/95 p-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] backdrop-blur transition-transform duration-300 ease-out md:hidden"
+  data-barra-fija
+>
+  <a
+    href={ficha.web_reservas}
+    class="flex min-h-13 flex-1 items-center justify-center rounded-full bg-neon text-lg font-bold text-noche"
+    target="_blank"
+    rel="noopener"
+  >
+    Reservar
+  </a>
+  <a
+    href={whatsapp}
+    class="flex min-h-13 flex-1 items-center justify-center gap-2 rounded-full border-2 border-noche-borde text-lg font-bold text-hueso"
+    target="_blank"
+    rel="noopener"
+  >
+    <Icono nombre="whatsapp" class="size-6" />
+    WhatsApp
+  </a>
+</div>
+
+<script>
+  // Escondida mientras se ve el hero (ya tiene sus botones); aparece al pasar la primera pantalla.
+  const barra = document.querySelector<HTMLElement>('[data-barra-fija]');
+  const hero = document.querySelector<HTMLElement>('[data-hero]');
+  if (barra && hero && 'IntersectionObserver' in window) {
+    const io = new IntersectionObserver(
+      ([e]) => barra.classList.toggle('translate-y-[120%]', e.isIntersecting),
+      { threshold: 0.35 },
+    );
+    io.observe(hero);
+  }
+</script>

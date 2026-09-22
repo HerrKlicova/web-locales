@@ -1,0 +1,43 @@
+---
+import '@fontsource/unbounded/700.css';
+import '@fontsource/manrope/400.css';
+import '@fontsource/manrope/700.css';
+import '../styles/global.css';
+import unbounded700 from '@fontsource/unbounded/files/unbounded-latin-700-normal.woff2?url';
+
+interface Props {
+  titulo: string;
+  descripcion: string;
+  /** Demo: noindex, sin sitemap, sin formulario (§9). */
+  demo?: boolean;
+  schema?: Record<string, unknown>;
+  /** Sala cuya luz tiñe el fondo desde el primer frame (páginas de sala). */
+  sala?: string;
+}
+const { titulo, descripcion, demo = true, schema, sala } = Astro.props;
+// En demo la web cuelga de /<slug>-<token>; los estáticos de public/ necesitan ese prefijo.
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+---
+
+<!doctype html>
+<html lang="es" data-sala={sala}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{titulo}</title>
+    <meta name="description" content={descripcion} />
+    {demo && <meta name="robots" content="noindex, nofollow" />}
+    <meta name="theme-color" content="#0e0a10" />
+    <link rel="icon" href={`${base}/favicon.svg`} type="image/svg+xml" />
+    <link rel="preload" as="font" type="font/woff2" href={unbounded700} crossorigin />
+    {schema && <script type="application/ld+json" set:html={JSON.stringify(schema)} />}
+  </head>
+  <body class="min-h-dvh">
+    <a
+      href="#contenido"
+      class="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-50 focus:rounded focus:bg-neon focus:px-4 focus:py-2 focus:font-bold focus:text-noche"
+      >Ir al contenido</a
+    >
+    <slot />
+  </body>
+</html>

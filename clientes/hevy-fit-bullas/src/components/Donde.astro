@@ -1,0 +1,142 @@
+---
+import { direccionCompleta, enlaceComoLlegar, enlaceWhatsapp } from '@plantilla/lib/ficha';
+import { indicesDia } from '@plantilla/lib/horario';
+import type { FichaHevy } from '../lib/datos';
+import { Picture } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
+import Icono from './Icono.astro';
+
+interface Props { ficha: FichaHevy; fachada: ImageMetadata }
+const { ficha, fachada } = Astro.props;
+const [lat, lng] = ficha.coordenadas;
+const srcMapa = `https://www.google.com/maps?q=${lat},${lng}&z=16&hl=es&output=embed`;
+const comoLlegar = enlaceComoLlegar(ficha);
+const whatsapp = enlaceWhatsapp(ficha, `Hola, quiero información sobre ${ficha.marca}.`);
+---
+
+<section id="donde" aria-labelledby="donde-titulo" data-sala="noche" class="px-4 py-16 sm:px-8 md:py-24">
+  <div class="mx-auto grid max-w-6xl gap-10 lg:grid-cols-2 lg:items-start">
+    <div class="reveal">
+      <h2 id="donde-titulo" class="rotulo m-0 text-3xl sm:text-5xl">Dónde estamos y cuándo abrimos</h2>
+      <address class="mt-6 text-xl not-italic leading-snug">
+        <span class="flex items-start gap-3">
+          <Icono nombre="pin" class="mt-1 size-6 shrink-0 text-neon" />
+          <span>{ficha.nombre}<br />{direccionCompleta(ficha)}</span>
+        </span>
+      </address>
+
+      <div class="mt-6 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+        <a
+          href={comoLlegar}
+          class="inline-flex min-h-13 items-center justify-center gap-2.5 rounded-full bg-neon px-6 text-lg font-bold text-noche transition-colors hover:bg-hueso"
+          target="_blank"
+          rel="noopener"
+        >
+          <Icono nombre="ruta" class="size-5" />
+          Cómo llegar
+        </a>
+        <a
+          href={whatsapp}
+          class="inline-flex min-h-13 items-center justify-center gap-2.5 rounded-full border-2 border-noche-borde px-6 text-lg font-bold text-hueso transition-colors hover:border-hueso"
+          target="_blank"
+          rel="noopener"
+        >
+          <Icono nombre="whatsapp" class="size-6" />
+          Escribir por WhatsApp
+        </a>
+      </div>
+
+      <div id="horario" class="mt-10">
+        <div class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
+          <h3 class="m-0 flex items-center gap-2 text-xl font-bold">
+            <Icono nombre="reloj" class="size-5 text-neon" />
+            Horario del centro
+          </h3>
+          <p class="m-0 font-bold text-neon" data-hoy hidden></p>
+        </div>
+        <dl class="mt-4 divide-y divide-noche-borde border-t border-noche-borde text-lg">
+          {
+            ficha.horario.map((h) => (
+              <div class="flex items-baseline justify-between gap-4 py-2.5" data-dias={indicesDia(h.dias).join(',')}>
+                <dt>{h.dias}</dt>
+                <dd class="m-0 text-right font-bold tabular-nums">
+                  {h.horas.split(' y ').map((t, i) => (
+                    <span class="block whitespace-nowrap sm:inline">
+                      {i > 0 && <span class="hidden font-normal sm:inline"> y </span>}
+                      {t}
+                    </span>
+                  ))}
+                </dd>
+              </div>
+            ))
+          }
+        </dl>
+        <p class="mt-3 text-sm text-hueso-tenue">Horario publicado en la ficha de Google. Las clases tienen su propio horario.</p>
+      </div>
+    </div>
+
+    <!-- El mapa se carga solo al pulsar: así no pesa en la primera carga. -->
+    <div
+      class="reveal luz-magenta relative aspect-[3/2] overflow-hidden rounded-2xl border border-noche-borde bg-noche-alta lg:aspect-[4/5] lg:max-h-[36rem]"
+      data-mapa
+      data-src={srcMapa}
+    >
+      <!-- La fachada del local, para reconocerlo desde la calle; el mapa la sustituye al pulsar. -->
+      <Picture
+        src={fachada}
+        alt="Fachada de Hevy Fit en la avenida Luis de los Reyes, con el rótulo iluminado y el escaparate del estudio"
+        formats={['avif', 'webp']}
+        widths={[480, 760, 1000]}
+        sizes="(min-width: 1024px) 40vw, 100vw"
+        loading="lazy"
+        decoding="async"
+        pictureAttributes={{ class: 'absolute inset-0 block h-full w-full' }}
+        class="block h-full w-full object-cover opacity-60"
+      />
+      <div class="absolute inset-0 flex flex-col items-center justify-center gap-3 p-4">
+        <Icono nombre="mapa" class="size-10 text-hueso" />
+        <button
+          type="button"
+          class="inline-flex min-h-12 items-center gap-2 rounded-full border-2 border-hueso px-5 text-lg font-bold text-hueso transition-colors hover:bg-hueso hover:text-noche"
+          data-mapa-boton
+        >
+          Ver el mapa
+        </button>
+        <span class="rounded-full bg-noche/80 px-3 py-1 text-sm text-hueso">Carga un mapa de Google</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  // Mapa bajo demanda.
+  const caja = document.querySelector<HTMLElement>('[data-mapa]');
+  const boton = caja?.querySelector<HTMLButtonElement>('[data-mapa-boton]');
+  if (caja && boton) {
+    boton.addEventListener('click', () => {
+      const iframe = document.createElement('iframe');
+      iframe.src = caja.dataset.src ?? '';
+      iframe.title = 'Mapa de Google con la ubicación de Hevy Fit';
+      iframe.loading = 'lazy';
+      iframe.referrerPolicy = 'no-referrer-when-downgrade';
+      iframe.className = 'absolute inset-0 h-full w-full border-0';
+      caja.querySelector('picture')?.remove();
+      boton.parentElement?.replaceWith(iframe);
+    });
+  }
+
+  // Marca el día de hoy y lo resume junto al título. Sin JS la lista se lee igual.
+  const hoy = (new Date().getDay() + 6) % 7; // 0 = lunes
+  document.querySelectorAll<HTMLElement>('#horario [data-dias]').forEach((fila) => {
+    const dias = (fila.dataset.dias ?? '').split(',').filter(Boolean).map(Number);
+    if (!dias.includes(hoy)) return;
+    fila.classList.add('text-neon');
+    fila.setAttribute('aria-current', 'date');
+    const aviso = document.querySelector<HTMLElement>('#horario [data-hoy]');
+    const horas = (fila.querySelector('dd')?.textContent ?? '').replace(/\s+/g, ' ').trim();
+    if (aviso && horas) {
+      aviso.textContent = /cerrado/i.test(horas) ? 'Hoy: cerrado' : `Hoy: ${horas}`;
+      aviso.hidden = false;
+    }
+  });
+</script>

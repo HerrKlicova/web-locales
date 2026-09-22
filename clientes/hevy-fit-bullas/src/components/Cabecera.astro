@@ -1,0 +1,36 @@
+---
+import type { FichaHevy } from '../lib/datos';
+import Logo from './Logo.astro';
+
+/** Cabecera común: logo, salas, eventos, dónde y el botón de reservar. Los enlaces llevan la base de la demo. */
+interface Props { ficha: FichaHevy }
+const { ficha } = Astro.props;
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+const enlaces = [
+  [`${base}/pilates/`, 'Pilates'],
+  [`${base}/training/`, 'Training Club'],
+  [`${base}/barre/`, 'Barre'],
+  [`${base}/fuerza/`, 'Fuerza'],
+  [`${base}/eventos/`, 'Eventos'],
+  [`${base}/#donde`, 'Dónde'],
+];
+---
+
+<div class="mx-auto flex max-w-[90rem] items-center justify-between gap-6 px-4 py-4 sm:px-8">
+  <a href={`${base}/`} class="inline-flex min-h-11 items-center" aria-label="Hevy Fit, inicio">
+    <Logo class="h-12 w-auto sm:h-14" neon />
+  </a>
+  <nav aria-label="Secciones" class="hidden items-center gap-1 md:flex">
+    {enlaces.map(([href, texto]) => (
+      <a href={href} class="inline-flex min-h-11 items-center px-3 text-hueso-tenue transition-colors hover:text-hueso">{texto}</a>
+    ))}
+    <a
+      href={ficha.web_reservas}
+      class="ml-3 inline-flex min-h-11 items-center rounded-full bg-neon px-5 font-bold text-noche transition-colors hover:bg-hueso"
+      target="_blank"
+      rel="noopener"
+    >
+      Reservar
+    </a>
+  </nav>
+</div>

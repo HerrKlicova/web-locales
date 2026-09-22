@@ -1,0 +1,115 @@
+---
+import { Picture } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
+import { enlaceWhatsapp } from '@plantilla/lib/ficha';
+import type { Actividad, FichaHevy, HorarioActividad } from '../lib/datos';
+import Icono from './Icono.astro';
+import RejillaHorario from './RejillaHorario.astro';
+
+/**
+ * Una sala del recorrido: su luz, sus fotos, sus tarifas y su horario.
+ * Al entrar en la sección, el fondo de la página se tiñe con su luz (CambioSala.astro).
+ */
+interface Foto { src: ImageMetadata; alt: string }
+interface Props {
+  ficha: FichaHevy;
+  actividad: Actividad;
+  fotos: Foto[];
+  horario?: HorarioActividad;
+  /** Enlace a la página propia de la sala (portada). En la página de la sala no se muestra. */
+  enlace?: string;
+}
+const { ficha, actividad: a, fotos, horario, enlace } = Astro.props;
+const whatsapp = enlaceWhatsapp(ficha, `Hola, quiero información sobre ${a.nombre} en Hevy Fit.`);
+// Barre: fotos con arco, como los arcos de luz del estudio. Pilates: marco de listones de madera.
+const marco = a.id === 'barre' ? 'arco' : 'rounded-xl';
+const tarjeta = a.id === 'pilates' ? 'listones' : '';
+---
+
+<section id={a.id} data-sala={a.id} aria-labelledby={`${a.id}-titulo`} class={`luz-${a.luz} px-4 py-16 sm:px-8 md:py-24`}>
+  <div class="mx-auto max-w-6xl">
+    <div class="reveal max-w-[44rem]">
+      <div class="led w-16" aria-hidden="true"></div>
+      <h2 id={`${a.id}-titulo`} class="rotulo m-0 mt-5 text-3xl sm:text-5xl">{a.nombre}</h2>
+      <p class="mt-5 max-w-[52ch] text-lg leading-snug text-hueso-tenue">
+        {a.texto} <span class="texto-luz font-bold">{a.sala}.</span>
+      </p>
+      {enlace && (
+        <p class="mt-4">
+          <a href={enlace} class="texto-luz inline-flex min-h-11 items-center border-b-2 border-current font-bold hover:text-hueso">
+            Ver la sala: fotos, tarifas y horario
+          </a>
+        </p>
+      )}
+    </div>
+
+    <div class="mt-10 grid gap-5 md:mt-12 lg:grid-cols-[3fr_2fr] lg:gap-8">
+      <ul class="reveal m-0 grid list-none grid-cols-2 gap-3 self-start p-0 md:gap-4">
+        {
+          fotos.slice(0, 2).map((f, i) => (
+            <li class:list={['foto-zoom relative aspect-[3/4] overflow-hidden', marco]}>
+              <Picture
+                src={f.src}
+                alt={f.alt}
+                formats={['avif', 'webp']}
+                widths={[360, 540, 760, 1000]}
+                sizes="(min-width: 1024px) 30vw, 50vw"
+                loading="lazy"
+                decoding="async"
+                pictureAttributes={{ class: 'block h-full' }}
+                class="block h-full w-full object-cover"
+              />
+            </li>
+          ))
+        }
+      </ul>
+
+      <div class:list={["reveal-tarde flex flex-col rounded-2xl border border-(--borde) bg-(--fondo-alto) p-6 sm:p-8", tarjeta]}>
+        <h3 class="m-0 text-xl font-bold">Tarifas</h3>
+        <dl class="mt-4 divide-y divide-(--borde) border-t border-(--borde)">
+          {
+            a.tarifas.map((t) => (
+              <div class="flex items-baseline justify-between gap-4 py-3">
+                <dt class="leading-snug">
+                  {t.nombre}
+                  {t.nota && <small class="block text-sm text-hueso-tenue">{t.nota}</small>}
+                </dt>
+                <dd class="texto-luz m-0 whitespace-nowrap text-right text-lg font-bold tabular-nums">{t.precio}</dd>
+              </div>
+            ))
+          }
+        </dl>
+        <div class="mt-6 flex flex-col gap-3">
+          <a
+            href={ficha.web_reservas}
+            class="inline-flex min-h-12 items-center justify-center rounded-full bg-neon px-6 font-bold text-noche transition-colors hover:bg-hueso"
+            target="_blank"
+            rel="noopener"
+          >
+            Reservar
+          </a>
+          <a
+            href={whatsapp}
+            class="inline-flex min-h-12 items-center justify-center gap-2.5 rounded-full border-2 border-(--borde) px-6 font-bold text-hueso transition-colors hover:border-hueso"
+            target="_blank"
+            rel="noopener"
+          >
+            <Icono nombre="whatsapp" class="size-5" />
+            Preguntar por WhatsApp
+          </a>
+        </div>
+      </div>
+    </div>
+
+    {
+      horario && (
+        <div class="reveal mt-12 md:mt-16">
+          <h3 class="m-0 text-xl font-bold">Horario semanal de {a.nombre}</h3>
+          <div class="mt-5">
+            <RejillaHorario ficha={ficha} horario={horario} />
+          </div>
+        </div>
+      )
+    }
+  </div>
+</section>

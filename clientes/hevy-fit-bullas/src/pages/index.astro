@@ -1,0 +1,64 @@
+---
+// Portada: recorrido por las salas. Cada sala tiene su luz y el fondo cambia al pasar de una a otra.
+import Layout from '../layouts/Layout.astro';
+import HeroPaneo from '../components/HeroPaneo.astro';
+import Cifras from '../components/Cifras.astro';
+import Sala from '../components/Sala.astro';
+import Resenas from '../components/Resenas.astro';
+import Donde from '../components/Donde.astro';
+import Footer from '../components/Footer.astro';
+import BarraFija from '../components/BarraFija.astro';
+import CambioSala from '../components/CambioSala.astro';
+import { schemaLocalBusiness } from '@plantilla/lib/schema';
+import { HORARIOS, type FichaHevy } from '../lib/datos';
+import { FOTOS } from '../lib/fotos';
+
+import fichaJson from '../../ficha.json';
+import fotoRecepcionIzquierda from '../../fotos/recepcion-izquierda.jpg';
+import fotoRecepcionDerecha from '../../fotos/recepcion-derecha.jpg';
+import fotoFachada from '../../fotos/fachada-pilates.jpg';
+
+const ficha = fichaJson as unknown as FichaHevy;
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+
+const titulo = `${ficha.nombre} — Pilates, Barre y gimnasio en ${ficha.pueblo}`;
+const descripcion = `Gimnasio boutique en ${ficha.pueblo} con más de 400 m²: Pilates con aparatos, Training Club, Barre y sala de fuerza. Tarifas y horarios de clases. Reserva en hevyfitbullas.es o escribe por WhatsApp.`;
+
+const schema = {
+  ...schemaLocalBusiness(ficha, Astro.site?.href),
+  email: ficha.email,
+  sameAs: [ficha.instagram, ficha.maps_url],
+  priceRange: '€€',
+  foundingDate: ficha.apertura,
+};
+// Demo por defecto (noindex). Producción: PRODUCCION=true npm run build (§9).
+const demo = import.meta.env.PRODUCCION !== 'true';
+---
+
+<Layout titulo={titulo} descripcion={descripcion} demo={demo} schema={schema}>
+  <HeroPaneo ficha={ficha} izquierda={fotoRecepcionIzquierda} derecha={fotoRecepcionDerecha} />
+
+  <main id="contenido">
+    <Cifras ficha={ficha} />
+
+    {
+      // Orden del recorrido: Pilates, Training Club, Barre y centro de fuerza (el de la ficha).
+      ficha.actividades.map((a) => (
+        <Sala
+          ficha={ficha}
+          actividad={a}
+          horario={HORARIOS.find((h) => h.id === a.id)}
+          fotos={FOTOS[a.id]}
+          enlace={`${base}/${a.id}/`}
+        />
+      ))
+    }
+
+    <Resenas ficha={ficha} />
+    <Donde ficha={ficha} fachada={fotoFachada} />
+  </main>
+
+  <Footer ficha={ficha} titular={ficha.titular} nif={ficha.nif} />
+  <BarraFija ficha={ficha} />
+  <CambioSala />
+</Layout>

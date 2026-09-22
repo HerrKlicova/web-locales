@@ -1,0 +1,155 @@
+---
+import { DIAS, DIAS_CORTOS, HORARIOS } from '../lib/datos';
+
+/** Horario semanal de clases por actividad. Pestañas con JS; sin JS se ven las tres tablas seguidas. */
+---
+
+<section id="horarios" aria-labelledby="horarios-titulo" class="px-4 py-16 sm:px-8 md:py-24">
+  <div class="mx-auto max-w-6xl">
+    <div class="reveal flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
+      <div class="max-w-[44rem]">
+        <h2 id="horarios-titulo" class="rotulo m-0 text-3xl sm:text-5xl">Horarios de clases</h2>
+        <p class="mt-5 max-w-[52ch] text-lg leading-snug text-hueso-tenue">
+          Las clases dirigidas son de lunes a viernes. Si quieres empezar, escríbenos y te decimos dónde queda hueco.
+        </p>
+      </div>
+      <div class="pestanas flex gap-2" role="tablist" aria-label="Actividad">
+        {
+          HORARIOS.map((h, i) => (
+            <button
+              type="button"
+              role="tab"
+              id={`pestana-${h.id}`}
+              aria-controls={`panel-${h.id}`}
+              aria-selected={i === 0 ? 'true' : 'false'}
+              tabindex={i === 0 ? 0 : -1}
+              class={`luz-${h.luz} min-h-11 rounded-full border-2 border-noche-borde px-4 font-bold text-hueso transition-colors hover:border-hueso`}
+            >
+              {h.nombre}
+            </button>
+          ))
+        }
+      </div>
+    </div>
+
+    {
+      HORARIOS.map((h, i) => (
+        <div
+          id={`panel-${h.id}`}
+          role="tabpanel"
+          aria-labelledby={`pestana-${h.id}`}
+          class={`luz-${h.luz} reveal mt-8`}
+          data-panel
+          hidden={i !== 0}
+        >
+          <!-- Escritorio: rejilla de semana -->
+          <table class="hidden w-full border-separate border-spacing-1 md:table">
+            <caption class="sr-only">Horario semanal de {h.nombre}</caption>
+            <thead>
+              <tr>
+                <th scope="col" class="w-20 pb-2 text-left font-bold text-hueso-tenue">Hora</th>
+                {DIAS.map((d) => (
+                  <th scope="col" class="pb-2 text-left font-bold text-hueso-tenue">{d}</th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {h.filas.map((f) => (
+                <tr>
+                  <th scope="row" class="py-1 pr-3 text-left font-bold tabular-nums">{f.hora}</th>
+                  {f.dias.map((c) => (
+                    <td class="p-0 align-top">
+                      {c ? (
+                        <span
+                          class:list={[
+                            'block min-h-12 rounded-md px-3 py-2 text-sm leading-tight',
+                            c.estado === 'formacion'
+                              ? 'border border-dashed border-(--luz) text-hueso'
+                              : 'bg-(--luz)/25 text-hueso',
+                          ]}
+                        >
+                          {c.nota ? c.nota : <span class="sr-only">Clase</span>}
+                        </span>
+                      ) : (
+                        <span class="block min-h-12 rounded-md bg-noche-alta" aria-hidden="true" />
+                      )}
+                    </td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+
+          <!-- Móvil: lista por día -->
+          <dl class="m-0 grid gap-4 md:hidden">
+            {DIAS.map((d, di) => {
+              const clases = h.filas
+                .map((f) => ({ hora: f.hora, c: f.dias[di] }))
+                .filter((x) => x.c !== null);
+              return (
+                <div class="border-t border-noche-borde pt-3">
+                  <dt class="font-bold">{d}</dt>
+                  <dd class="m-0 mt-2 flex flex-wrap gap-2">
+                    {clases.length === 0 && <span class="text-hueso-tenue">Sin clases</span>}
+                    {clases.map(({ hora, c }) => (
+                      <span
+                        class:list={[
+                          'inline-flex min-h-9 items-center rounded-md px-2.5 text-sm tabular-nums',
+                          c!.estado === 'formacion' ? 'border border-dashed border-(--luz)' : 'bg-(--luz)/25',
+                        ]}
+                      >
+                        {hora}
+                        {c!.nota && <span class="ml-1.5 text-hueso-tenue">{c!.nota}</span>}
+                      </span>
+                    ))}
+                  </dd>
+                </div>
+              );
+            })}
+          </dl>
+
+          <div class="mt-5 flex flex-col gap-2 text-sm text-hueso-tenue sm:flex-row sm:flex-wrap sm:gap-x-8">
+            {h.aviso && <p class="m-0">{h.aviso}</p>}
+            {h.leyenda && (
+              <ul class="m-0 flex list-none flex-wrap gap-x-6 gap-y-1 p-0">
+                <li class="inline-flex items-center gap-2">
+                  <span class="inline-block size-3.5 rounded-sm bg-(--luz)/40" aria-hidden="true" />
+                  {h.leyenda.activo}
+                </li>
+                <li class="inline-flex items-center gap-2">
+                  <span class="inline-block size-3.5 rounded-sm border border-dashed border-(--luz)" aria-hidden="true" />
+                  {h.leyenda.formacion}
+                </li>
+              </ul>
+            )}
+          </div>
+          <span class="sr-only">{DIAS_CORTOS.join(', ')}</span>
+        </div>
+      ))
+    }
+  </div>
+</section>
+
+<script>
+  // Pestañas accesibles: flechas para moverse, Enter/espacio para elegir.
+  const lista = document.querySelector<HTMLElement>('#horarios [role="tablist"]');
+  if (lista) {
+    const pestanas = [...lista.querySelectorAll<HTMLButtonElement>('[role="tab"]')];
+    const paneles = [...document.querySelectorAll<HTMLElement>('#horarios [data-panel]')];
+    const elegir = (i: number, foco = false) => {
+      pestanas.forEach((p, j) => {
+        p.setAttribute('aria-selected', String(i === j));
+        p.tabIndex = i === j ? 0 : -1;
+        paneles[j].hidden = i !== j;
+      });
+      if (foco) pestanas[i].focus();
+    };
+    pestanas.forEach((p, i) => {
+      p.addEventListener('click', () => elegir(i));
+      p.addEventListener('keydown', (e) => {
+        if (e.key === 'ArrowRight') elegir((i + 1) % pestanas.length, true);
+        if (e.key === 'ArrowLeft') elegir((i - 1 + pestanas.length) % pestanas.length, true);
+      });
+    });
+  }
+</script>

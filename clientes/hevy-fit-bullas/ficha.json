@@ -1,0 +1,185 @@
+{
+  "slug": "hevy-fit-bullas",
+  "demo_token": "k7m2qx",
+  "nombre": "Hevy Fit Gym Boutique",
+  "marca": "Hevy Fit",
+  "tipo": "HealthClub",
+  "pueblo": "Bullas",
+  "direccion": "Av. Luis de los Reyes, 6, bajo",
+  "cp": "30180",
+  "telefono": "642 52 64 50",
+  "telefono2": "642 34 64 59",
+  "whatsapp": "642 52 64 50",
+  "email": "info@hevyfitbullas.es",
+  "instagram": "https://www.instagram.com/hevy_fit/",
+  "web_reservas": "https://hevyfitbullas.es/register",
+  "maps_url": "https://maps.google.com/?cid=14715465484661474815",
+  "coordenadas": [
+    38.0496119,
+    -1.6663585
+  ],
+  "valoracion": 4.9,
+  "num_resenas": 157,
+  "horario": [
+    {
+      "dias": "Lunes y miércoles",
+      "horas": "7:00–13:00 y 16:30–21:30"
+    },
+    {
+      "dias": "Martes, jueves y viernes",
+      "horas": "8:00–13:00 y 16:30–21:30"
+    },
+    {
+      "dias": "Sábado",
+      "horas": "10:30–14:00"
+    },
+    {
+      "dias": "Domingo",
+      "horas": "Cerrado"
+    }
+  ],
+  "matricula": "10 € de matrícula, pago único. Una vez abonada vale para todas las actividades.",
+  "actividades": [
+    {
+      "id": "pilates",
+      "nombre": "Pilates Club",
+      "sala": "Sala de Pilates",
+      "luz": "ambar",
+      "texto": "Método clásico en grupos reducidos, sobre colchoneta o con aparatos: reformer, tower, cadillac, wunda chair y spine corrector.",
+      "tarifas": [
+        {
+          "nombre": "Pilates mat, 1 día a la semana",
+          "precio": "25 €/mes"
+        },
+        {
+          "nombre": "Pilates mat, 2 días a la semana",
+          "precio": "45 €/mes"
+        },
+        {
+          "nombre": "Con aparatos, 1 día a la semana",
+          "precio": "45 €/mes"
+        },
+        {
+          "nombre": "Con aparatos, 2 días a la semana",
+          "precio": "95 €/mes"
+        },
+        {
+          "nombre": "Con aparatos, trimestral",
+          "precio": "85 €/mes",
+          "nota": "contratando el trimestre"
+        },
+        {
+          "nombre": "Fidelidad de más de 8 meses, 2 días",
+          "precio": "90 €/mes"
+        },
+        {
+          "nombre": "Sesión individual con aparatos",
+          "precio": "15 €"
+        }
+      ]
+    },
+    {
+      "id": "training",
+      "nombre": "Training Club",
+      "sala": "Sala de grupos",
+      "luz": "azul",
+      "texto": "Entrenamiento en grupo guiado por tu entrenador: fuerza, cardio y trabajo funcional con máquinas y peso libre. Para quien entrena solo y acaba dejándolo.",
+      "tarifas": [
+        {
+          "nombre": "2 sesiones a la semana",
+          "precio": "60 €/mes",
+          "nota": "162 € el trimestre"
+        },
+        {
+          "nombre": "3 sesiones a la semana",
+          "precio": "70 €/mes",
+          "nota": "189 € el trimestre"
+        },
+        {
+          "nombre": "Acceso ilimitado",
+          "precio": "85 €/mes",
+          "nota": "229,50 € el trimestre"
+        }
+      ]
+    },
+    {
+      "id": "barre",
+      "nombre": "Barre Club",
+      "sala": "Estudio de Barre",
+      "luz": "magenta",
+      "texto": "Barra, música y trabajo de postura y fuerza en la sala de los arcos.",
+      "tarifas": [
+        {
+          "nombre": "1 día a la semana",
+          "precio": "38 €/mes"
+        },
+        {
+          "nombre": "2 días a la semana",
+          "precio": "60 €/mes"
+        },
+        {
+          "nombre": "Trimestral",
+          "precio": "51,60 €/mes",
+          "nota": "contratando el trimestre: 155 €"
+        },
+        {
+          "nombre": "Sesión individual",
+          "precio": "12 €"
+        },
+        {
+          "nombre": "Pack movimiento: 2 días de Barre y acceso ilimitado al centro de fuerza",
+          "precio": "75 €/mes"
+        }
+      ]
+    },
+    {
+      "id": "fuerza",
+      "nombre": "Centro de fuerza",
+      "sala": "Sala de fuerza y cardio",
+      "luz": "verde",
+      "texto": "Acceso libre al gimnasio: peso libre, máquinas y cardio, a tu aire y en tu horario.",
+      "tarifas": [
+        {
+          "nombre": "Acceso libre al gimnasio",
+          "precio": "40 €/mes"
+        },
+        {
+          "nombre": "Entrenamiento personal dúo",
+          "precio": "114 €/mes",
+          "nota": "por pareja"
+        }
+      ]
+    }
+  ],
+  "resenas": [
+    {
+      "texto": "Un centro precioso y súper cuidado al detalle. Las instalaciones transmiten muchísima calma y elegancia desde que entras: iluminación cálida, decoración moderna y espacios muy limpios y acogedores. La zona de barre tiene un ambiente espectacular, con luces y espejos que hacen que las clases se sientan muy especiales, y la sala de pilates está equipada con reformers y material de muy buena calidad.",
+      "autor": "Gema García Martínez",
+      "estrellas": 5
+    },
+    {
+      "texto": "En cuanto a Pilates, todos los profesores han sido estupendos y muy profesionales. Mención especial para Álvaro, ¡que es un crack! No he utilizado otros servicios del gimnasio, por lo que solo puedo hablar de mi experiencia con Pilates, pero ha sido muy buena. Espero poder repetir el próximo verano.",
+      "autor": "Aida Llamas",
+      "estrellas": 5
+    },
+    {
+      "texto": "Espectacular… el centro con más variedad en el mundo del fitness. 4 centros en 1 pilates máquinas, centro de fuerza, barrer, zona exclusiva para entrenamiento en grupo, si buscas la excelencia y buen trato este es tu lugar.",
+      "autor": "Victor Valera Martinez",
+      "estrellas": 5
+    },
+    {
+      "texto": "Pocas veces se encuentra un gimnasio que consiga reunir profesionalidad, cercanía y una verdadera cultura del alto rendimiento de una manera tan natural. Desde el primer momento se percibe un ambiente familiar y acogedor, donde el trato humano no está reñido con la exigencia ni con la excelencia.",
+      "autor": "Carlos Coleto sala",
+      "estrellas": 5
+    }
+  ],
+  "anio_apertura": 2023,
+  "fotos_cedidas": true,
+  "direccion_visual": "Cuatro salas, cuatro luces: neón magenta del logo y del estudio de Barre, ámbar de las lámparas de madera de Pilates, verde del neón de la sala de fuerza y azul de los LED del gimnasio. Fondo negro como las paredes del centro. Unbounded (extendida, como el logo) y Manrope.",
+  "notas": "Datos de Google Business (22/09/2026): nombre 'Hevy Fit Gym Boutique', 4,9 con 157 reseñas, horario y coordenadas. Reseñas copiadas de Google en español; la de Aida Llamas y la de Carlos Coleto están recortadas (son muy largas), no reescritas. Tarifas de Pilates, Barre y Training Club sacadas de los posts de Instagram de septiembre de 2026 (carruseles). Acceso libre 40 € y dúo 114 € por pareja: dato dado por Eugenio. La web hevyfit.es tiene tarifas distintas (cuota básica 38 €, Pilates 40 €…) y título 'Gimnasio en Paracuellos del Jarama': parece desactualizada, no se ha usado. Recepción (fotos de 22/09/2026): al entrar, a la izquierda la pared de listones con espejos y césped (recepcion-izquierda.jpg) y a la derecha el mostrador con el neón (recepcion-derecha.jpg). Confirmado por Eugenio (22/09/2026): solo WhatsApp como contacto (sin botones de llamar), más de 400 m² de instalaciones, apertura en Bullas el 9 de enero de 2023 y más de 16 años de experiencia en total; fuera la mención a las 8 personas por clase de Barre. Horarios de clases: imágenes de Temporada 26/27 (Training Club) y de septiembre (Pilates y Barre), mostrados como horarios fijos. Confirmado por Eugenio (22/09/2026): dúo 114 €/mes por pareja; trimestral de Barre contratando el trimestre; titular Alexandra Klicova, NIF X8625569V.",
+  "titular": "Alexandra Klicova",
+  "nif": "X8625569V",
+  "apertura": "2023-01-09",
+  "experiencia_anios": 16,
+  "superficie_m2": 400
+}

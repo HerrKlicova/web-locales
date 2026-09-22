@@ -12,6 +12,14 @@
       "type": "stdio",
       "command": "npx",
       "args": ["chrome-devtools-mcp@latest"]
+    },
+    "gmaps": {
+      "type": "stdio",
+      "command": "uvx",
+      "args": ["--with", "mcp<2", "gmaps-mcp"],
+      "env": {
+        "GOOGLE_MAPS_API_KEY": "${GOOGLE_MAPS_API_KEY}"
+      }
     }
   }
 }
