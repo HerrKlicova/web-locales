@@ -1,0 +1,40 @@
+---
+import { ficha } from '../lib/datos';
+import Icono from './Icono.astro';
+
+/* Reseñas reales de su ficha de Google, copiadas tal cual y en su idioma original
+   (Places API v1 con languageCode=es). No se corrige ni se recorta nada. */
+const resenas = ficha.resenas;
+const valoracion = ficha.valoracion.toLocaleString('es-ES', { minimumFractionDigits: 1 });
+---
+
+<section id="resenas" aria-labelledby="resenas-titulo" class="contenedor py-14">
+  <div class="revela border-t border-hair pt-10">
+    <h2 id="resenas-titulo" class="titulo text-[clamp(1.5rem,3.6vw,2.1rem)] text-verde">
+      Lo que dicen los pacientes
+    </h2>
+    <p class="mt-3 flex flex-wrap items-center gap-x-2 gap-y-1 text-tinta-2">
+      <span class="flex" aria-hidden="true">
+        {[0, 1, 2, 3, 4].map(() => <Icono nombre="estrella" class="size-4 text-verde-medio" />)}
+      </span>
+      <span class="sans font-extrabold text-tinta">{valoracion}</span>
+      <span>de media en {ficha.num_resenas} reseñas de Google.</span>
+    </p>
+  </div>
+
+  <ul class="mt-8 grid list-none gap-4 p-0 md:grid-cols-2">
+    {resenas.map((r) => (
+      <li class="revela border-t border-hair pt-5">
+        <div class="flex gap-1" role="img" aria-label={`${r.estrellas} de 5 estrellas`}>
+          {Array.from({ length: r.estrellas }).map(() => (
+            <Icono nombre="estrella" class="size-3.5 text-verde-medio" />
+          ))}
+        </div>
+        <blockquote class="mt-3 text-[1.0625rem] leading-relaxed whitespace-pre-line text-tinta">
+          {r.texto}
+        </blockquote>
+        <p class="sans mt-3 text-[0.9375rem] font-extrabold text-tinta-2">{r.autor}</p>
+      </li>
+    ))}
+  </ul>
+</section>

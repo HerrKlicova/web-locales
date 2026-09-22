@@ -1,0 +1,89 @@
+---
+import { ficha } from '../lib/datos';
+import { enlaceWhatsapp } from '@plantilla/lib/ficha';
+import Icono from './Icono.astro';
+
+/* §10, punto 6: las dudas reales que frenan antes de pedir cita, sacadas de la
+   investigación (investigacion.md §3). Solo están las que se pueden responder con datos
+   que ya tenemos. Las de criterio clínico (cuánto dura la sesión, cuántas van a hacer
+   falta, si duele) se quedan fuera a propósito: responderlas sería inventárselo. Las de
+   precio y horario las quitó Eugenio.
+
+   Van en filas con filete, no en tarjetas con sombra (§4). */
+const dudas = [
+  {
+    p: '¿Me tiene que mandar el médico?',
+    r: 'No hace falta. Puedes pedir cita tú directamente, sin volante ni derivación.',
+  },
+  {
+    p: 'No sé lo que tengo.',
+    r: 'Tampoco hace falta saberlo. Hay traumatología y ecografía en la propia clínica, así que se mira antes de empezar a tratar nada.',
+  },
+  {
+    p: 'Ya he probado en otro sitio y sigo igual.',
+    r: 'Es lo que más se repite de quien llega aquí. Somos once especialidades en la misma casa: si lo que te pasa tiene más de una causa, se puede mirar desde más de un lado.',
+  },
+];
+---
+
+<section id="dudas" aria-labelledby="dudas-titulo" class="contenedor py-14">
+  <div class="revela border-t border-hair pt-10">
+    <h2 id="dudas-titulo" class="titulo text-[clamp(1.6rem,3.6vw,2.4rem)] text-verde">Antes de pedir cita</h2>
+    <p class="mt-3 max-w-[52ch] text-[1.0625rem] text-tinta-2">
+      Las dudas que más nos llegan por teléfono.
+    </p>
+  </div>
+
+  <dl class="mt-8">
+    {dudas.map((d) => (
+      <div class="fila revela">
+        <dt class="pregunta sans">{d.p}</dt>
+        <dd class="respuesta">{d.r}</dd>
+      </div>
+    ))}
+  </dl>
+
+  <div class="mt-8 flex flex-wrap items-center gap-x-4 gap-y-3">
+    <p class="text-[1.0625rem] text-tinta-2">¿Te quedan más preguntas?</p>
+    <a
+      class="boton boton-secundario"
+      href={enlaceWhatsapp(ficha, `Hola, tengo una duda antes de pedir cita en ${ficha.nombre}.`)}
+    >
+      <Icono nombre="whatsapp" class="size-5" />
+      Pregúntanos por WhatsApp
+    </a>
+  </div>
+</section>
+
+<style>
+  .fila {
+    border-top: 1px solid var(--color-hair);
+    padding-block: 1.5rem;
+  }
+  .fila:last-child { border-bottom: 1px solid var(--color-hair); }
+
+  .pregunta {
+    font-weight: 800;
+    font-size: clamp(1.0625rem, 2.4vw, 1.25rem);
+    line-height: 1.25;
+    color: var(--color-verde);
+  }
+  .respuesta {
+    margin-top: 0.5rem;
+    max-width: 62ch;
+    font-size: 1.0625rem;
+    line-height: 1.55;
+    color: var(--color-tinta);
+  }
+
+  /* En pantallas anchas, pregunta y respuesta en dos columnas: llena la fila. */
+  @media (min-width: 1100px) {
+    .fila {
+      display: grid;
+      grid-template-columns: minmax(0, 22rem) minmax(0, 1fr);
+      column-gap: 2rem;
+      align-items: start;
+    }
+    .respuesta { margin-top: 0; }
+  }
+</style>

@@ -1,0 +1,43 @@
+---
+import '@fontsource/hanken-grotesk/latin-400.css';
+import '@fontsource/hanken-grotesk/latin-800.css';
+import '@fontsource/source-serif-4/latin-400.css';
+import '../styles/global.css';
+import hanken800 from '@fontsource/hanken-grotesk/files/hanken-grotesk-latin-800-normal.woff2?url';
+import serif400 from '@fontsource/source-serif-4/files/source-serif-4-latin-400-normal.woff2?url';
+
+interface Props {
+  titulo: string;
+  descripcion: string;
+  /** Demo: noindex, sin sitemap, sin formulario (§9). */
+  demo?: boolean;
+  schema?: Record<string, unknown>;
+}
+const { titulo, descripcion, demo = true, schema } = Astro.props;
+// En demo la web cuelga de /<slug>-<token>; los estáticos de public/ necesitan ese prefijo.
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+---
+
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{titulo}</title>
+    <meta name="description" content={descripcion} />
+    {demo && <meta name="robots" content="noindex, nofollow" />}
+    <meta name="theme-color" content="#f1e9df" />
+    <link rel="icon" href={`${base}/favicon.svg`} type="image/svg+xml" />
+    <link rel="preload" as="font" type="font/woff2" href={hanken800} crossorigin />
+    <link rel="preload" as="font" type="font/woff2" href={serif400} crossorigin />
+    {schema && <script type="application/ld+json" set:html={JSON.stringify(schema)} />}
+  </head>
+  <body class="min-h-dvh">
+    <a
+      href="#contenido"
+      class="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-50 focus:rounded-full focus:bg-verde focus:inline-flex focus:min-h-11 focus:items-center focus:px-4 focus:py-2 focus:font-bold focus:text-crema"
+      >Ir al contenido</a
+    >
+    <slot />
+  </body>
+</html>

@@ -1,0 +1,24 @@
+---
+import { ficha } from '../lib/datos';
+---
+
+<section id="horario" aria-labelledby="horario-titulo" class="contenedor py-14">
+  <div class="revela grid gap-8 border-t border-hair pt-10 md:grid-cols-[1fr_1.1fr] md:gap-12">
+    <div>
+      <h2 id="horario-titulo" class="titulo text-[clamp(1.5rem,3.6vw,2.1rem)] text-verde">Horario</h2>
+      <p class="prosa mt-3 text-tinta-2">
+        Se atiende con cita. Por la mañana y por la tarde, de lunes a viernes.
+      </p>
+    </div>
+    <dl class="text-[1.0625rem]">
+      {ficha.horario.map((h) => (
+        <div class="flex items-baseline justify-between gap-6 border-b border-hair py-3 last:border-b-0">
+          <dt class="sans font-extrabold text-tinta">{h.dias}</dt>
+          <dd class:list={['text-right', h.horas === 'Cerrado' ? 'text-tinta-2' : 'text-verde']}>
+            {h.horas}
+          </dd>
+        </div>
+      ))}
+    </dl>
+  </div>
+</section>

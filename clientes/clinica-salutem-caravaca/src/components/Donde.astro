@@ -1,0 +1,62 @@
+---
+import { ficha } from '../lib/datos';
+import { direccionCompleta } from '@plantilla/lib/ficha';
+import Icono from './Icono.astro';
+
+const [lat, lng] = ficha.coordenadas;
+const srcMapa = `https://www.google.com/maps?q=${lat},${lng}&z=17&hl=es&output=embed`;
+/* «Cómo llegar» tiene que abrir la ruta, no la ficha. El ayudante de la plantilla devuelve
+   maps_url cuando existe, y entonces este botón y «Ver en Google» llevaban al mismo sitio. */
+const comoLlegar = `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`;
+---
+
+<section id="donde" aria-labelledby="donde-titulo" class="contenedor py-14">
+  <div class="revela grid gap-8 border-t border-hair pt-10 md:grid-cols-2 md:items-start md:gap-12">
+    <div>
+      <h2 id="donde-titulo" class="titulo text-[clamp(1.5rem,3.6vw,2.1rem)] text-verde">Dónde estamos</h2>
+      <address class="mt-4 flex items-start gap-3 text-[1.125rem] not-italic leading-snug">
+        <Icono nombre="pin" class="mt-1 size-5 shrink-0 text-verde-medio" />
+        <span>{ficha.nombre}<br />{direccionCompleta(ficha)}</span>
+      </address>
+      <div class="mt-6 flex flex-wrap gap-3">
+        <a class="boton boton-principal" href={comoLlegar} target="_blank" rel="noopener">
+          <Icono nombre="ruta" class="size-5" />
+          Cómo llegar
+        </a>
+        <a class="boton boton-secundario" href={ficha.maps_url} target="_blank" rel="noopener">
+          <Icono nombre="google" class="size-5" />
+          Ver en Google
+        </a>
+      </div>
+    </div>
+
+    <!-- El mapa se carga solo al pulsar: así no pesa en la primera carga ni trae cookies de Google. -->
+    <div
+      class="relative aspect-[4/3] overflow-hidden rounded-xl border border-hair bg-panel"
+      data-mapa
+      data-src={srcMapa}
+    >
+      <div class="absolute inset-0 flex flex-col items-center justify-center gap-3 p-4 text-center">
+        <Icono nombre="mapa" class="size-9 text-verde-medio" />
+        <button type="button" class="boton boton-secundario" data-mapa-boton>Ver el mapa</button>
+        <span class="text-sm text-tinta-2">Al abrirlo se carga un mapa de Google.</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  const caja = document.querySelector<HTMLElement>('[data-mapa]');
+  const boton = caja?.querySelector<HTMLButtonElement>('[data-mapa-boton]');
+  if (caja && boton) {
+    boton.addEventListener('click', () => {
+      const iframe = document.createElement('iframe');
+      iframe.src = caja.dataset.src ?? '';
+      iframe.title = 'Mapa de Google con la situación de la clínica';
+      iframe.loading = 'lazy';
+      iframe.referrerPolicy = 'no-referrer-when-downgrade';
+      iframe.className = 'absolute inset-0 h-full w-full border-0';
+      boton.parentElement?.replaceWith(iframe);
+    });
+  }
+</script>

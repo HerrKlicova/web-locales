@@ -1,0 +1,166 @@
+{
+  "slug": "clinica-salutem-caravaca",
+  "demo_token": "cz9nsx",
+  "nombre": "Clínica Salutem",
+  "nombre_google": "Clinica Salutem Fisioterapia y Osteopatía",
+  "tipo": "MedicalClinic",
+  "pueblo": "Caravaca de la Cruz",
+  "direccion": "Av. Ctra. de Granada, 24",
+  "cp": "30400",
+  "telefono": "+34 681 62 28 02",
+  "whatsapp": "+34 681 62 28 02",
+  "email": "cfsalutem@gmail.com",
+  "maps_url": "https://maps.google.com/?cid=8684168117532789535",
+  "coordenadas": [
+    38.1030308,
+    -1.8656624
+  ],
+  "valoracion": 5,
+  "num_resenas": 142,
+  "horario": [
+    {
+      "dias": "Lunes a viernes",
+      "horas": "9:00–14:00 y 15:00–21:00"
+    },
+    {
+      "dias": "Sábado y domingo",
+      "horas": "Cerrado"
+    }
+  ],
+  "servicios": [
+    {
+      "nombre": "Fisioterapia avanzada",
+      "zona": "Dolor y lesión",
+      "texto": "Terapia manual, punción seca y ejercicio pautado. Primero se calma el dolor; después se trabaja para que no vuelva."
+    },
+    {
+      "nombre": "Osteopatía",
+      "zona": "Dolor y lesión",
+      "texto": "Se busca el origen de la molestia, que muchas veces no está donde duele. Se mira el cuerpo entero, no solo la zona."
+    },
+    {
+      "nombre": "Traumatología",
+      "zona": "Diagnóstico médico",
+      "texto": "El diagnóstico médico de la lesión. Saber exactamente qué hay antes de empezar a tratarlo."
+    },
+    {
+      "nombre": "Ecografía",
+      "zona": "Diagnóstico médico",
+      "texto": "Ver la lesión por dentro en la propia consulta. Sirve para confirmar qué pasa y para comprobar si va mejorando."
+    },
+    {
+      "nombre": "Pilates terapéutico",
+      "zona": "Movimiento",
+      "texto": "Grupos pequeños con un fisioterapeuta delante. Cada ejercicio se adapta a la lesión de quien lo hace."
+    },
+    {
+      "nombre": "Hipopresivos",
+      "zona": "Movimiento",
+      "texto": "Trabajo de respiración y de la faja abdominal profunda. Se usa sobre todo después del parto y en hernias."
+    },
+    {
+      "nombre": "Suelo pélvico",
+      "zona": "Salud de la mujer",
+      "texto": "Pérdidas de orina, sensación de pesadez o dolor en las relaciones. Es muy frecuente, no es normal y tiene tratamiento."
+    },
+    {
+      "nombre": "Ginecología y obstetricia",
+      "zona": "Salud de la mujer",
+      "texto": "Revisiones y seguimiento del embarazo, coordinado con el suelo pélvico, que casi siempre va de la mano."
+    },
+    {
+      "nombre": "Podología",
+      "zona": "El pie",
+      "texto": "Estudio de la pisada, plantillas y quiropodia. Muchos dolores de rodilla, cadera y espalda empiezan en el pie."
+    },
+    {
+      "nombre": "Nutrición",
+      "zona": "Hábitos",
+      "texto": "Pautas de alimentación realistas, sin dietas imposibles. Como apoyo a una recuperación o por sí solas."
+    },
+    {
+      "nombre": "Medicina estética",
+      "zona": "Piel",
+      "texto": "Tratamientos médicos de cara y cuerpo, con criterio clínico y sin prometer lo que no se puede cumplir."
+    }
+  ],
+  "resenas": [
+    {
+      "texto": "Estoy muy contenta con la atención recibida en la clínica. Son muy profesionales y el trato es cercano y cuidadoso. En mi caso estoy tratándome el suelo pélvico y una tendinitis en la muñeca, y han sabido organizarme las sesiones para poder atender ambas cosas.\n\nEmpecé con una fisioterapeuta y, como no tenía disponibilidad para tratar también la mano, me asignaron otra fisio para esa parte, algo que agradecí porque se preocuparon por buscarme hueco lo antes posible.\n\nEn general, transmiten mucha profesionalidad y confianza. Muy recomendable.",
+      "autor": "Mari Carmen Llorente Martínez",
+      "estrellas": 5,
+      "fecha": "2026-03-06"
+    },
+    {
+      "texto": "Mi experiencia en esta clínica de fisioterapia ha sido excelente. Desde el primer momento me trataron con mucha profesionalidad, cercanía y atención. Se nota que se preocupan de verdad por sus pacientes y explican todo de forma clara.\n\nEl tratamiento me ha ayudado mucho y he notado una gran mejoría. Además, las instalaciones están muy cuidadas y el ambiente es agradable.\n\nSin duda, recomiendo esta clínica a cualquiera que busque un servicio de calidad. ¡Muchas gracias por el trato y la dedicación!",
+      "autor": "david manuel martinez marin",
+      "estrellas": 5,
+      "fecha": "2026-06-30"
+    },
+    {
+      "texto": "He estado en la clínica tratándome y no puedo estar más agradecida.\nGrandes profesionales increíblemente atentos, expertos y competentes.\nEstoy yendo desde que abrieron y no puedo estar más contenta.\nMe han tratado varías lesiones y no sólo me han ayudado a recuperarme, sino qué también me han enseñado ejercicios para hacer en casa y prevenir futuros problemas.\nLa clínica cuenta con una amplia gama de equipos y tecnología de última generación para tratamientos de fisioterapia y osteopatía, abordar diferentes tipos de lesiones, terapias y tratamientos personalizados.",
+      "autor": "Alicia Fernandez",
+      "estrellas": 5,
+      "fecha": "2026-04-08"
+    },
+    {
+      "texto": "Excelente experiencia! Fuí por un problema de flexión de cadera y el trato fue inmejorable. Me atendió Maria José, quien me trató con mucha empatía y profesionalidad. Me sentí muy cómoda en todo momento, y además el dolor desapareció por completo. Recomiendo 100%!!!",
+      "autor": "Patricia Navarro",
+      "estrellas": 5,
+      "fecha": "2026-03-09"
+    },
+    {
+      "texto": "Mi sitio favorito de fisioterapia. Miguel Ángel, mi fisio de confianza siempre consigue arreglar mis tres mil piezas sueltas, gran profesional y gran persona, trato muy cercano",
+      "autor": "Maria ángeles Aznar Ruiz",
+      "estrellas": 5,
+      "fecha": "2026-07-16"
+    }
+  ],
+  "anio_apertura": null,
+  "experiencia_texto": "más de nueve años",
+  "fotos_cedidas": false,
+  "direccion_visual": "Su logotipo: dos manos sosteniendo una columna de once vértebras de puntos que forma la S de Salutem. La columna es la sección central de la web. Fondo crema plano, verdes del logo, Hanken Grotesk 800 en titulares y Source Serif 4 en el texto.",
+  "notas": "DIRECCIÓN: Google Business dice «C. Junquico, 7». Su Instagram y su Facebook dicen «Avenida Carretera de Granada, 24». Se usa la de Avenida Carretera de Granada, 24 y el mapa apunta ahí; las dos direcciones geocodifican a unos 30 m de distancia, así que parece el mismo edificio en esquina con dos fachadas. Rompe la regla de NAP idéntico a Google a propósito: la ficha de Google parece desactualizada. PENDIENTE DE CONFIRMAR CON LA CLÍNICA antes de producción; si confirman Junquico, cambiar dirección y coordenadas. NOMBRE: en Google figuran como «Clinica Salutem Fisioterapia y Osteopatía»; se usa «Clínica Salutem» en la web y el nombre de Google queda como alternateName en el schema para no romper el NAP. DISEÑO: la dirección visual viene de referencia/DISENO.md y referencia/columna.html (aprobados el 22/09/2026). La paleta, la tipografía, las coordenadas de las vértebras y el orden salen de ahí. Del prototipo se han cambiado dos cosas por §3 y §6 del CLAUDE.md: se quitan las etiquetas en mayúsculas espaciadas y el gris #9A9081 de números y títulos inactivos sube a #6B6252 para llegar a 4,5:1. Tampoco se lleva el modo oscuro del prototipo: el crema es justo el del badge de su logotipo y es lo que hace que no se recorte. ESPECIALIDADES: son once, aunque Google las catalogue solo como fisioterapia. El orden y los textos descriptivos son provisionales y los tiene que confirmar la clínica. PRECIOS: no se publican, es lo normal en el sector; los servicios van sin precio a propósito, no son huecos pendientes. AÑO DE APERTURA: dicen «más de nueve años»; no se pone un año concreto porque no está confirmado. FOTOS: todas generadas con Higgsfield. No se ha usado nada de su Instagram ni de Google Maps (sin permiso escrito). TITULAR: por decisión de Eugenio el h1 se queda en «Once especialidades, una sola clínica», sin el pueblo. Rompe la regla de §9 de meter tipo de negocio y pueblo en el h1; el pueblo sigue en el <title>, en la meta description, en la dirección de la portada y en el schema. FOTOS: la portada no lleva foto a propósito; manda la columna. El pilates es en suelo, no de aparatos.",
+  "pendiente": [
+    "EQUIPO: la página /equipo existe y se enlaza desde la portada, pero va entera en huecos. En sus reseñas de Google aparecen «Miguel Ángel» y «María José», y se quitaron por decisión de Eugenio: son nombres de pacientes hablando, no una lista que haya dado la clínica. Hay que pedirles los nombres, los papeles y cuánta gente son. Se rellena en \"equipo\" de esta ficha y la página se actualiza sola.",
+    "PRECIOS Y HORARIO EN LAS DUDAS: se han quitado las preguntas «¿Cuánto cuesta?» y «¿Puedo ir al salir de trabajar?» por decisión de Eugenio.",
+    "DOMINIO: sin definir. astro.config.mjs lo exige para el build de producción (site + sitemap, §9/§11). Se rellena cuando la clínica contrate y diga qué dominio quiere.",
+    "Confirmar la dirección buena: Google dice C. Junquico, 7; Instagram y Facebook, Avenida Carretera de Granada, 24.",
+    "Cuánto dura una sesión y si la primera es más larga. Es la queja concreta que aparece en el sector (ver investigacion.md §3) y hoy no se puede responder en la web.",
+    "Precios: no se publican, pero hay que saber qué contestar por WhatsApp. La sección «Antes de pedir cita» remite ahí.",
+    "Repasar con la clínica el texto de «Antes de pedir cita»: las respuestas están escritas en su voz y las tienen que dar por buenas.",
+    "¿Reorganizan las sesiones o asignan otro fisio para que entres antes? Sale en una reseña, pero una reseña no es una política y no se anuncia como tal.",
+    "«Recuperación funcional» sale en el lema del logotipo pero no en la biografía: ¿es una duodécima especialidad o el paraguas de todas?",
+    "Visto bueno de la clínica para usar las vértebras de su logotipo sueltas como elemento de la web.",
+    "Orden definitivo de las once especialidades: depende de qué les factura más.",
+    "Logotipo en vectorial: fija la tipografía definitiva y los valores buenos de la paleta.",
+    "Año exacto de apertura: dicen más de nueve años, no hay fecha confirmada."
+  ],
+  "equipo": [
+    {
+      "nombre": "[NOMBRE]",
+      "papel": "[ESPECIALIDAD]"
+    },
+    {
+      "nombre": "[NOMBRE]",
+      "papel": "[ESPECIALIDAD]"
+    },
+    {
+      "nombre": "[NOMBRE]",
+      "papel": "[ESPECIALIDAD]"
+    },
+    {
+      "nombre": "[NOMBRE]",
+      "papel": "[ESPECIALIDAD]"
+    },
+    {
+      "nombre": "[NOMBRE]",
+      "papel": "[ESPECIALIDAD]"
+    },
+    {
+      "nombre": "[NOMBRE]",
+      "papel": "[ESPECIALIDAD]"
+    }
+  ],
+  "dominio": null
+}

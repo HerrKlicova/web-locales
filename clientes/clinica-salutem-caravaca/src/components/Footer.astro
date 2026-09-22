@@ -1,0 +1,76 @@
+---
+import { ficha } from '../lib/datos';
+import { enlaceWhatsapp, enlaceTelefono, direccionCompleta } from '@plantilla/lib/ficha';
+import Icono from './Icono.astro';
+
+interface Props { demo?: boolean }
+const { demo = true } = Astro.props;
+/* En producción se rellenan titular y NIF con los datos reales del cliente (§9). */
+const titular = '[TITULAR]';
+const nif = '[NIF]';
+---
+
+<footer class="mt-6 border-t border-hair bg-panel px-5 pt-12 pb-[calc(6rem+env(safe-area-inset-bottom))] md:pb-12">
+  <div class="contenedor px-0">
+    <div class="grid gap-8 md:grid-cols-[1.2fr_1fr]">
+      <div>
+        <p class="titulo text-[1.75rem] text-verde">{ficha.nombre}</p>
+        <p class="mt-2 text-tinta-2">{direccionCompleta(ficha)}</p>
+        <div class="mt-5 flex flex-wrap gap-3">
+          <a class="boton boton-principal" href={enlaceWhatsapp(ficha)}>
+            <Icono nombre="whatsapp" class="size-5" />
+            WhatsApp
+          </a>
+          <a class="boton boton-secundario" href={enlaceTelefono(ficha)}>
+            <Icono nombre="telefono" class="size-5" />
+            {ficha.telefono}
+          </a>
+        </div>
+        <p class="mt-4">
+          <a class="inline-flex min-h-11 items-center text-tinta underline decoration-verde-claro underline-offset-4 hover:text-verde" href={`mailto:${ficha.email}`}>
+            {ficha.email}
+          </a>
+        </p>
+      </div>
+
+      <div class="text-[0.9375rem] text-tinta-2">
+        <p class="sans font-extrabold text-tinta">Horario</p>
+        {ficha.horario.map((h) => (
+          <p class="mt-1">{h.dias}: {h.horas}</p>
+        ))}
+      </div>
+    </div>
+
+    <div class="mt-10 border-t border-hair pt-5 text-[0.9375rem] text-tinta-2">
+      <div class="flex flex-wrap gap-x-6 gap-y-2">
+        <details>
+          <summary class="inline-flex min-h-11 cursor-pointer list-none items-center underline decoration-verde-claro underline-offset-4 hover:text-verde">Aviso legal</summary>
+          <div class="prosa mt-3 space-y-2">
+            <p>Titular de esta web: {titular}, con NIF {nif} y domicilio en {direccionCompleta(ficha)}. Contacto: {ficha.email}.</p>
+            <p>Los textos, las fotos y la marca de esta web pertenecen a su titular. No se permite copiarlos sin permiso.</p>
+          </div>
+        </details>
+        <details>
+          <summary class="inline-flex min-h-11 cursor-pointer list-none items-center underline decoration-verde-claro underline-offset-4 hover:text-verde">Privacidad</summary>
+          <div class="prosa mt-3 space-y-2">
+            <p>Esta web no tiene formularios ni guarda datos personales. Si escribes por WhatsApp, llamas o mandas un correo, tus datos los trata {titular} solo para atender tu petición y darte cita, según el Reglamento (UE) 2016/679.</p>
+            <p>Puedes pedir acceso, corrección o borrado de tus datos escribiendo a {ficha.email}.</p>
+          </div>
+        </details>
+        <details>
+          <summary class="inline-flex min-h-11 cursor-pointer list-none items-center underline decoration-verde-claro underline-offset-4 hover:text-verde">Cookies</summary>
+          <div class="prosa mt-3 space-y-2">
+            <p>Esta web no usa cookies propias ni de seguimiento. Si pulsas «Ver el mapa», se carga un mapa de Google y Google puede usar las suyas.</p>
+          </div>
+        </details>
+      </div>
+      {/* §12: el crédito va con enlace, pero mientras la URL de la marca sea un hueco se
+          queda en texto. Un href="#" es un enlace muerto y §13 no los deja pasar. */}
+      {!demo && (
+        <p class="mt-5">
+          Web hecha por <span class="sans font-extrabold">[MARCA]</span>
+        </p>
+      )}
+    </div>
+  </div>
+</footer>

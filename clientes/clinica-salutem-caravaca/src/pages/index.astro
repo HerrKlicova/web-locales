@@ -1,0 +1,54 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Columna from '../components/Columna.astro';
+import Horario from '../components/Horario.astro';
+import Galeria from '../components/Galeria.astro';
+import Resenas from '../components/Resenas.astro';
+import Objeciones from '../components/Objeciones.astro';
+import Donde from '../components/Donde.astro';
+import Footer from '../components/Footer.astro';
+import BarraWhatsapp from '../components/BarraWhatsapp.astro';
+import { ficha } from '../lib/datos';
+import { schemaLocalBusiness } from '@plantilla/lib/schema';
+
+const demo = !import.meta.env.PRODUCCION;
+
+/* Schema MedicalClinic (§7). Se parte del ayudante común y se añade lo propio de una
+   clínica: el nombre con el que figuran en Google como alternateName, para que el NAP
+   siga cuadrando aunque la web lleve el nombre corto, y las once especialidades.
+   No se marcan las reseñas: son reseñas sobre uno mismo en la web de uno mismo, que
+   Google no admite para resultados enriquecidos. Se enseñan igual, pero sin schema. */
+const base = schemaLocalBusiness(ficha as never, undefined, []);
+delete (base as Record<string, unknown>).priceRange;
+const schema = {
+  ...base,
+  alternateName: ficha.nombre_google,
+  email: ficha.email,
+  availableService: ficha.servicios.map((s) => ({
+    '@type': 'MedicalTherapy',
+    name: s.nombre,
+    description: s.texto,
+  })),
+};
+
+const titulo = `${ficha.nombre} — Clínica de fisioterapia y once especialidades en ${ficha.pueblo}`;
+const descripcion =
+  `Fisioterapia, osteopatía, traumatología, ecografía, suelo pélvico, podología y más, en ${ficha.pueblo}. ` +
+  `Cita por WhatsApp o llamando al ${ficha.telefono}.`;
+---
+
+<Layout titulo={titulo} descripcion={descripcion} demo={demo} schema={schema}>
+  <main id="contenido">
+    <Columna />
+    <Horario />
+    <Galeria />
+    <Resenas />
+    {/* Equipo.astro va aquí cuando la clínica confirme nombres y papeles: hoy solo
+        conocemos «María José» y «Miguel Ángel» de sus reseñas, sin saber qué hace
+        cada uno, y ponerles un cargo sería inventarlo (§10). */}
+    <Objeciones />
+    <Donde />
+  </main>
+  <Footer demo={demo} />
+  <BarraWhatsapp />
+</Layout>

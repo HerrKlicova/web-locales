@@ -1,0 +1,60 @@
+---
+import { ficha } from '../lib/datos';
+import { esHueco } from '@plantilla/lib/ficha';
+
+/* El equipo, en su propia página (/equipo), con acceso desde la portada.
+
+   De momento va entera en huecos visibles (§10). En sus reseñas de Google se citan dos
+   nombres, pero se quitaron: son pacientes hablando, no una lista que haya dado la
+   clínica, y no sabemos ni qué hace cada uno ni cuánta gente son. Las fichas en blanco
+   marcan el sitio que ocupan.
+
+   Todo sale de "equipo" en ficha.json. El día que la clínica lo confirme, se rellena ahí
+   y esta página se actualiza sola. */
+const equipo = ficha.equipo ?? [];
+---
+
+<section aria-labelledby="equipo-titulo" class="contenedor pb-4">
+  <h1 id="equipo-titulo" class="titulo text-[clamp(2rem,5.2vw,3.5rem)] text-verde">Quién te atiende</h1>
+  <p class="prosa mt-5 text-[1.0625rem] text-tinta md:text-[1.1875rem]">
+    Somos un equipo. Cuando lo que te pasa toca a más de una especialidad no te mandamos a
+    otro sitio: lo vemos entre varios y nos ponemos de acuerdo.
+  </p>
+
+  <ul class="mt-10 grid list-none gap-x-8 gap-y-7 p-0 sm:grid-cols-2 lg:grid-cols-3">
+    {equipo.map((m) => (
+      <li class:list={['ficha revela', esHueco(m.nombre) && 'pendiente']}>
+        <p class="nombre sans">{m.nombre}</p>
+        <p class="papel">{m.papel}</p>
+      </li>
+    ))}
+  </ul>
+</section>
+
+<style>
+  .ficha {
+    border-top: 2px solid var(--color-verde);
+    padding-top: 0.85rem;
+  }
+  .nombre {
+    font-weight: 800;
+    font-size: 1.25rem;
+    line-height: 1.2;
+    color: var(--color-tinta);
+  }
+  .papel {
+    margin-top: 0.25rem;
+    font-size: 1.0625rem;
+    color: var(--color-verde-medio);
+  }
+
+  /* Las fichas sin nombre confirmado se ven, pero calladas: marcan el sitio que ocupan
+     sin fingir que ya hay alguien ahí. */
+  .ficha.pendiente {
+    border-top-color: var(--color-hair);
+  }
+  .ficha.pendiente .nombre,
+  .ficha.pendiente .papel {
+    color: var(--color-tinta-2);
+  }
+</style>

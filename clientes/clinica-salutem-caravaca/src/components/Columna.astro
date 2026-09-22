@@ -1,0 +1,318 @@
+---
+import { ficha, VERTEBRAS } from '../lib/datos';
+import { enlaceWhatsapp, enlaceTelefono } from '@plantilla/lib/ficha';
+import Icono from './Icono.astro';
+
+/* La sección principal (DISEÑO §1). Portada y especialidades son una sola cosa: hay UNA
+   columna, la de su logotipo, fija a la izquierda de principio a fin.
+
+   Al cargar está entera en verde, que es como está en su logotipo, al lado del titular.
+   Al bajar, el titular se va, la columna se queda y las once especialidades pasan a su
+   lado encendiendo su vértebra. Las coordenadas están medidas sobre su logotipo real y
+   van tal cual; las manos no se dibujan, eso es su logotipo.
+
+   El titular es el elemento LCP y no se anima (§5). Sin JavaScript la columna se queda
+   entera en verde y todos los textos en su color final: no se esconde nada. */
+const especialidades = ficha.servicios;
+const valoracion = ficha.valoracion.toLocaleString('es-ES', { minimumFractionDigits: 1 });
+---
+
+<section id="especialidades" class="contenedor">
+  <div class="directorio">
+    <!-- La columna. Una sola, fija mientras dura la sección. -->
+    <div class="espina-caja">
+      <svg
+        class="espina"
+        data-modo="marca"
+        viewBox="0 0 120 280"
+        role="img"
+        aria-label="La columna de once vértebras del logotipo de la clínica: una por cada especialidad"
+      >
+        {VERTEBRAS.map(([cx, cy, r], i) => (
+          <g class="v" data-v={i}>
+            <circle class="anillo" cx={cx} cy={cy} r={r} />
+            <circle class="bola" cx={cx} cy={cy} r={r} />
+          </g>
+        ))}
+      </svg>
+    </div>
+
+    <div class="contenido">
+      <header class="portada" data-hero>
+        <p class="marca sans">{ficha.nombre}</p>
+
+        <h1 class="titular titulo text-verde">Once especialidades, una sola clínica</h1>
+
+        <p class="estrellas">
+          <span class="flex" aria-hidden="true">
+            {[0, 1, 2, 3, 4].map(() => <Icono nombre="estrella" class="size-[1.05rem] text-verde-medio" />)}
+          </span>
+          <span><b class="sans font-extrabold text-tinta">{valoracion}</b> con {ficha.num_resenas} reseñas en Google</span>
+        </p>
+
+        <p class="entrada prosa text-tinta" data-entra>
+          Llevamos {ficha.experiencia_texto} tratando dolor y lesiones. Fisioterapia, traumatología,
+          ecografía, suelo pélvico y mucho más.
+        </p>
+
+        <p class="remate prosa text-tinta" data-entra>
+          Si lo que te pasa tiene más de una causa, no tienes que ir a más de un sitio.
+        </p>
+
+        <div class="botones" data-entra>
+          <a class="boton boton-principal" href={enlaceWhatsapp(ficha, `Hola, quiero pedir cita en ${ficha.nombre}.`)}>
+            <Icono nombre="whatsapp" class="size-5" />
+            Pedir cita por WhatsApp
+          </a>
+          <a class="boton boton-secundario" href={enlaceTelefono(ficha)}>
+            <Icono nombre="telefono" class="size-5" />
+            {ficha.telefono}
+          </a>
+        </div>
+
+        <p class="direccion" data-entra>
+          <Icono nombre="pin" class="size-4 shrink-0 text-verde-medio" />
+          {ficha.direccion}, {ficha.pueblo}
+        </p>
+      </header>
+
+      <!-- Transición: de dónde sale la columna, justo antes de recorrerla. -->
+      <div class="transicion revela">
+        <h2 class="titulo text-[clamp(1.6rem,3.6vw,2.4rem)] text-verde">Una vértebra por especialidad</h2>
+      </div>
+
+      <ol class="lista" id="lista">
+        {especialidades.map((e, i) => (
+          <li data-v={i} class={i === 0 ? 'on' : undefined}>
+            <div class="fila">
+              <span class="num" aria-hidden="true"></span>
+              <div class="nombre">
+                <p class="familia">{e.zona}</p>
+                <h3>{e.nombre}</h3>
+              </div>
+              <p class="desc">{e.texto}</p>
+            </div>
+          </li>
+        ))}
+      </ol>
+    </div>
+  </div>
+</section>
+
+<style>
+  /* Dos franjas: la columna fija a la izquierda y todo lo demás a su derecha.
+     La columna abarca de la primera fila a la última, así que se queda a la vista
+     durante la portada y durante las once especialidades. */
+  .directorio {
+    display: grid;
+    grid-template-columns: 5.25rem minmax(0, 1fr);
+    column-gap: 0.875rem;
+    align-items: start;
+  }
+  .espina-caja {
+    grid-column: 1;
+    grid-row: 1 / -1;
+    align-self: start;
+    position: sticky;
+    top: 0;
+    height: 100dvh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .espina {
+    display: block;
+    width: 100%;
+    height: auto;
+    max-height: 82vh;
+  }
+  .contenido { grid-column: 2; min-width: 0; }
+
+  /* La portada ocupa la primera pantalla, para que la columna quede a su lado. */
+  .portada {
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 1.1rem;
+    padding-block: 2.5rem;
+  }
+  .marca {
+    font-weight: 800;
+    font-size: 1.0625rem;
+    color: var(--color-verde-medio);
+    margin-bottom: -0.6rem;
+  }
+  .titular {
+    font-size: clamp(1.4375rem, 6.2vw, 4.5rem);
+    max-width: 18ch;
+  }
+  .estrellas {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    color: var(--color-tinta-2);
+    font-size: 0.9375rem;
+  }
+  .entrada { font-size: 1.0625rem; }
+  .remate { font-size: 1.0625rem; }
+  .botones { display: flex; flex-direction: column; align-items: stretch; gap: 0.75rem; }
+  .botones .boton { white-space: nowrap; }
+  .direccion {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.9375rem;
+    color: var(--color-tinta-2);
+  }
+
+  .transicion { padding-block: 0 2.5rem; }
+
+  .lista { list-style: none; margin: 0; padding: 0 0 2rem; counter-reset: esp; }
+  .lista li { border-top: 1px solid var(--color-hair); padding-block: 28px; }
+  .lista li:last-child { border-bottom: 1px solid var(--color-hair); }
+
+  /* Angosto: número a la izquierda, nombre y descripción apilados debajo.
+     Ancho: número, nombre y descripción en tres columnas, que es lo que llena la fila. */
+  .fila {
+    display: grid;
+    grid-template-columns: 1.75rem minmax(0, 1fr);
+    column-gap: 0.75rem;
+    align-items: start;
+  }
+  .num { grid-column: 1; grid-row: 1; }
+  .nombre { grid-column: 2; grid-row: 1; }
+  .desc { grid-column: 2; grid-row: 2; margin-top: 0.35rem; }
+
+  /* La numeración es una secuencia real: once vértebras, de arriba abajo de la columna. */
+  .num {
+    counter-increment: esp;
+    font-family: var(--font-titulo);
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--color-tinta-2);
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.03em;
+    padding-top: 0.6rem;
+  }
+  .num::before { content: counter(esp, decimal-leading-zero); }
+  li.on .num { color: var(--color-verde); }
+
+  .familia {
+    font-family: var(--font-titulo);
+    font-size: 0.875rem;
+    color: var(--color-tinta-2);
+    margin-bottom: 4px;
+  }
+  .fila h3 {
+    font-family: var(--font-titulo);
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    line-height: 1.15;
+    font-size: clamp(1.25rem, 3.2vw, 1.6875rem);
+    color: var(--color-tinta-2);
+    margin-bottom: 6px;
+  }
+  li.on .fila h3 { color: var(--color-verde); }
+
+  .desc {
+    max-width: 52ch;
+    color: var(--color-tinta);
+    font-size: 1.0625rem;
+    line-height: 1.55;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .num, .fila h3 { transition: color 350ms ease; }
+  }
+
+  @media (min-width: 768px) {
+    .directorio {
+      grid-template-columns: clamp(11rem, 17vw, 17rem) minmax(0, 1fr);
+      column-gap: clamp(2.5rem, 5vw, 5rem);
+    }
+    .marca { font-size: 1.125rem; }
+    .estrellas { font-size: 1rem; }
+    .entrada { font-size: 1.1875rem; max-width: 56ch; }
+    .remate { font-size: 1.1875rem; max-width: 56ch; }
+    .botones { flex-direction: row; flex-wrap: wrap; align-items: center; }
+    .transicion { padding-block: 1rem 3.5rem; }
+  }
+
+  @media (min-width: 1100px) {
+    .fila {
+      grid-template-columns: 2.75rem minmax(0, 19rem) minmax(0, 1fr);
+      column-gap: 2rem;
+    }
+    .desc { grid-column: 3; grid-row: 1; margin-top: 0; }
+  }
+</style>
+
+<script>
+  /* La columna tiene dos estados. «marca»: las once en verde, como en su logotipo, que es
+     como se ve al cargar y mientras se lee la portada. «recorrido»: solo la vértebra de la
+     especialidad que se está leyendo, en verde pleno y con su anillo; las demás, apagadas.
+     Se pasa de uno a otro según haya o no una especialidad cruzando el centro de pantalla. */
+  const lista = document.getElementById('lista');
+  const espina = document.querySelector<SVGElement>('.espina');
+
+  if (lista && espina && 'IntersectionObserver' in window) {
+    const items = Array.from(lista.querySelectorAll('li'));
+    const vertebras = Array.from(espina.querySelectorAll('.v'));
+    let actual = -1;
+
+    const recorrido = (i: number) => {
+      espina.dataset.modo = 'recorrido';
+      if (i === actual) return;
+      actual = i;
+      items.forEach((li, n) => li.classList.toggle('on', n === i));
+      vertebras.forEach((g, n) => g.classList.toggle('on', n === i));
+    };
+
+    const marca = () => {
+      if (actual === -1) return;
+      actual = -1;
+      espina.dataset.modo = 'marca';
+      vertebras.forEach((g) => g.classList.remove('on'));
+      items.forEach((li, n) => li.classList.toggle('on', n === 0));
+    };
+
+    document.documentElement.classList.add('js');
+
+    /* Se lleva la cuenta de las que están en la banda central. No se puede comparar
+       intersectionRatio: es la fracción DEL ELEMENTO que entra en la banda, así que una
+       especialidad de texto corto que cabe entera da 1 y una larga que la cruza de lado a
+       lado da mucho menos, y ganaba la corta. Además el callback solo trae las entradas
+       que han cambiado, nunca todas. Con el conjunto completo se elige la que cruza la
+       línea central de la pantalla, que es la que se está leyendo. */
+    const visibles = new Set<number>();
+    const io = new IntersectionObserver(
+      (entradas) => {
+        for (const e of entradas) {
+          const i = items.indexOf(e.target as HTMLLIElement);
+          if (i < 0) continue;
+          if (e.isIntersecting) visibles.add(i);
+          else visibles.delete(i);
+        }
+        const centro = window.innerHeight / 2;
+        if (!visibles.size) {
+          // Sin ninguna en la banda: si la lista aún queda por debajo, seguimos en portada.
+          if (lista.getBoundingClientRect().top > centro) marca();
+          return;
+        }
+        let elegida = Math.min(...visibles);
+        for (const i of visibles) {
+          const r = items[i].getBoundingClientRect();
+          if (r.top <= centro && r.bottom > centro) {
+            elegida = i;
+            break;
+          }
+        }
+        recorrido(elegida);
+      },
+      { rootMargin: '-45% 0px -45% 0px', threshold: 0 },
+    );
+    items.forEach((li) => io.observe(li));
+  }
+</script>

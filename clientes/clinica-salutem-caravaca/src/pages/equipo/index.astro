@@ -1,0 +1,53 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Equipo from '../../components/Equipo.astro';
+import Footer from '../../components/Footer.astro';
+import BarraWhatsapp from '../../components/BarraWhatsapp.astro';
+import Icono from '../../components/Icono.astro';
+import { ficha } from '../../lib/datos';
+import { enlaceWhatsapp, enlaceTelefono } from '@plantilla/lib/ficha';
+
+const demo = !import.meta.env.PRODUCCION;
+// En demo la web cuelga de /<slug>-<token>; los enlaces internos necesitan ese prefijo.
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+
+const titulo = `Quién te atiende — ${ficha.nombre}, ${ficha.pueblo}`;
+const descripcion = `El equipo de ${ficha.nombre}: once especialidades trabajando juntas en ${ficha.pueblo}.`;
+---
+
+<Layout titulo={titulo} descripcion={descripcion} demo={demo}>
+  <header class="contenedor pt-6 pb-8 md:pt-8">
+    <a
+      class="inline-flex min-h-11 items-center gap-2 text-[1.0625rem] text-verde-medio hover:text-verde"
+      href={`${base}/`}
+    >
+      Volver a {ficha.nombre}
+    </a>
+  </header>
+
+  <main id="contenido">
+    <Equipo />
+
+    <section class="contenedor py-12">
+      <div class="revela border-t border-hair pt-8">
+        <p class="prosa text-[1.0625rem] text-tinta-2">
+          Si no sabes con quién tienes que hablar, cuéntanos qué te pasa y te decimos quién
+          lo lleva.
+        </p>
+        <div class="mt-6 flex flex-wrap gap-3">
+          <a class="boton boton-principal" href={enlaceWhatsapp(ficha, `Hola, quiero pedir cita en ${ficha.nombre}.`)}>
+            <Icono nombre="whatsapp" class="size-5" />
+            Pedir cita por WhatsApp
+          </a>
+          <a class="boton boton-secundario" href={enlaceTelefono(ficha)}>
+            <Icono nombre="telefono" class="size-5" />
+            {ficha.telefono}
+          </a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <Footer demo={demo} />
+  <BarraWhatsapp />
+</Layout>

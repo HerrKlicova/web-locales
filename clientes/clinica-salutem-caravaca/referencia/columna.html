@@ -1,0 +1,413 @@
+<title>Columna de especialidades</title>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;800&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap">
+
+<style>
+  :root{
+    --crema:#F1E9DF;
+    --crema-alta:#F7F2EA;
+    --panel:#E9E0D3;
+    --grano:0;
+    --verde:#2B6034;
+    --verde-medio:#4C7132;
+    --verde-claro:#7C9440;
+    --verde-vivo:#3C7B42;
+    --tinta:#3F382D;
+    --tinta-2:#6B6252;
+    --tinta-3:#9A9081;
+    --hair:#D6CBB8;
+    --mota:rgba(90,74,48,.10);
+    --mota-2:rgba(90,74,48,.06);
+    --apagado:#CFC6B3;
+    color-scheme:light;
+  }
+  @media (prefers-color-scheme:dark){
+    :root:not([data-theme="light"]){
+      --crema:#14170F;
+      --crema-alta:#1B2015;
+      --panel:#1E2418;
+      --grano:0;
+      --verde:#8FC26A;
+      --verde-medio:#A8CE72;
+      --verde-claro:#C2DC8C;
+      --verde-vivo:#A2D37B;
+      --tinta:#E9E5D8;
+      --tinta-2:#ABA593;
+      --tinta-3:#77715F;
+      --hair:#2F3527;
+      --mota:rgba(240,235,210,.055);
+      --mota-2:rgba(240,235,210,.03);
+      --apagado:#343A2B;
+      color-scheme:dark;
+    }
+  }
+  :root[data-theme="dark"]{
+    --crema:#14170F;
+    --crema-alta:#1B2015;
+    --panel:#1E2418;
+    --grano:0;
+    --verde:#8FC26A;
+    --verde-medio:#A8CE72;
+    --verde-claro:#C2DC8C;
+    --verde-vivo:#A2D37B;
+    --tinta:#E9E5D8;
+    --tinta-2:#ABA593;
+    --tinta-3:#77715F;
+    --hair:#2F3527;
+    --mota:rgba(240,235,210,.055);
+    --mota-2:rgba(240,235,210,.03);
+    --apagado:#343A2B;
+    color-scheme:dark;
+  }
+
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    color:var(--tinta);
+    font-family:"Hanken Grotesk","Helvetica Neue",Arial,sans-serif;
+    font-size:16px;line-height:1.55;
+    -webkit-font-smoothing:antialiased;
+    background-color:var(--crema);
+  }
+
+  /* grano de papel: ruido fractal, sin patrón visible */
+  body::before{
+    content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
+    opacity:var(--grano);
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23g)' opacity='0.06'/%3E%3C/svg%3E");
+  }
+  .proto,.wrap{position:relative;z-index:1;}
+
+  .wrap{max-width:1060px;margin:0 auto;padding-inline:20px;}
+
+  /* ---------- aviso de prototipo ---------- */
+  .proto{border-bottom:1px solid var(--hair);background:var(--panel);}
+  .proto .wrap{padding-block:13px;display:flex;gap:13px;align-items:baseline;flex-wrap:wrap;}
+  .proto .badge{
+    font-size:10px;letter-spacing:.14em;text-transform:uppercase;font-weight:800;
+    color:var(--verde);border:1px solid var(--verde);border-radius:2px;padding:2px 7px;flex:0 0 auto;
+  }
+  .proto p{margin:0;font-size:13.5px;color:var(--tinta-2);flex:1 1 320px;}
+
+  /* ---------- cabecera ---------- */
+  header.hero{padding-block:54px 34px;}
+  .eyebrow{
+    font-size:11px;letter-spacing:.2em;text-transform:uppercase;
+    color:var(--verde);font-weight:700;margin-bottom:14px;
+  }
+  h1{
+    font-size:clamp(31px,5.6vw,50px);line-height:1.06;margin:0 0 16px;
+    font-weight:800;letter-spacing:-.025em;text-wrap:balance;max-width:20ch;
+  }
+  header.hero p{
+    margin:0;max-width:50ch;color:var(--tinta-2);
+    font-family:"Source Serif 4",Georgia,serif;font-size:clamp(16px,2.4vw,18.5px);
+  }
+  .rule{height:1px;background:var(--hair);margin-top:32px;}
+
+  /* ---------- el directorio ---------- */
+  .directorio{
+    display:grid;grid-template-columns:200px 1fr;gap:56px;
+    padding-block:44px 76px;align-items:start;
+  }
+
+  .columna{
+    position:sticky;top:calc(env(safe-area-inset-top,0px) + 28px);align-self:start;
+  }
+  .columna svg{width:100%;height:auto;display:block;max-width:180px;margin-inline:auto;}
+
+  .contador{
+    margin-top:20px;border-top:1px solid var(--hair);padding-top:12px;text-align:center;
+  }
+  .contador .n{
+    font-size:13px;font-weight:600;color:var(--verde);font-variant-numeric:tabular-nums;
+    letter-spacing:.04em;
+  }
+  .contador .n b{font-weight:800;}
+  .contador .zona{
+    font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--tinta-3);
+    font-weight:700;margin-top:5px;
+  }
+
+  /* vértebras */
+  .v .anillo{
+    fill:none;stroke:var(--verde);stroke-width:2.2;opacity:0;
+    transform-box:fill-box;transform-origin:center;transform:scale(.7);
+  }
+  .v .bola{
+    fill:var(--apagado);
+    transform-box:fill-box;transform-origin:center;
+    transition:fill .4s ease, transform .4s ease;
+  }
+  .v.pasada .bola{fill:var(--verde);opacity:.42;}
+  .v.on .bola{fill:var(--verde);opacity:1;transform:scale(1.1);}
+  @media (prefers-reduced-motion:no-preference){
+    .v .anillo{transition:opacity .45s ease, transform .45s ease;}
+  }
+  .v.on .anillo{opacity:.5;transform:scale(1.55);}
+
+  /* ---------- lista ---------- */
+  ol.lista{list-style:none;margin:0;padding:0;counter-reset:esp;}
+  ol.lista li{border-top:1px solid var(--hair);padding-block:28px;}
+  ol.lista li:last-child{border-bottom:1px solid var(--hair);}
+
+  .fila{display:grid;grid-template-columns:34px 1fr;gap:14px;align-items:start;}
+  .num{
+    counter-increment:esp;
+    font-size:12px;font-weight:700;color:var(--tinta-3);font-variant-numeric:tabular-nums;
+    padding-top:9px;transition:color .35s ease;letter-spacing:.03em;
+  }
+  .num::before{content:counter(esp,decimal-leading-zero);}
+  li.on .num{color:var(--verde);}
+
+  .fila h2{
+    margin:0 0 5px;font-size:clamp(20px,3.2vw,27px);font-weight:800;letter-spacing:-.02em;
+    color:var(--tinta-3);transition:color .35s ease;line-height:1.15;
+  }
+  li.on .fila h2{color:var(--verde);}
+  .zona-lbl{
+    font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--tinta-3);
+    font-weight:700;margin:0 0 8px;
+  }
+  .desc{
+    margin:0;color:var(--tinta-2);font-size:16px;max-width:44ch;
+    font-family:"Source Serif 4",Georgia,serif;
+  }
+
+  /* ---------- cierre ---------- */
+  .cierre{border-top:1px solid var(--hair);padding-block:34px 66px;}
+  .cierre h3{font-size:20px;font-weight:800;margin:0 0 10px;letter-spacing:-.015em;}
+  .cierre p{margin:0 0 12px;color:var(--tinta-2);font-size:15.5px;max-width:62ch;}
+  .cierre ul{margin:12px 0 0;padding-left:18px;color:var(--tinta-2);font-size:15px;max-width:62ch;}
+  .cierre li{margin-bottom:7px;}
+
+  .paleta{display:flex;flex-wrap:wrap;gap:10px;margin:18px 0 6px;}
+  .muestra{border:1px solid var(--hair);border-radius:3px;overflow:hidden;width:118px;background:var(--crema-alta);}
+  .muestra .t{height:44px;}
+  .muestra .c{
+    font-size:10.5px;padding:5px 7px;font-variant-numeric:tabular-nums;
+    color:var(--tinta-2);letter-spacing:.02em;
+  }
+  .muestra .c b{display:block;color:var(--tinta);font-size:11px;font-weight:700;letter-spacing:0;}
+
+  @media (max-width:780px){
+    .directorio{grid-template-columns:1fr;gap:6px;padding-block:24px 52px;}
+    .columna{
+      top:calc(env(safe-area-inset-top,0px));
+      background:linear-gradient(to bottom,var(--crema) 74%,transparent);
+      padding-block:10px 16px;z-index:2;
+      display:grid;grid-template-columns:64px 1fr;gap:18px;align-items:center;
+    }
+    .columna svg{max-width:64px;margin-inline:0;}
+    .contador{margin-top:0;border-top:0;padding-top:0;text-align:left;}
+    ol.lista li{padding-block:22px;}
+    .fila{grid-template-columns:30px 1fr;gap:10px;}
+  }
+</style>
+
+<div class="proto">
+  <div class="wrap">
+    <span class="badge">Prototipo</span>
+    <p>Sección «la columna» para Clínica Salutem. Once vértebras de su logotipo, once
+    especialidades. Baja despacio. Los textos son provisionales.</p>
+  </div>
+</div>
+
+<div class="wrap">
+  <header class="hero">
+    <div class="eyebrow">Caravaca de la Cruz</div>
+    <h1>Once especialidades, una sola clínica</h1>
+    <p>Su logotipo ya lo contaba: una columna de vértebras sostenida entre dos manos.
+    Resulta que hay una por cada cosa que tratan.</p>
+    <div class="rule"></div>
+  </header>
+
+  <div class="directorio">
+
+    <!-- ============ la columna ============ -->
+    <div class="columna">
+      <svg viewBox="0 0 120 280" role="img" aria-label="Columna de once vértebras; cada una corresponde a una especialidad">
+        <g class="v" data-v="0"><circle class="anillo" cx="74" cy="21" r="8.4"/><circle class="bola" cx="74" cy="21" r="8.4"/></g>
+        <g class="v" data-v="1"><circle class="anillo" cx="50" cy="32" r="10.4"/><circle class="bola" cx="50" cy="32" r="10.4"/></g>
+        <g class="v" data-v="2"><circle class="anillo" cx="35" cy="53" r="12.1"/><circle class="bola" cx="35" cy="53" r="12.1"/></g>
+        <g class="v" data-v="3"><circle class="anillo" cx="29" cy="80" r="11.6"/><circle class="bola" cx="29" cy="80" r="11.6"/></g>
+        <g class="v" data-v="4"><circle class="anillo" cx="36" cy="110" r="14.4"/><circle class="bola" cx="36" cy="110" r="14.4"/></g>
+        <g class="v" data-v="5"><circle class="anillo" cx="60" cy="138" r="20.4"/><circle class="bola" cx="60" cy="138" r="20.4"/></g>
+        <g class="v" data-v="6"><circle class="anillo" cx="90" cy="163" r="14.5"/><circle class="bola" cx="90" cy="163" r="14.5"/></g>
+        <g class="v" data-v="7"><circle class="anillo" cx="97" cy="192" r="11.8"/><circle class="bola" cx="97" cy="192" r="11.8"/></g>
+        <g class="v" data-v="8"><circle class="anillo" cx="90" cy="220" r="12.3"/><circle class="bola" cx="90" cy="220" r="12.3"/></g>
+        <g class="v" data-v="9"><circle class="anillo" cx="69" cy="239" r="10.7"/><circle class="bola" cx="69" cy="239" r="10.7"/></g>
+        <g class="v" data-v="10"><circle class="anillo" cx="46" cy="252" r="8.5"/><circle class="bola" cx="46" cy="252" r="8.5"/></g>
+      </svg>
+
+      <div class="contador">
+        <div class="n"><b>01</b> / 11</div>
+        <div class="zona">Fisioterapia avanzada</div>
+      </div>
+    </div>
+
+    <!-- ============ lista ============ -->
+    <ol class="lista" id="lista">
+      <li data-v="0" class="on">
+        <div class="fila"><span class="num"></span><div>
+          <p class="zona-lbl">Lo que ya conoces de ellos</p>
+          <h2>Fisioterapia avanzada</h2>
+          <p class="desc">Texto provisional. Aquí va lo que tratan y cómo, escrito con las
+          palabras que usan sus pacientes en las reseñas.</p>
+        </div></div>
+      </li>
+      <li data-v="1">
+        <div class="fila"><span class="num"></span><div>
+          <p class="zona-lbl">Columna y articulaciones</p>
+          <h2>Osteopatía</h2>
+          <p class="desc">Texto provisional.</p>
+        </div></div>
+      </li>
+      <li data-v="2">
+        <div class="fila"><span class="num"></span><div>
+          <p class="zona-lbl">Lesiones</p>
+          <h2>Traumatología</h2>
+          <p class="desc">Texto provisional. Es de las que ninguna otra clínica del pueblo
+          anuncia, así que probablemente merezca más espacio que el resto.</p>
+        </div></div>
+      </li>
+      <li data-v="3">
+        <div class="fila"><span class="num"></span><div>
+          <p class="zona-lbl">Diagnóstico</p>
+          <h2>Ecografía</h2>
+          <p class="desc">Texto provisional. Poder ver la lesión en el momento es un argumento
+          fuerte y hoy no aparece en ningún sitio suyo.</p>
+        </div></div>
+      </li>
+      <li data-v="4">
+        <div class="fila"><span class="num"></span><div>
+          <p class="zona-lbl">Movimiento</p>
+          <h2>Pilates terapéutico</h2>
+          <p class="desc">Texto provisional.</p>
+        </div></div>
+      </li>
+      <li data-v="5">
+        <div class="fila"><span class="num"></span><div>
+          <p class="zona-lbl">Movimiento</p>
+          <h2>Hipopresivos</h2>
+          <p class="desc">Texto provisional.</p>
+        </div></div>
+      </li>
+      <li data-v="6">
+        <div class="fila"><span class="num"></span><div>
+          <p class="zona-lbl">Salud de la mujer</p>
+          <h2>Suelo pélvico</h2>
+          <p class="desc">Texto provisional. En sus reseñas de Google el suelo pélvico sale
+          citado por nombre, así que esta ya viene avalada.</p>
+        </div></div>
+      </li>
+      <li data-v="7">
+        <div class="fila"><span class="num"></span><div>
+          <p class="zona-lbl">Salud de la mujer</p>
+          <h2>Ginecología y obstetricia</h2>
+          <p class="desc">Texto provisional.</p>
+        </div></div>
+      </li>
+      <li data-v="8">
+        <div class="fila"><span class="num"></span><div>
+          <p class="zona-lbl">Pie</p>
+          <h2>Podología</h2>
+          <p class="desc">Texto provisional.</p>
+        </div></div>
+      </li>
+      <li data-v="9">
+        <div class="fila"><span class="num"></span><div>
+          <p class="zona-lbl">Hábitos</p>
+          <h2>Nutrición</h2>
+          <p class="desc">Texto provisional.</p>
+        </div></div>
+      </li>
+      <li data-v="10">
+        <div class="fila"><span class="num"></span><div>
+          <p class="zona-lbl">Rostro y piel</p>
+          <h2>Medicina estética</h2>
+          <p class="desc">Texto provisional. Va la última a propósito: es la que menos pega
+          con el resto y la que peor sienta arriba del todo en una clínica de salud.</p>
+        </div></div>
+      </li>
+    </ol>
+  </div>
+
+  <div class="cierre">
+    <h3>Los colores, sacados de su logotipo</h3>
+    <p>Muestreados de la foto que me has pasado, no del archivo original. Son fieles de sobra
+    para la demo, pero los valores buenos están en el vectorial, que solo lo tienen ellos.</p>
+    <p>El fondo de su logotipo es plano: medido, varía un 1 % sobre su media, y lo que parece
+    textura al ampliarlo son artefactos del JPEG. Así que el fondo de la página es ese mismo
+    crema liso, sin trama ni grano. Como el suyo es exactamente este color, su logotipo
+    redondo se fundirá con la página en vez de recortarse encima.</p>
+
+    <div class="paleta">
+      <div class="muestra"><div class="t" style="background:#2B6034"></div>
+        <div class="c"><b>#2B6034</b>Verde del nombre y las vértebras</div></div>
+      <div class="muestra"><div class="t" style="background:#4C7132"></div>
+        <div class="c"><b>#4C7132</b>Verde medio de las manos</div></div>
+      <div class="muestra"><div class="t" style="background:#7C9440"></div>
+        <div class="c"><b>#7C9440</b>Verde claro, punta de los dedos</div></div>
+      <div class="muestra"><div class="t" style="background:#F1E9DF"></div>
+        <div class="c"><b>#F1E9DF</b>Crema del fondo, medido</div></div>
+      <div class="muestra"><div class="t" style="background:#3F382D"></div>
+        <div class="c"><b>#3F382D</b>Gris cálido del lema</div></div>
+    </div>
+
+    <h3 style="margin-top:30px;">Tres cosas que decidir</h3>
+    <ul>
+      <li><b>El orden.</b> Lo he puesto yo: primero lo musculoesquelético, que es su identidad,
+        y la medicina estética la última. El orden real depende de qué les factura más, y eso
+        lo sabe él.</li>
+      <li><b>Falta una en el logotipo.</b> Su lema dice «Fisioterapia · Osteopatía ·
+        Recuperación funcional». La recuperación funcional no está en la biografía de Instagram:
+        o es una especialidad más y son doce, o es la manera de llamar al conjunto. Hay que
+        preguntárselo.</li>
+      <li><b>El logotipo lleva su lema desfasado.</b> Dice que son de fisioterapia y osteopatía,
+        y resulta que hacen once cosas. Es el mismo problema que la dirección de Google: lo que
+        cuentan de sí mismos va por detrás de lo que son.</li>
+    </ul>
+
+    <p style="margin-top:20px;"><b>Un aviso:</b> estas vértebras están dibujadas de cero
+    midiendo las suyas, no calcadas, pero el motivo es de su logotipo. Para la web final se usa
+    su archivo original en la cabecera, y conviene que él dé el visto bueno a usar las
+    vértebras sueltas como elemento de la página.</p>
+  </div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  var items = Array.prototype.slice.call(document.querySelectorAll("#lista li"));
+  var vert  = Array.prototype.slice.call(document.querySelectorAll(".v"));
+  var numEl = document.querySelector(".contador .n");
+  var zonaEl= document.querySelector(".contador .zona");
+  var actual = -1;
+
+  function activar(i){
+    if (i === actual || i < 0 || i >= items.length) return;
+    actual = i;
+    items.forEach(function(li,n){ li.classList.toggle("on", n === i); });
+    vert.forEach(function(g,n){
+      g.classList.toggle("on", n === i);
+      g.classList.toggle("pasada", n < i);
+    });
+    numEl.innerHTML = "<b>" + (i < 9 ? "0" : "") + (i+1) + "</b> / " + items.length;
+    zonaEl.textContent = items[i].querySelector("h2").textContent;
+  }
+
+  if (!("IntersectionObserver" in window)) { activar(0); return; }
+
+  var io = new IntersectionObserver(function(es){
+    var mejor = null;
+    es.forEach(function(e){
+      if (e.isIntersecting && (!mejor || e.intersectionRatio > mejor.intersectionRatio)) mejor = e;
+    });
+    if (mejor) activar(items.indexOf(mejor.target));
+  }, { rootMargin: "-42% 0px -42% 0px", threshold: 0 });
+
+  items.forEach(function(li){ io.observe(li); });
+  activar(0);
+})();
+</script>

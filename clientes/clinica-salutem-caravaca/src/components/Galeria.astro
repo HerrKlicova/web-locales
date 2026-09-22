@@ -1,0 +1,72 @@
+---
+import { Image } from 'astro:assets';
+import recepcion from '../../fotos/recepcion.jpg';
+import consulta from '../../fotos/consulta.jpg';
+import consultaRodilla from '../../fotos/consulta-rodilla.jpg';
+import ecografia from '../../fotos/ecografia.jpg';
+import pilatesSala from '../../fotos/pilates-suelo-sala.jpg';
+import pilatesAro from '../../fotos/pilates-suelo-aro.jpg';
+
+/* Fotos generadas con Higgsfield (fotos/prompts.md). Ninguna es de su Instagram ni de
+   Google Maps: no hay permiso escrito (§6). Cuando la clínica ceda las suyas, se cambian.
+   El pilates es en suelo, no de aparatos. */
+const fotos = [
+  { src: recepcion, alt: 'Recepción de la clínica: mostrador de roble claro, toallas dobladas y un helecho junto al ventanal' },
+  { src: consulta, alt: 'Consulta vista desde la puerta, con la camilla preparada y la sierra al fondo por la ventana' },
+  { src: pilatesSala, alt: 'Sala de pilates en suelo: esterillas extendidas con aros, pelotas y un rulo sobre el suelo de madera' },
+  { src: consultaRodilla, alt: 'Las manos de una fisioterapeuta trabajando la rodilla de un paciente tumbado en la camilla' },
+  { src: ecografia, alt: 'Sonda de ecografía apoyada sobre la rodilla de un paciente, con gel y el monitor al fondo' },
+  { src: pilatesAro, alt: 'Ejercicio de pilates en suelo sobre la esterilla, apretando un aro entre las rodillas' },
+];
+
+// En demo la web cuelga de /<slug>-<token>; los enlaces internos necesitan ese prefijo.
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+---
+
+<section id="clinica" aria-labelledby="clinica-titulo" class="contenedor py-14">
+  <div class="revela border-t border-hair pt-10">
+    <h2 id="clinica-titulo" class="titulo text-[clamp(1.6rem,3.6vw,2.4rem)] text-verde">La clínica</h2>
+    <p class="mt-3 max-w-[52ch] text-[1.0625rem] text-tinta-2">
+      Consultas independientes, sala de pilates en suelo y ecógrafo en el mismo local.
+    </p>
+  </div>
+
+  <!-- Rejilla llena: la primera ocupa dos columnas y dos filas, y la última se estira
+       en móvil para que no quede un hueco al final. -->
+  <ul class="mt-8 grid list-none grid-cols-2 gap-3 p-0 md:grid-cols-3 md:gap-4">
+    {fotos.map((f, i) => (
+      <li
+        class:list={[
+          'revela overflow-hidden rounded-xl',
+          i === 0 && 'col-span-2 md:row-span-2',
+          i === 5 && 'col-span-2 md:col-span-1',
+        ]}
+      >
+        <Image
+          src={f.src}
+          alt={f.alt}
+          widths={[320, 560, 900, 1200]}
+          sizes={i === 0 ? '(min-width: 768px) 60vw, 100vw' : '(min-width: 768px) 30vw, 50vw'}
+          class="h-full w-full object-cover"
+          loading="lazy"
+          decoding="async"
+        />
+      </li>
+    ))}
+  </ul>
+
+  <div class="mt-8 flex flex-wrap items-center gap-x-4 gap-y-3">
+    <p class="text-[1.0625rem] text-tinta-2">Detrás de todo esto hay un equipo.</p>
+    <a class="boton boton-secundario" href={`${base}/equipo/`}>
+      Quién te atiende
+    </a>
+  </div>
+</section>
+
+<style>
+  /* Sin la proporción fija, la primera foto estira la fila y las de al lado se deforman. */
+  #clinica li { aspect-ratio: 4 / 3; }
+  @media (min-width: 768px) {
+    #clinica li:first-child { aspect-ratio: auto; }
+  }
+</style>

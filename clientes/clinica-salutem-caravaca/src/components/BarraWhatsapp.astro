@@ -1,0 +1,32 @@
+---
+import { ficha } from '../lib/datos';
+import { enlaceWhatsapp } from '@plantilla/lib/ficha';
+import Icono from './Icono.astro';
+
+/** Botón fijo abajo en móvil, a partir de la primera pantalla (§8). */
+const enlace = enlaceWhatsapp(ficha);
+---
+
+<div
+  class="fixed inset-x-0 bottom-0 z-40 border-t border-hair bg-crema/95 p-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] backdrop-blur-sm transition-transform duration-300 ease-out md:hidden"
+  data-whatsapp-fijo
+>
+  <a class="boton boton-principal w-full" href={enlace} target="_blank" rel="noopener">
+    <Icono nombre="whatsapp" class="size-6" />
+    Pedir cita por WhatsApp
+  </a>
+</div>
+
+<script>
+  // Escondido mientras se ve la portada, que ya tiene su botón; aparece al pasarla.
+  const barra = document.querySelector<HTMLElement>('[data-whatsapp-fijo]');
+  const hero = document.querySelector<HTMLElement>('[data-hero]');
+  if (barra && hero && 'IntersectionObserver' in window) {
+    const io = new IntersectionObserver(([e]) => barra.classList.toggle('translate-y-[120%]', e.isIntersecting), {
+      threshold: 0.35,
+    });
+    io.observe(hero);
+  } else if (barra) {
+    barra.classList.remove('translate-y-[120%]');
+  }
+</script>
