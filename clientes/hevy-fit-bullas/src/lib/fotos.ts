@@ -151,3 +151,16 @@ export const FOTOS_EVENTOS: Foto[] = [
   { src: eventos12, alt: 'Material de entrenamiento preparado sobre la pista al aire libre' },
   { src: eventos14, alt: 'Botellas y folletos de Hevy Fit preparados para un evento' },
 ];
+
+/* Vídeos por sala (en public/video/, rutas relativas a la base). Con dos clips, el primero se
+   reproduce unos segundos y se funde al segundo, que queda en bucle: la sala "se enciende". */
+export interface Clip { mp4: string; mp4Movil: string; poster: string; alt: string }
+export const VIDEOS: Partial<Record<Actividad['id'], Clip[]>> = {
+  pilates: [
+    { mp4: 'video/pilates-clase-1080.mp4', mp4Movil: 'video/pilates-clase-720.mp4', poster: 'video/pilates-clase-poster.jpg', alt: 'Clase de Pilates en los reformers, vista lateral' },
+  ],
+  barre: [
+    { mp4: 'video/barre-calido-1080.mp4', mp4Movil: 'video/barre-calido-720.mp4', poster: 'video/barre-calido-poster.jpg', alt: 'Recorrido por el estudio de Barre con luz cálida' },
+    { mp4: 'video/barre-magenta-1080.mp4', mp4Movil: 'video/barre-magenta-720.mp4', poster: 'video/barre-magenta-poster.jpg', alt: 'Recorrido por el estudio de Barre con la luz magenta encendida' },
+  ],
+};
