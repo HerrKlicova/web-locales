@@ -6,11 +6,10 @@ Lead 04. Peluquería y estética de Alberto Rico, C. de S. Ramón, 172. Última 
 
 ## Dónde está
 
-**Punto de control de las fotos**: A-a (portada), D1 y D2 (comparador) hechas y pendientes de
-que Eugenio las apruebe en la hoja de revisión (enlace en `fotos/prompts.md`). Todo sale de A-a,
-para que el fondo sea el mismo salón en todas: D1 es una edición de A-a y D2 una edición de D1,
-compuesta para que fuera del pelo sea D1 píxel a píxel. Con el visto bueno, B, C y D. Créditos:
-22 de 30.
+**Fotos generadas, las 6**: A-a (portada), D1 y D2 (comparador) aprobadas por Eugenio; B, C y D
+(servicios) hechas y pendientes de su revisión (hoja en `fotos/prompts.md`). Todo sale de A-a,
+para que el fondo sea el mismo salón: D1 es una edición de A-a y D2 una edición de D1, compuesta
+para que fuera del pelo sea D1 píxel a píxel. Créditos: 28 de 30.
 
 La página está montada entera, con **huecos marcados** en lugar de las fotos (mismo tamaño que
 las de verdad, así que al cambiarlas no se mueve nada). Sin desplegar.
@@ -95,8 +94,8 @@ siguiente.
 
 ## Pendiente
 
-1. Aprobar A-a, D1 y D2 (hoja de revisión) → B, C y D con A-a de referencia. Quedan 8 de los
-   30 créditos (B, C y D son 6).
+1. Revisar B, C y D (manos de cinco dedos, encaje, adorno, sin caras ni texto). Quedan 2
+   créditos: da para repetir una.
 2. Descargar las fotos (`fotos/descargar.mjs`), revisar cada una (§4: caras, manos, pelo, texto,
    45 % central) y ajustar los `alt` a lo que se vea (ahora describen el prompt).
 3. Repetir capturas a 390 y 1440, Lighthouse y la traza con las fotos reales.

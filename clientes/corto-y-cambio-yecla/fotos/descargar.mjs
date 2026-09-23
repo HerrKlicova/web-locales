@@ -36,9 +36,10 @@ const ELEGIDAS = {
   // fuera del pelo, los píxeles de D1 (fotos/prompts.md).
   'comparador-despues.jpg': 'https://d2ol7oe51mr4n9.cloudfront.net/user_3JAuaMDVPdsAyTgWQOem3xzwisr/fd8608bc-5924-4934-9d10-02a85a3c100b.jpg',
   'comparador-antes.jpg': 'https://d2ol7oe51mr4n9.cloudfront.net/user_3JAuaMDVPdsAyTgWQOem3xzwisr/5468f5d9-a92d-4283-9080-ec6e75a4b634.jpg',
-  'color-mechas.jpg': null, // B
-  'novia-recogido.jpg': null, // C
-  'mantilla.jpg': null, // D
+  // B, C y D: con A-a de referencia de luz y paleta, tal cual salieron (PNG → JPEG).
+  'color-mechas.jpg': GENERADAS + 'hf_20260923_161419_56c9900d-7152-4fdc-8bd7-f9f9410cb0dc.png', // B
+  'novia-recogido.jpg': GENERADAS + 'hf_20260923_161415_529158e5-64f2-49d5-8810-0e9f51ab1227.png', // C
+  'mantilla.jpg': GENERADAS + 'hf_20260923_161416_c4359d43-676f-4a0e-a386-8c4c30ca9dbf.png', // D
 };
 
 for (const [archivo, cual] of Object.entries(ELEGIDAS)) {

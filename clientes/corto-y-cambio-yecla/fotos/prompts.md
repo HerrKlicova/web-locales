@@ -7,8 +7,8 @@ permiso escrito (CLAUDE.md §4).
 Modelo pedido: `nano_banana_2` a 2k. El servidor las resolvió con `nano_banana_flash`, como
 pasó con Salutem; salen a 2752×1536 en 16:9.
 
-**Tope de esta web: 30 créditos** (2 por foto). Gastados: **22** (A ×4, D1 ×4 descartadas,
-D1 nueva ×2 y D2 ×1). Quedan 8: B, C y D son 6, así que hay margen para repetir una.
+**Tope de esta web: 30 créditos** (2 por foto). Gastados: **28** (A ×4, D1 ×4 descartadas,
+D1 nueva ×2, D2 ×1, y B, C y D). Quedan 2: da para repetir una sola foto.
 
 Luz y paleta comunes: pared negra mate, banda de piedra beige cálida abajo, luz cálida de
 ventana por la izquierda. Es la fachada del salón: negro arriba y piedra abajo, como la web.
@@ -144,22 +144,55 @@ Finales (las que baja `descargar.mjs`):
 - Hoja de revisión (la pareja, el comparador con la línea al 25, 50 y 75 %, recortes 4:5 y el
   móvil al 40 y 65 %): https://d2ol7oe51mr4n9.cloudfront.net/user_3JAuaMDVPdsAyTgWQOem3xzwisr/4b222421-5e23-414d-bdaf-8a29b5c49810.jpg
 
-## B, C y D — Fotos de sección 4:5 (pendientes de aprobar A, D1 y D2)
+## B, C y D — Fotos de sección 4:5 (hechas el 23/09, pendientes de revisar)
 
-Con A-a como referencia de estilo. Coletilla para las tres:
+Con A-a como referencia **solo de luz, paleta y salón** (dicho así en el prompt, para que no
+copie su composición). Salen a 1856×2304. Coletilla de las tres:
 
 > same light and palette as the reference image; no faces, no mirrors, no reflections of
 > people; no text, no signs, no logos, no brand names, no labelled bottles; realistic 35mm
 > photography, natural colour, no HDR.
 
-- **B** (`color-mechas.jpg`): manos de colorista con guantes negros de nitrilo aplicando
-  decolorante con una paletina sobre un mechón fino apoyado en papel de aluminio, en la nuca
-  de una clienta de espaldas. Solo manos, papel, pelo y capa negra.
-- **C** (`novia-recogido.jpg`): recogido de novia bajo visto de espaldas, con un detalle de
-  trenza y ondas sueltas, y un adorno pequeño y discreto. Sin cara, sin velo por delante.
-- **D** (`mantilla.jpg`): mujer de espaldas con mantilla negra de encaje sobre peineta alta de
-  carey, moño bajo, fondo oscuro. Sin cara. Si el encaje sale deforme o con motivos repetidos a
-  lo bruto, se repite; si no, se quita.
+**B** (`color-mechas.jpg`, trabajo `56c9900d-7152-4fdc-8bd7-f9f9410cb0dc`):
+
+> Use the reference image only as a style reference for the light, the colour palette and the
+> salon; this is a new photograph. Close-up documentary photograph in that same small hair
+> salon: a colourist's hands in black nitrile gloves apply bleach with a tint brush to a fine,
+> thin section of hair laid flat on a sheet of aluminium foil, at the nape of a client seen
+> from behind. Only the gloved hands, the foil, the hair and the plain black cutting cape are
+> in the frame; the surrounding hair is a natural light brown. Anatomically correct hands with
+> five fingers each, the brush held naturally and fully visible. Shallow depth of field, the
+> background softly out of focus. Warm window light from the left, matte black and warm beige
+> stone tones. + coletilla
+
+**C** (`novia-recogido.jpg`, trabajo `529158e5-64f2-49d5-8810-0e9f51ab1227`):
+
+> Use the reference image only as a style reference for the light, the colour palette and the
+> salon; this is a new photograph. Documentary photograph in that same small hair salon: a
+> bride's low updo seen from directly behind at head height, a soft low chignon at the nape
+> with a delicate braided detail and a few loose, soft waves around it, and one small,
+> discreet ornament, a tiny pearl hair pin. We only see the back of her head, her neck and the
+> top of her shoulders, with the simple neckline of an ivory wedding dress; never her face, and
+> no veil in front. Background softly out of focus: the matte black wall and the band of warm
+> beige stone. Warm window light from the left. + coletilla
+
+**D** (`mantilla.jpg`, trabajo `c4359d43-676f-4a0e-a386-8c4c30ca9dbf`):
+
+> Use the reference image only as a style reference for the light, the colour palette and the
+> salon; this is a new photograph. Documentary photograph in that same small hair salon: a
+> woman seen from directly behind wearing a traditional Spanish black lace mantilla draped over
+> a tall tortoiseshell peineta, her hair gathered in a low bun at the nape. The lace is fine,
+> delicate and realistic, with a natural floral pattern that follows the folds and drape of the
+> fabric, not a repeated tiled pattern, falling softly over her shoulders and back. Dark
+> background, softly out of focus, the matte black wall; warm window light from the left
+> catching the edge of the peineta. We only see the back of her head and shoulders, never her
+> face. + coletilla
+
+Encaje de D, medido en el sandbox: pico de autocorrelación 0,058 en la zona central (sin motivo
+repetido en mosaico). Si a la vista sale deforme, se repite (quedan 2 créditos) o se quita.
+
+Hoja de revisión (enteras arriba; detalle 1:1 del centro abajo):
+https://d2ol7oe51mr4n9.cloudfront.net/user_3JAuaMDVPdsAyTgWQOem3xzwisr/b0621d0a-300e-4229-809e-42c596958f16.jpg
 
 ## Revisión de cada foto (§4 y encargo)
 
