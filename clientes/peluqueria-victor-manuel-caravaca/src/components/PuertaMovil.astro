@@ -1,0 +1,110 @@
+---
+import { enlaceTelefono, enlaceWhatsapp } from '@plantilla/lib/ficha';
+import type { Ficha } from '@plantilla/lib/ficha';
+import Icono from './Icono.astro';
+import Cartel from './Cartel.astro';
+
+/**
+ * La puerta en el móvil (§10): fija abajo desde la primera pantalla. Es la misma puerta de la
+ * cristalera de escritorio, con su cartel de «abierto» y el WhatsApp; al lado, llamar.
+ * Solo en pantallas verticales o estrechas: en escritorio la puerta está en la cristalera.
+ */
+interface Props { ficha: Ficha }
+const { ficha } = Astro.props;
+const whatsapp = enlaceWhatsapp(ficha, 'Hola Víctor, quería pedir hora para cortarme el pelo.');
+---
+
+<nav class="puerta-movil" aria-label="Pedir hora">
+  <!-- La acción va primero en el código (el nombre del enlace empieza por «Pide hora») y el
+       estado se pinta encima con CSS. -->
+  <a href={whatsapp} class="pm-hoja" target="_blank" rel="noopener">
+    <span class="pm-accion">
+      <Icono nombre="whatsapp" class="pm-icono" />
+      <span>Pide hora <span class="pm-por">por WhatsApp</span></span>
+    </span>
+    <span class="pm-estado" data-estado-caja hidden>
+      <Cartel /><span data-estado-corto></span>
+    </span>
+  </a>
+  <a href={enlaceTelefono(ficha)} class="pm-llamar" aria-label={`Llamar al ${ficha.telefono.replace('+34 ', '')}`}>
+    <Icono nombre="telefono" class="size-5" />
+    <span>Llamar</span>
+  </a>
+</nav>
+
+<style>
+  .puerta-movil {
+    position: fixed;
+    inset: auto 0 0 0;
+    z-index: 40;
+    display: flex;
+    gap: var(--perfil);
+    padding: var(--perfil) var(--perfil) max(var(--perfil), env(safe-area-inset-bottom));
+    background: var(--color-azul);
+  }
+  .pm-hoja,
+  .pm-llamar {
+    display: flex;
+    min-height: 3.6rem;
+    text-decoration: none;
+    color: var(--color-azul);
+    background: var(--vinilo);
+    transition: transform 160ms var(--ease-out);
+  }
+  .pm-hoja:active,
+  .pm-llamar:active { transform: scale(0.98); }
+  .pm-hoja:focus-visible,
+  .pm-llamar:focus-visible { outline-offset: -5px; }
+  .pm-hoja {
+    flex: 1;
+    min-width: 0;
+    flex-direction: column;
+    justify-content: center;
+    gap: 0.15rem;
+    padding: 0.45rem 0.9rem;
+  }
+  .pm-estado {
+    order: -1;
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--color-azul-tenue);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .pm-accion {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 1.05rem;
+    font-weight: 800;
+    letter-spacing: -0.01em;
+    white-space: nowrap;
+  }
+  .pm-accion :global(.pm-icono) { width: 1.5rem; height: 1.5rem; flex: none; }
+  .pm-llamar {
+    flex: none;
+    width: 5rem;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.2rem;
+    font-size: 0.85rem;
+    font-weight: 700;
+  }
+  /* Móviles estrechos: todo en una línea y más compacto, para que la puerta no se coma la
+     pantalla (a 320 px medía 116 px con el texto partido). */
+  @media (max-width: 370px) {
+    .pm-hoja { padding: 0.4rem 0.65rem; }
+    .pm-estado { font-size: 0.72rem; }
+    .pm-accion { font-size: 0.98rem; gap: 0.4rem; }
+    .pm-por { display: none; }
+    .pm-llamar { width: 4.1rem; }
+  }
+  @media (min-width: 900px) and (min-aspect-ratio: 1/1) {
+    .puerta-movil { display: none; }
+  }
+</style>

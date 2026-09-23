@@ -1,0 +1,155 @@
+---
+import { direccionCompleta, enlaceTelefono, enlaceWhatsapp } from '@plantilla/lib/ficha';
+import type { Ficha } from '@plantilla/lib/ficha';
+import Icono from './Icono.astro';
+
+/**
+ * El pie: el zócalo de la fachada, debajo de la cristalera. Cierra con su rótulo encendido y la
+ * puerta otra vez (WhatsApp y teléfono), una línea con nombre, dirección y teléfono tal cual están
+ * en su ficha de Google, y la letra pequeña (aviso legal, privacidad y cookies).
+ */
+interface Props {
+  ficha: Ficha;
+  demo?: boolean;
+  /** Solo en producción y si el cliente lo acepta (§12). */
+  credito?: { marca: string; url: string } | null;
+  titular?: string;
+  nif?: string;
+}
+const { ficha, demo = true, credito = null, titular = '[TITULAR]', nif = '[NIF]' } = Astro.props;
+const whatsapp = enlaceWhatsapp(ficha, 'Hola Víctor, quería pedir hora para cortarme el pelo.');
+const telefono = ficha.telefono.replace('+34 ', '');
+const resumen = 'inline-flex min-h-11 cursor-pointer list-none items-center underline decoration-azul/40 underline-offset-4 hover:decoration-azul';
+---
+
+<footer id="contacto" class="zocalo">
+  <div class="z-cierre">
+    <!-- Su rótulo otra vez, encendido. Decorativo: el nombre está escrito debajo. -->
+    <p class="z-rotulo" aria-hidden="true">
+      <span class="z-rotulo-nombre">Víctor Manuel</span>
+      <span class="z-rotulo-sub">Peluquería masculina</span>
+    </p>
+    <div class="z-contacto">
+      <a href={whatsapp} class="z-boton boton" target="_blank" rel="noopener">
+        <Icono nombre="whatsapp" class="size-6" />
+        Pide hora por WhatsApp
+      </a>
+      <a href={enlaceTelefono(ficha)} class="z-tel">
+        <Icono nombre="telefono" class="size-5" />
+        <span class="tabular-nums">{telefono}</span>
+      </a>
+    </div>
+  </div>
+
+  <p class="z-nap">
+    <strong>{ficha.nombre}</strong>
+    <span>{direccionCompleta(ficha)}</span>
+    <span class="tabular-nums">{ficha.telefono}</span>
+  </p>
+
+  <div class="z-legal">
+    <div class="flex flex-wrap gap-x-6 gap-y-1">
+      <details>
+        <summary class={resumen}>Aviso legal</summary>
+        <div class="z-texto">
+          <p>Titular de esta web: {titular}, con NIF {nif}, con domicilio en {direccionCompleta(ficha)}. Contacto: {ficha.telefono}.</p>
+          <p>El contenido de esta web (textos, fotos y marca) pertenece a su titular. No se permite copiarlo sin permiso.</p>
+        </div>
+      </details>
+      <details>
+        <summary class={resumen}>Privacidad</summary>
+        <div class="z-texto">
+          <p>
+            Esta web no tiene formularios ni guarda datos personales. Si escribes por WhatsApp o llamas por teléfono, tus datos los
+            trata {titular} solo para atender tu petición, según el Reglamento (UE) 2016/679.
+          </p>
+          <p>Puedes pedir acceso, corrección o borrado de tus datos llamando al {ficha.telefono}.</p>
+        </div>
+      </details>
+      <details>
+        <summary class={resumen}>Cookies</summary>
+        <div class="z-texto">
+          <p>Esta web no usa cookies. El plano está dibujado con datos de OpenStreetMap y no carga nada de otras webs.</p>
+        </div>
+      </details>
+    </div>
+    {demo && <p class="z-muestra">Las fotos y el vídeo de esta web son imágenes de muestra, hasta tener las del local.</p>}
+    <p class="z-copy">
+      © {new Date().getFullYear()} {ficha.nombre}.
+      {credito && (<>{' '}Web hecha por <a href={credito.url} class="underline">{credito.marca}</a>.</>)}
+    </p>
+  </div>
+</footer>
+
+<style>
+  .zocalo {
+    /* En el móvil el texto no se pega al borde de la pantalla (el muro allí es de 8 px). */
+    margin-inline: max(var(--muro), 1.1rem);
+    padding: clamp(2.5rem, 6vw, 4rem) 0 calc(var(--puerta) + 2rem);
+    color: var(--color-azul);
+  }
+  .z-cierre { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 1.5rem 2rem; }
+  /* El rótulo en pequeño y ya encendido: cara azul con luz, filete blanco y el nombre a pincel. */
+  .z-rotulo {
+    position: relative;
+    margin: 0;
+    display: inline-flex;
+    flex-direction: column;
+    align-items: flex-end;
+    padding: 0.35rem 1.5rem 0.65rem 1.2rem;
+    color: var(--color-luz);
+    background:
+      radial-gradient(ellipse 70% 90% at 50% 50%, rgb(98 140 190 / 0.34), transparent 75%),
+      var(--color-azul);
+    box-shadow: 0 0 60px 8px rgb(214 229 250 / 0.9);
+  }
+  .z-rotulo::after {
+    content: "";
+    position: absolute;
+    inset: 5px;
+    border: 1.5px solid rgb(255 255 255 / 0.92);
+    pointer-events: none;
+  }
+  .z-rotulo-nombre {
+    align-self: center;
+    font-family: var(--font-rotulo);
+    font-size: clamp(2rem, 4vw, 2.6rem);
+    line-height: 1.05;
+    white-space: nowrap;
+    text-shadow: 0 0 10px rgb(206 226 255 / 0.7);
+  }
+  .z-rotulo-sub { margin-top: -0.1rem; font-size: 0.72rem; font-weight: 800; letter-spacing: 0.04em; text-transform: uppercase; }
+  .z-contacto { display: flex; flex-wrap: wrap; align-items: center; gap: 0.75rem 1.5rem; }
+  .z-boton {
+    display: inline-flex;
+    min-height: 3.25rem;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.6rem 1.3rem;
+    background: var(--color-azul);
+    color: var(--color-luz);
+    font-weight: 700;
+    font-size: 1.08rem;
+    text-decoration: none;
+  }
+  .z-boton:hover { background: var(--color-azul-hondo); }
+  .z-tel {
+    display: inline-flex;
+    min-height: 2.75rem;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: var(--color-azul);
+    text-decoration: none;
+  }
+  .z-tel:hover { text-decoration: underline; text-underline-offset: 0.3em; }
+  .z-nap { margin: 2rem 0 0; display: flex; flex-wrap: wrap; gap: 0.2rem 1.25rem; line-height: 1.5; }
+  .z-legal { margin-top: 1.25rem; padding-top: 1rem; border-top: 1px solid rgb(27 47 68 / 0.18); font-size: 0.92rem; color: var(--color-azul-tenue); }
+  .z-texto { margin-top: 0.5rem; max-width: 70ch; }
+  .z-texto p { margin: 0.4rem 0; line-height: 1.5; }
+  .z-muestra, .z-copy { margin: 0.9rem 0 0; max-width: 70ch; }
+  @media (min-width: 900px) {
+    .zocalo { padding-bottom: 2.5rem; }
+  }
+</style>

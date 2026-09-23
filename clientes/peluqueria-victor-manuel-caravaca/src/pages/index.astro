@@ -1,0 +1,121 @@
+---
+// Peluquería de Caballeros Víctor Manuel. La web es su fachada vista desde la acera: el rótulo
+// arriba, la cristalera debajo y, detrás del cristal, el peluquero trabajando. El resto de la
+// página sigue la misma rejilla de perfiles: cada bloque en sus paños. Un solo gesto: encender.
+import { getImage } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
+import Layout from '../layouts/Layout.astro';
+import Rotulo from '../components/Rotulo.astro';
+import Cristalera from '../components/Cristalera.astro';
+import Servicios from '../components/Servicios.astro';
+import Horario from '../components/Horario.astro';
+import Opiniones from '../components/Opiniones.astro';
+import Dudas from '../components/Dudas.astro';
+import Donde from '../components/Donde.astro';
+import Zocalo from '../components/Zocalo.astro';
+import PuertaMovil from '../components/PuertaMovil.astro';
+import Estado from '../components/Estado.astro';
+import { schemaLocalBusiness } from '@plantilla/lib/schema';
+import type { Ficha } from '@plantilla/lib/ficha';
+import { horarioPuerta } from '../lib/horario';
+
+import fichaJson from '../../ficha.json';
+import inicioEscritorio from '../../fotos/video/inicio.jpg';
+import inicioMovil from '../../fotos/video/inicio-movil.jpg';
+import fotoTijera from '../../fotos/b-tijera-peine.jpg';
+import fotoSillon from '../../fotos/c-sillon.jpg';
+import fotoManos from '../../fotos/d-manos.jpg';
+
+const ficha = fichaJson as unknown as Ficha;
+const { valoracion, num_resenas: numResenas } = fichaJson as { valoracion: number; num_resenas: number };
+const demo = import.meta.env.PRODUCCION !== 'true';
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+
+const titulo = `Víctor Manuel — Peluquería de caballeros en ${ficha.pueblo}`;
+const descripcion = `Peluquería de caballeros en ${ficha.pueblo}, en la avenida Juan Carlos I. Corte a tijera, degradado, barba y corte infantil. Pide hora por WhatsApp o llama al ${ficha.telefono.replace('+34 ', '')}.`;
+
+// Schema HairSalon. Sin priceRange (no hay precios confirmados) y sin imágenes: las de la demo
+// son de muestra y no se presentan como fotos del local.
+const { priceRange: _sinPrecio, ...base_schema } = schemaLocalBusiness(ficha, Astro.site?.href);
+const schema = {
+  ...base_schema,
+  paymentAccepted: 'Efectivo',
+  currenciesAccepted: 'EUR',
+  aggregateRating: { '@type': 'AggregateRating', ratingValue: valoracion, reviewCount: numResenas, bestRating: 5 },
+};
+
+// Se precarga el primer fotograma del vídeo, que es el LCP: el de móvil y el de escritorio, cada
+// uno con su media query para que el navegador baje solo el suyo. Mismos parámetros que en
+// Cristalera.astro, así las URL coinciden.
+const pre = async (img: ImageMetadata, anchos: number[]) =>
+  getImage({ src: img, format: 'avif', widths: anchos, width: anchos.at(-1), quality: 52 });
+const preEscritorio = await pre(inicioEscritorio, [960, 1440, 1920]);
+const preMovil = await pre(inicioMovil, [480, 720, 864]);
+const precarga = [
+  { srcset: preMovil.srcSet.attribute, sizes: '100vw', tipo: 'image/avif', media: '(max-aspect-ratio: 1/1)' },
+  { srcset: preEscritorio.srcSet.attribute, sizes: '100vw', tipo: 'image/avif', media: '(min-aspect-ratio: 1/1)' },
+];
+---
+
+<Layout titulo={titulo} descripcion={descripcion} demo={demo} schema={schema} precarga={precarga}>
+  <Rotulo ficha={ficha} />
+
+  <main id="contenido" class="escaparate">
+    <Cristalera
+      ficha={ficha}
+      inicio={{ escritorio: inicioEscritorio, movil: inicioMovil }}
+      video={{ escritorio: `${base}/video/cristalera-1080.mp4`, movil: `${base}/video/cristalera-movil.mp4` }}
+      horarioPuerta={horarioPuerta(ficha)}
+      demo={demo}
+    />
+    <Servicios ficha={ficha} foto={fotoTijera} />
+    <Horario ficha={ficha} foto={fotoSillon} />
+    <Opiniones ficha={ficha} valoracion={valoracion} numResenas={numResenas} foto={fotoManos} />
+    <Dudas ficha={ficha} />
+    <Donde ficha={ficha} />
+  </main>
+
+  <Zocalo ficha={ficha} demo={demo} />
+  <PuertaMovil ficha={ficha} />
+  <Estado ficha={ficha} />
+</Layout>
+
+<script>
+  // ENCENDER al bajar: cada paño que aún no se ha visto entra con un velo azul tenue (nunca
+  // invisible) y se enciende al llegar, de izquierda a derecha, como tubos que se prenden uno tras
+  // otro. Se dispara cuando el paño ya ha subido un 18 % de la pantalla: así se ve encenderse y no
+  // pasa debajo de la puerta fija del móvil. Los paños que ya se ven al cargar (o por encima, si el
+  // navegador restaura el scroll a media página) no se apagan nunca. Si el observador no responde
+  // en 500 ms, se enciende todo.
+  const panos = [...document.querySelectorAll<HTMLElement>('.escaparate .pano, .escaparate .pano-claro')];
+  if ('IntersectionObserver' in window && panos.length) {
+    const alto = window.innerHeight;
+    const porEncender = panos.filter((p) => p.getBoundingClientRect().top > alto * 0.82);
+    porEncender.forEach((p) => p.classList.add('apagado'));
+
+    let respondio = false;
+    const observador = new IntersectionObserver(
+      (entradas) => {
+        respondio = true;
+        const llegan = entradas
+          .filter((e) => e.isIntersecting)
+          .map((e) => e.target as HTMLElement)
+          .sort((a, b) => {
+            const ra = a.getBoundingClientRect();
+            const rb = b.getBoundingClientRect();
+            return ra.top - rb.top || ra.left - rb.left;
+          });
+        llegan.forEach((p, i) => {
+          p.style.setProperty('--retraso', `${Math.min(i, 5) * 70}ms`);
+          p.classList.remove('apagado');
+          observador.unobserve(p);
+        });
+      },
+      { threshold: 0.05, rootMargin: '0px 0px -18% 0px' },
+    );
+    porEncender.forEach((p) => observador.observe(p));
+    window.setTimeout(() => {
+      if (!respondio) porEncender.forEach((p) => p.classList.remove('apagado'));
+    }, 500);
+  }
+</script>

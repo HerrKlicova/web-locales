@@ -1,0 +1,133 @@
+---
+import { enlaceTelefono, enlaceWhatsapp } from '@plantilla/lib/ficha';
+import type { Ficha } from '@plantilla/lib/ficha';
+import Icono from './Icono.astro';
+
+/**
+ * Lo que la gente pregunta antes de ir a una peluquería de caballeros de la zona
+ * (investigacion.md), contestado con lo que dicen su ficha de Google y sus reseñas. Nada más.
+ */
+interface Props { ficha: Ficha }
+const { ficha } = Astro.props;
+const whatsapp = enlaceWhatsapp(ficha, 'Hola Víctor, quería pedir hora para cortarme el pelo.');
+const telefono = ficha.telefono.replace('+34 ', '');
+
+const dudas = [
+  {
+    clave: 'cita',
+    pregunta: '¿Hace falta cita?',
+    respuesta: 'Mejor pedir hora, por WhatsApp o llamando. Y la hora se respeta: «pides hora y se ciñen a ella», escribe Cristobal en Google.',
+  },
+  {
+    clave: 'paso',
+    pregunta: '¿Y si estoy de paso por Caravaca?',
+    respuesta: 'Escríbeme y te digo si hay hueco ese día.',
+  },
+  {
+    clave: 'pago',
+    pregunta: '¿Se puede pagar con tarjeta?',
+    respuesta: 'No, solo en efectivo.',
+  },
+  {
+    clave: 'ninos',
+    pregunta: '¿Cortas a niños?',
+    respuesta: 'Sí, con paciencia. Y les hago el corte que piden.',
+  },
+  {
+    clave: 'maquina',
+    pregunta: '¿A tijera o a máquina?',
+    respuesta: 'Como tú lo quieras. Lo mío es la tijera, y el degradado también lo hago.',
+  },
+  {
+    clave: 'precio',
+    pregunta: '¿Es caro?',
+    respuesta: 'Quien viene lo cuenta en Google: «muy buen precio», «muy bien de precio», «buen precio».',
+  },
+];
+---
+
+<section id="dudas" class="panos dudas" aria-labelledby="dudas-titulo">
+  <div class="pano d-titulo">
+    <h2 id="dudas-titulo" class="titular h2-bloque d-h2">Antes de venir</h2>
+  </div>
+
+  {
+    dudas.map((d) => (
+      <div class={`pano d-duda d-${d.clave}`}>
+        <h3 class="titular d-pregunta">{d.pregunta}</h3>
+        <p class="d-respuesta">{d.respuesta}</p>
+      </div>
+    ))
+  }
+
+  <div class="pano d-cierre">
+    <p class="titular d-guardo">¿Te guardo hora?</p>
+    <div class="d-botones">
+      <a href={whatsapp} class="d-boton boton" target="_blank" rel="noopener">
+        <Icono nombre="whatsapp" class="size-6" />
+        Escribir por WhatsApp
+      </a>
+      <a href={enlaceTelefono(ficha)} class="d-llamar boton">
+        <Icono nombre="telefono" class="size-5" />
+        <span>o llama al <span class="tabular-nums whitespace-nowrap">{telefono}</span></span>
+      </a>
+    </div>
+  </div>
+</section>
+
+<style>
+  .d-titulo { display: flex; align-items: flex-start; }
+  .d-h2 { max-width: 8ch; }
+  .d-duda { display: flex; flex-direction: column; gap: 0.6rem; }
+  .d-pregunta { margin: 0; font-size: clamp(1.15rem, 1.55vw, 1.5rem); line-height: 1.12; }
+  .d-respuesta { margin: 0; font-size: 1.02rem; line-height: 1.45; }
+
+  .d-cierre { display: flex; flex-direction: column; justify-content: space-between; gap: 1.25rem; }
+  .d-guardo { margin: 0; font-size: clamp(1.5rem, 2.4vw, 2.3rem); }
+  .d-botones { display: flex; flex-wrap: wrap; align-items: center; gap: 0.75rem 1.5rem; }
+  .d-boton {
+    display: inline-flex;
+    min-height: 3.25rem;
+    align-items: center;
+    gap: 0.6rem;
+    /* Con margen arriba y abajo: en 320 px la etiqueta se parte en dos líneas. */
+    padding: 0.6rem 1.3rem;
+    background: var(--color-azul);
+    color: var(--color-luz);
+    font-weight: 700;
+    font-size: 1.08rem;
+    text-decoration: none;
+  }
+  .d-boton:hover { background: var(--color-azul-hondo); }
+  .d-llamar {
+    display: inline-flex;
+    min-height: 2.75rem;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 700;
+    color: var(--color-azul);
+    text-decoration: underline;
+    text-decoration-thickness: 2px;
+    text-underline-offset: 0.3em;
+  }
+  .d-llamar:hover { text-decoration-thickness: 3px; }
+
+  /* Móvil: título; cita a lo ancho (es la respuesta más larga); el resto de dos en dos; cierre. */
+  .d-titulo, .d-cita, .d-precio, .d-cierre { grid-column: 1 / -1; }
+  /* Móviles estrechos: todas a lo ancho. */
+  @media (max-width: 379px) {
+    .d-duda { grid-column: 1 / -1; }
+  }
+
+  /* Escritorio: título y las seis dudas en dos filas de cuatro, con el cierre al final. */
+  @media (min-width: 900px) {
+    .d-titulo { grid-area: 1 / 1; }
+    .d-cita { grid-area: 1 / 2; }
+    .d-paso { grid-area: 1 / 3; }
+    .d-pago { grid-area: 1 / 4; }
+    .d-ninos { grid-area: 2 / 1; }
+    .d-maquina { grid-area: 2 / 2; }
+    .d-precio { grid-area: 2 / 3; }
+    .d-cierre { grid-area: 2 / 4; }
+  }
+</style>

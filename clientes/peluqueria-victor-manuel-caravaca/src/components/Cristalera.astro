@@ -1,0 +1,551 @@
+---
+import { getImage } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
+import { enlaceWhatsapp } from '@plantilla/lib/ficha';
+import type { Ficha } from '@plantilla/lib/ficha';
+import Icono from './Icono.astro';
+import Cartel from './Cartel.astro';
+
+/**
+ * La cristalera: la fachada vista desde la acera. Detrás del cristal, Víctor cortando (vídeo en
+ * bucle); delante, la rejilla de perfiles azules. Unos paños son cristal claro y dejan ver el
+ * vídeo; otros son vinilo esmerilado, y en esos va el texto. El paño alto de la derecha es la
+ * puerta, y la puerta es WhatsApp; encima, en el montante, el número de la calle.
+ *
+ * - Escritorio (horizontal): 4 × 3, con la primera fila más baja, como un montante (así el
+ *   perfil no cruza la tijera). El vídeo 16:9 cubre toda la cristalera; el texto va en la columna
+ *   de la izquierda y la puerta en la de la derecha, filas 2 y 3.
+ * - Móvil y pantallas verticales: 2 × 3. El vídeo es el recorte 4:5 y ocupa las dos primeras
+ *   filas; el texto va en la tercera, de lado a lado. La puerta es la barra fija de abajo.
+ * - El primer fotograma del vídeo está también como <img> precargado: es el LCP y se ve desde el
+ *   primer fotograma de la página. El vídeo se pide cuando la página ya ha pintado y se pone
+ *   encima cuando ya pinta; como empieza en el mismo fotograma, el cambio no se ve.
+ * - Al cargar, después del rótulo, se enciende la luz de dentro: la cristalera pasa de penumbra a
+ *   luz y el peluquero se pone a cortar. Nada del texto empieza invisible.
+ * - El vídeo se puede parar (botón abajo a la izquierda del cristal, WCAG 2.2.2).
+ */
+interface Encuadre { escritorio: ImageMetadata; movil: ImageMetadata }
+interface Props {
+  ficha: Ficha;
+  inicio: Encuadre;
+  video: { escritorio: string; movil: string };
+  /** El horario para la puerta, como el vinilo de la puerta de verdad. */
+  horarioPuerta: { dias: string; horas: string }[];
+  demo?: boolean;
+}
+const { ficha, inicio, video, horarioPuerta, demo = true } = Astro.props;
+const whatsapp = enlaceWhatsapp(ficha, 'Hola Víctor, quería pedir hora para cortarme el pelo.');
+// «Av. Juan Carlos I, 45» → calle y número, para el montante de la puerta.
+const [, calle = ficha.direccion, numero = ''] = /^(.*?),\s*(\S+)$/.exec(ficha.direccion) ?? [];
+
+const imagen = (img: ImageMetadata, format: 'avif' | 'webp', anchos: number[]) =>
+  getImage({ src: img, format, widths: anchos, width: anchos.at(-1), quality: 52 });
+const ANCHOS_ESCRITORIO = [960, 1440, 1920];
+const ANCHOS_MOVIL = [480, 720, 864];
+const escAvif = await imagen(inicio.escritorio, 'avif', ANCHOS_ESCRITORIO);
+const escWebp = await imagen(inicio.escritorio, 'webp', ANCHOS_ESCRITORIO);
+const movAvif = await imagen(inicio.movil, 'avif', ANCHOS_MOVIL);
+const movWebp = await imagen(inicio.movil, 'webp', ANCHOS_MOVIL);
+
+// El mismo criterio que el CSS: en vertical, recorte 4:5 (lección del taller: manda la orientación).
+const MEDIA_VERTICAL = '(max-aspect-ratio: 1/1)';
+const SIZES = '100vw';
+---
+
+<section class="cristalera" aria-labelledby="titulo" data-cristalera>
+  <!-- Lo que hay detrás del cristal. -->
+  <div class="cristalera-fondo">
+    <picture>
+      <source media={MEDIA_VERTICAL} type="image/avif" srcset={movAvif.srcSet.attribute} sizes={SIZES} />
+      <source media={MEDIA_VERTICAL} type="image/webp" srcset={movWebp.srcSet.attribute} sizes={SIZES} />
+      <source type="image/avif" srcset={escAvif.srcSet.attribute} sizes={SIZES} />
+      <source type="image/webp" srcset={escWebp.srcSet.attribute} sizes={SIZES} />
+      <img
+        src={escWebp.src}
+        width={inicio.escritorio.width}
+        height={inicio.escritorio.height}
+        alt="Detrás de la cristalera, un peluquero corta a tijera sobre peine la nuca de un cliente sentado en un sillón rojo"
+        loading="eager"
+        fetchpriority="high"
+        decoding="async"
+        data-foto
+      />
+    </picture>
+    <video
+      muted
+      playsinline
+      loop
+      preload="none"
+      tabindex="-1"
+      aria-hidden="true"
+      data-src={video.escritorio}
+      data-src-movil={video.movil}
+      data-video
+    ></video>
+    <!-- La penumbra de antes de encender la luz de dentro. -->
+    <div class="cristalera-penumbra" aria-hidden="true"></div>
+  </div>
+
+  <!-- Vinilo esmerilado con el texto. En escritorio son tres paños de la columna izquierda; en
+       el móvil, un solo paño de lado a lado debajo del vídeo. -->
+  <div class="hero-texto">
+    <div class="hero-linea hero-linea-1">
+      <h1 id="titulo" class="titular hero-h1">Peluquería de caballeros en Caravaca de la Cruz</h1>
+    </div>
+    <div class="hero-linea hero-linea-2">
+      <p class="titular hero-voz">Corto a tijera, como los de antes.</p>
+    </div>
+    <div class="hero-linea hero-linea-3">
+      <p class="titular hero-voz-2">Si pides hora, a esa hora te siento.</p>
+      <p class="hero-calle">{ficha.direccion}</p>
+    </div>
+  </div>
+
+  <!-- Paños de cristal claro: solo los perfiles y el brillo; lo de detrás es la foto y el vídeo. -->
+  <div class="vidrio v1" aria-hidden="true"></div>
+  <div class="vidrio v2" aria-hidden="true"></div>
+  <div class="vidrio v3" aria-hidden="true"></div>
+  <div class="vidrio v4" aria-hidden="true"></div>
+  <div class="vidrio v5" aria-hidden="true"></div>
+  <div class="vidrio v6" aria-hidden="true"></div>
+
+  <!-- El montante de encima de la puerta, con el número pintado en el cristal (solo escritorio). -->
+  <p class="hero-numero" aria-hidden="true">
+    <span class="hero-numero-n">{numero}</span>
+    <span class="hero-numero-calle">{calle}</span>
+  </p>
+
+  <!-- La puerta (solo escritorio; en el móvil es la barra fija de abajo). La hoja se abre un poco
+       desde la bisagra al pasar el ratón. -->
+  <a href={whatsapp} class="puerta" target="_blank" rel="noopener">
+    <span class="puerta-hoja">
+      <span class="puerta-tirador" aria-hidden="true"></span>
+      <!-- La acción primero en el código (el nombre del enlace empieza por «Pide hora»); el estado
+           se pinta arriba con CSS. -->
+      <span class="puerta-accion">
+        <Icono nombre="whatsapp" class="puerta-icono" />
+        <span class="titular puerta-pide">Pide hora</span>
+        <span class="puerta-por">por WhatsApp</span>
+      </span>
+      <span class="puerta-estado" data-estado-caja hidden>
+        <Cartel /><span data-estado></span>
+      </span>
+      <span class="puerta-vinilo" aria-hidden="true">
+        {horarioPuerta.map((h) => (<span class="puerta-dia"><span class="puerta-dias">{h.dias}</span><span>{h.horas}</span></span>))}
+      </span>
+    </span>
+  </a>
+
+  <!-- Parar el vídeo (lo enseña el JS solo si el vídeo se va a reproducir). -->
+  <button type="button" class="pausa" data-pausa hidden aria-pressed="false" aria-label="Parar el vídeo">
+    <svg class="pausa-icono pausa-parar" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13M16 5.5v13" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" /></svg>
+    <svg class="pausa-icono pausa-seguir" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.2v13.6L19 12Z" fill="currentColor" /></svg>
+  </button>
+
+  {demo && <p class="muestra" aria-hidden="true">Imágenes de muestra</p>}
+</section>
+
+<style>
+  /* ── Móvil y pantallas verticales: 2 × 3 ──
+     Las dos primeras filas son el vídeo en 4:5; la tercera, el texto. El alto del vídeo se ajusta
+     para que en un móvil normal quepan rótulo, vídeo, texto y puerta en la primera pantalla. */
+  .cristalera {
+    /* Lo que se reserva para el paño del texto crece con el ancho, como su letra: en una tablet de
+       pie el texto es más grande y, si no, la última línea caía debajo de la puerta fija. */
+    --reserva-texto: clamp(13.5rem, 32cqw, 17rem);
+    --alto-video: clamp(15rem, min(125cqw, calc(100svh - var(--cab) - var(--puerta) - var(--reserva-texto))), 64rem);
+    --fila: calc((var(--alto-video) - var(--perfil)) / 2);
+    position: relative;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-rows: var(--fila) var(--fila) auto;
+    gap: var(--perfil);
+  }
+  .cristalera-fondo {
+    position: absolute;
+    inset: 0 0 auto 0;
+    height: var(--alto-video);
+    overflow: hidden;
+    background: #cfd4d6;
+  }
+  .cristalera-fondo img,
+  .cristalera-fondo video {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: 50% 38%;
+  }
+  /* El vídeo solo se ve mientras se mueve. Parado, se ve la foto: Chrome pinta en negro un vídeo
+     parado cuando libera su memoria (lección de Salutem 3D). */
+  .cristalera-fondo video { opacity: 0; }
+  .cristalera-fondo video.en-marcha { opacity: 1; transition: opacity 220ms ease-out; }
+
+  /* La penumbra: se ve apagada un instante y la luz de dentro se enciende justo después del
+     rótulo. No toca el texto ni la foto: es una capa encima que se desvanece. */
+  .cristalera-penumbra {
+    position: absolute;
+    inset: 0;
+    background: #0d1824;
+    opacity: 0;
+  }
+  @keyframes luz-de-dentro {
+    from { opacity: 0.42; }
+    to   { opacity: 0; }
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .cristalera-penumbra { animation: luz-de-dentro 820ms var(--ease-out) 780ms both; }
+  }
+
+  /* Los vidrios de la portada llevan además el brillo del cristal. */
+  .vidrio { background: linear-gradient(118deg, transparent 36%, rgb(255 255 255 / 0.08) 46%, transparent 57%); }
+  .v1 { grid-area: 1 / 1; }
+  .v2 { grid-area: 1 / 2; }
+  .v3 { grid-area: 2 / 1; }
+  .v4 { grid-area: 2 / 2; }
+  .v5, .v6 { display: none; }
+
+  /* El texto: en el móvil, un solo paño de vinilo de lado a lado. El orden de tamaños: la frase
+     de Víctor manda; el titular (tipo de negocio y pueblo) va como el vinilo pequeño de encima. */
+  .hero-texto {
+    position: relative;
+    z-index: 1;
+    grid-column: 1 / -1;
+    grid-row: 3;
+    padding: 1.1rem 1.15rem 1.25rem;
+    background: var(--vinilo);
+  }
+  .hero-h1 {
+    margin: 0;
+    font-size: clamp(1.02rem, 4.4cqw, 1.35rem);
+    line-height: 1.12;
+    max-width: 26ch;
+  }
+  .hero-voz {
+    margin: 0;
+    font-size: clamp(1.6rem, 8cqw, 2.5rem);
+    line-height: 1;
+  }
+  .hero-voz-2 {
+    margin: 0;
+    font-size: clamp(1.08rem, 4.9cqw, 1.55rem);
+    font-weight: 700;
+    line-height: 1.15;
+  }
+  .hero-calle { margin: 0.55rem 0 0; font-size: 0.95rem; color: var(--color-azul-tenue); }
+  .hero-linea-2 { margin-top: 0.55rem; }
+  .hero-linea-3 { margin-top: 0.45rem; }
+
+  .hero-numero,
+  .puerta { display: none; }
+
+  /* El botón de parar el vídeo, en la esquina de abajo a la izquierda del cristal. */
+  .pausa {
+    position: absolute;
+    z-index: 5;
+    left: 0.6rem;
+    top: calc(var(--alto-video) - 3.35rem);
+    display: grid;
+    place-items: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    border: 0;
+    border-radius: 50%;
+    color: var(--color-luz);
+    background: rgb(20 36 59 / 0.78);
+    cursor: pointer;
+    transition: transform 160ms var(--ease-out), background-color 200ms ease;
+  }
+  .pausa[hidden] { display: none; }
+  .pausa:active { transform: scale(0.94); }
+  .pausa-icono { width: 1.25rem; height: 1.25rem; }
+  .pausa-seguir { display: none; }
+  .pausa[aria-pressed="true"] .pausa-parar { display: none; }
+  .pausa[aria-pressed="true"] .pausa-seguir { display: block; }
+
+  .muestra {
+    position: absolute;
+    z-index: 5;
+    right: 0.6rem;
+    top: calc(var(--alto-video) - 2.1rem);
+    margin: 0;
+    padding: 0.2rem 0.55rem;
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: var(--color-luz);
+    background: rgb(20 36 59 / 0.82);
+    pointer-events: none;
+  }
+
+  /* ── Escritorio (horizontal): 4 × 3 ── */
+  @media (min-width: 900px) and (min-aspect-ratio: 1/1) {
+    .cristalera {
+      /* Asoma el perfil y un filo de los paños de abajo (menos que su margen interior: sin letras
+         cortadas), para que se vea que la cristalera sigue. */
+      height: clamp(30rem, calc(100svh - var(--cab) - var(--marco) - 1.4rem), 60rem);
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      grid-template-rows: 0.72fr 1fr 1fr;
+    }
+    .cristalera-fondo { inset: 0; height: auto; }
+    .cristalera-fondo img,
+    .cristalera-fondo video { object-position: 50% 30%; }
+
+    .v1 { grid-area: 1 / 2; }
+    .v2 { grid-area: 1 / 3; }
+    .v3 { grid-area: 2 / 2; }
+    .v4 { grid-area: 2 / 3; }
+    .v5 { display: block; grid-area: 3 / 2; }
+    .v6 { display: block; grid-area: 3 / 3; }
+
+    /* Los tres paños de texto de la columna izquierda. */
+    .hero-texto { display: contents; }
+    .hero-linea {
+      position: relative;
+      z-index: 1;
+      grid-column: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      margin: 0;
+      padding: var(--pano-pad);
+      box-shadow: 0 0 0 calc(var(--perfil) / 2 + 0.5px) var(--color-azul);
+      background: var(--vinilo);
+    }
+    .hero-linea-1 { grid-row: 1; justify-content: flex-start; }
+    .hero-linea-2 { grid-row: 2; }
+    .hero-linea-3 { grid-row: 3; justify-content: space-between; }
+    .hero-h1 { font-size: clamp(1.15rem, 1.55vw, 1.7rem); max-width: 17ch; }
+    .hero-voz { font-size: clamp(2rem, 3.4vw, 3.8rem); max-width: 9ch; }
+    .hero-voz-2 { font-size: clamp(1.3rem, 1.85vw, 2.05rem); font-weight: 800; }
+    .hero-calle { display: none; }
+
+    /* El montante: número de la calle pintado en el cristal, encima de la puerta. */
+    .hero-numero {
+      position: relative;
+      z-index: 1;
+      grid-area: 1 / 4;
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 1rem;
+      margin: 0;
+      padding: var(--pano-pad);
+      box-shadow: 0 0 0 calc(var(--perfil) / 2 + 0.5px) var(--color-azul);
+      background: var(--vinilo);
+    }
+    .hero-numero-n { font-size: clamp(3rem, 5.2vw, 5.6rem); font-weight: 800; line-height: 0.8; letter-spacing: -0.04em; }
+    .hero-numero-calle { font-size: clamp(0.95rem, 1.15vw, 1.2rem); font-weight: 700; text-align: right; line-height: 1.15; max-width: 9ch; }
+
+    /* La puerta: el hueco oscuro de dentro y la hoja de vinilo, que gira sobre la bisagra de la
+       derecha. */
+    .puerta {
+      position: relative;
+      z-index: 1;
+      grid-column: 4;
+      grid-row: 2 / 4;
+      display: block;
+      color: var(--color-azul);
+      text-decoration: none;
+      background: #0d1824;
+      box-shadow: 0 0 0 calc(var(--perfil) / 2 + 0.5px) var(--color-azul);
+      perspective: 1400px;
+    }
+    .puerta:focus-visible { outline-offset: -6px; }
+    .puerta-hoja {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 1rem;
+      padding: var(--pano-pad) var(--pano-pad) var(--pano-pad) calc(var(--pano-pad) + 1.6rem);
+      background: var(--vinilo);
+      transform-origin: right center;
+      transition: transform 320ms var(--ease-out);
+    }
+    /* El marco de la hoja, en azul, por dentro: es lo que la distingue de los paños fijos. */
+    .puerta-hoja::before {
+      content: "";
+      position: absolute;
+      inset: 0.55rem;
+      border: 3px solid var(--color-azul);
+      pointer-events: none;
+    }
+    .puerta-tirador {
+      position: absolute;
+      left: 1.15rem;
+      top: 36%;
+      width: 0.42rem;
+      height: 28%;
+      border-radius: 0.25rem;
+      background: var(--color-azul);
+      transition: transform 260ms var(--ease-out);
+    }
+    .puerta:active .puerta-hoja { transform: rotateY(-7deg); }
+    .puerta-estado {
+      order: -1;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      font-size: 1rem;
+      font-weight: 700;
+      line-height: 1.25;
+    }
+    .puerta-accion { display: grid; gap: 0.15rem; }
+    .puerta-accion :global(.puerta-icono) { width: 2.25rem; height: 2.25rem; margin-bottom: 0.4rem; }
+    .puerta-pide { font-size: clamp(1.9rem, 2.8vw, 3.1rem); }
+    .puerta-por { font-size: 1.15rem; font-weight: 700; }
+    .puerta-vinilo {
+      display: grid;
+      gap: 0.45rem;
+      font-size: 0.95rem;
+      line-height: 1.3;
+      color: var(--color-azul-tenue);
+    }
+    .puerta-dia { display: grid; }
+    .puerta-dias { font-weight: 700; color: var(--color-azul); }
+
+    .pausa { left: calc(25% + 0.9rem); top: auto; bottom: 0.9rem; }
+    .muestra { top: auto; bottom: 0.9rem; right: calc(25% + 0.9rem); }
+  }
+
+  /* Con ratón, la hoja de la puerta se abre un poco desde la bisagra, como una puerta que se empuja. */
+  @media (min-width: 900px) and (min-aspect-ratio: 1/1) and (hover: hover) and (pointer: fine) {
+    .puerta:hover .puerta-hoja { transform: rotateY(-5deg); }
+    .puerta:hover .puerta-tirador { transform: translateX(0.15rem); }
+    .pausa:hover { background: rgb(20 36 59 / 0.95); }
+  }
+
+  /* El texto, el número y la puerta también se encienden con la luz de dentro. */
+  .hero-texto::after,
+  .hero-linea::after,
+  .hero-numero::after,
+  .puerta-hoja::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: var(--color-azul);
+    opacity: 0;
+  }
+  @keyframes pano-se-enciende {
+    from { opacity: 0.16; }
+    to   { opacity: 0; }
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .hero-texto::after { animation: pano-se-enciende 820ms var(--ease-luz) 780ms both; }
+    .hero-linea::after, .hero-numero::after, .puerta-hoja::after { animation: pano-se-enciende 820ms var(--ease-luz) both; }
+    .hero-linea-1::after { animation-delay: 780ms; }
+    .hero-numero::after { animation-delay: 830ms; }
+    .hero-linea-2::after { animation-delay: 860ms; }
+    .hero-linea-3::after { animation-delay: 940ms; }
+    .puerta-hoja::after { animation-delay: 1020ms; }
+  }
+  /* En el móvil el velo es el del paño único; en escritorio, el de cada paño. */
+  .hero-linea::after { display: none; }
+  @media (min-width: 900px) and (min-aspect-ratio: 1/1) {
+    .hero-texto::after { display: none; }
+    .hero-linea::after { display: block; }
+  }
+</style>
+
+<script>
+  // El vídeo detrás del cristal. Se pide cuando la página ya ha pintado, solo se reproduce a la
+  // vista (pausa fuera de pantalla y con la pestaña oculta) y, parado, se oculta para que se vea
+  // la foto. Sin reproducción con movimiento reducido, con ahorro de datos o en 2G. Se puede parar
+  // con el botón, y entonces se queda parado hasta que se vuelva a pulsar.
+  const cristalera = document.querySelector<HTMLElement>('[data-cristalera]');
+  const video = cristalera?.querySelector<HTMLVideoElement>('[data-video]');
+  const boton = cristalera?.querySelector<HTMLButtonElement>('[data-pausa]');
+  const reducido = window.matchMedia('(prefers-reduced-motion: reduce)');
+  const conexion = (navigator as Navigator & { connection?: { saveData?: boolean; effectiveType?: string } }).connection;
+  const ahorro = !!conexion && (conexion.saveData === true || /(^|-)2g$/.test(conexion.effectiveType ?? ''));
+  const vertical = window.matchMedia('(max-aspect-ratio: 1/1)');
+
+  if (cristalera && video && !reducido.matches && !ahorro) {
+    // La luz de dentro se enciende a los 0,78 s (CSS): el peluquero no se pone a cortar antes.
+    const NO_ANTES_DE = 1100;
+    let pedido = false;
+    let visible = false;
+    let paradoPorUsuario = false;
+
+    const fuente = () => (vertical.matches ? video.dataset.srcMovil : video.dataset.src) ?? '';
+    const ocultar = () => video.classList.remove('en-marcha');
+    const intentar = () => {
+      if (!pedido || !visible || document.hidden || paradoPorUsuario) return;
+      const espera = NO_ANTES_DE - performance.now();
+      if (espera > 0) {
+        window.setTimeout(intentar, espera);
+        return;
+      }
+      if (!video.paused) return;
+      video.play().catch(() => {});
+    };
+    const parar = () => {
+      if (!pedido) return;
+      video.pause();
+      ocultar();
+      // Vuelve a empezar en el mismo fotograma que la foto: al reanudar, el cambio no se ve.
+      if (video.readyState > 0) video.currentTime = 0;
+    };
+    const cargar = () => {
+      if (pedido) return;
+      pedido = true;
+      video.src = fuente();
+      video.load();
+      intentar();
+    };
+
+    // Se enseña cuando ya está pintando fotogramas, no antes.
+    video.addEventListener('playing', () => {
+      const v = video as HTMLVideoElement & { requestVideoFrameCallback?: (cb: () => void) => number };
+      if (v.requestVideoFrameCallback) v.requestVideoFrameCallback(() => video.classList.add('en-marcha'));
+      else requestAnimationFrame(() => video.classList.add('en-marcha'));
+    });
+    video.addEventListener('error', ocultar);
+
+    if (boton) {
+      boton.hidden = false;
+      boton.addEventListener('click', () => {
+        paradoPorUsuario = !paradoPorUsuario;
+        boton.setAttribute('aria-pressed', String(paradoPorUsuario));
+        boton.setAttribute('aria-label', paradoPorUsuario ? 'Seguir con el vídeo' : 'Parar el vídeo');
+        if (paradoPorUsuario) parar();
+        else intentar();
+      });
+    }
+
+    new IntersectionObserver(
+      ([entrada]) => {
+        visible = entrada.isIntersecting;
+        if (visible) intentar();
+        else parar();
+      },
+      { threshold: 0.05 },
+    ).observe(cristalera);
+    // Chrome no reproduce en pestañas ocultas: se reintenta al volver.
+    document.addEventListener('visibilitychange', () => (document.hidden ? parar() : intentar()));
+    reducido.addEventListener('change', (e) => {
+      if (!e.matches) return;
+      parar();
+      if (boton) boton.hidden = true;
+    });
+    // Al girar el móvil cambia el encuadre: 4:5 en vertical, 16:9 en horizontal.
+    vertical.addEventListener('change', () => {
+      if (!pedido) return;
+      parar();
+      video.src = fuente();
+      video.load();
+      intentar();
+    });
+
+    const tras = () => {
+      const w = window as Window & { requestIdleCallback?: (cb: () => void, o?: { timeout: number }) => number };
+      if (w.requestIdleCallback) w.requestIdleCallback(cargar, { timeout: 1200 });
+      else window.setTimeout(cargar, 200);
+    };
+    if (document.readyState === 'complete') tras();
+    else window.addEventListener('load', tras, { once: true });
+  }
+</script>

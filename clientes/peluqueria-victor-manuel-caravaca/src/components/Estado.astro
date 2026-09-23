@@ -1,0 +1,85 @@
+---
+import type { Ficha } from '@plantilla/lib/ficha';
+import { semanaEnMinutos } from '../lib/horario';
+
+/**
+ * «Abierto ahora, hasta las 13:30» / «Ahora cerrado, abrimos a las 16:30», con la hora de Madrid.
+ * Rellena los [data-estado] (la puerta y el rótulo) y los [data-estado-corto] (la barra del móvil),
+ * llena el cartel de «abierto» y marca en el horario el día de hoy y el tramo abierto.
+ * Sin JS no se enseña nada de esto: el horario completo está escrito en el HTML.
+ */
+interface Props { ficha: Ficha }
+const { ficha } = Astro.props;
+const semana = semanaEnMinutos(ficha);
+---
+
+<script type="application/json" id="semana" set:html={JSON.stringify(semana)} />
+
+<script>
+  const semana: [number, number][][] = JSON.parse(document.getElementById('semana')?.textContent ?? '[]');
+  const NOMBRES = ['lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado', 'domingo'];
+  const hora = (m: number) => `${Math.floor(m / 60)}:${String(m % 60).padStart(2, '0')}`;
+
+  // Día (0 = lunes) y minuto del día en Madrid, sea cual sea la zona del teléfono.
+  function ahoraEnMadrid() {
+    const partes = new Intl.DateTimeFormat('en-GB', {
+      timeZone: 'Europe/Madrid',
+      weekday: 'short',
+      hour: '2-digit',
+      minute: '2-digit',
+      hourCycle: 'h23',
+    }).formatToParts(new Date());
+    const p = Object.fromEntries(partes.map((x) => [x.type, x.value]));
+    const dia = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].indexOf(p.weekday);
+    return { dia, minuto: (Number(p.hour) % 24) * 60 + Number(p.minute) };
+  }
+
+  function calcular() {
+    const { dia, minuto } = ahoraEnMadrid();
+    const hoy = semana[dia] ?? [];
+    const abierto = hoy.find(([a, c]) => minuto >= a && minuto < c);
+    // «texto» para la puerta y el rótulo; «corto» para la barra del móvil, que cabe en 320 px.
+    if (abierto) return { dia, abierto, texto: `Abierto ahora, hasta las ${hora(abierto[1])}`, corto: `Abierto hasta las ${hora(abierto[1])}` };
+    const luego = hoy.find(([a]) => a > minuto);
+    if (luego) return { dia, abierto: null, texto: `Ahora cerrado, abrimos a las ${hora(luego[0])}`, corto: `Cerrado, abrimos a las ${hora(luego[0])}` };
+    for (let k = 1; k <= 7; k++) {
+      const d = (dia + k) % 7;
+      const primero = semana[d]?.[0];
+      if (primero) {
+        const cuando = k === 1 ? 'mañana' : `el ${NOMBRES[d]}`;
+        return { dia, abierto: null, texto: `Ahora cerrado, ${cuando} abrimos a las ${hora(primero[0])}`, corto: `Cerrado, ${cuando} a las ${hora(primero[0])}` };
+      }
+    }
+    return null;
+  }
+
+  function pintar() {
+    const e = calcular();
+    if (!e || e.dia < 0) return;
+    document.documentElement.dataset.abierto = e.abierto ? 'si' : 'no';
+    document.querySelectorAll<HTMLElement>('[data-estado]').forEach((el) => (el.textContent = e.texto));
+    document.querySelectorAll<HTMLElement>('[data-estado-corto]').forEach((el) => (el.textContent = e.corto));
+    document.querySelectorAll<HTMLElement>('[data-estado-caja]').forEach((el) => (el.hidden = false));
+
+    // El horario: la fila de hoy y, si está abierto, el tramo de ahora.
+    document.querySelectorAll<HTMLElement>('[data-dias]').forEach((fila) => {
+      const dias = (fila.dataset.dias ?? '').split(',').filter(Boolean).map(Number);
+      const esHoy = dias.includes(e.dia);
+      fila.classList.toggle('hoy', esHoy);
+      if (esHoy) fila.setAttribute('aria-current', 'date');
+      else fila.removeAttribute('aria-current');
+      const tramo = fila.dataset.tramo;
+      const ahora = !!e.abierto && esHoy && tramo === (e.abierto[0] < 14 * 60 ? 'manana' : 'tarde');
+      fila.classList.toggle('ahora', ahora);
+    });
+    const aviso = document.querySelector<HTMLElement>('[data-hoy]');
+    if (aviso) {
+      aviso.textContent = `Hoy es ${NOMBRES[e.dia]}. ${e.texto}.`;
+      aviso.hidden = false;
+    }
+  }
+
+  pintar();
+  // Se repasa cada minuto: si alguien deja la página abierta, el cartel cambia a su hora.
+  window.setInterval(pintar, 60_000);
+</script>

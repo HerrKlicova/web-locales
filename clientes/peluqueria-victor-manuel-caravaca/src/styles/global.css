@@ -1,0 +1,181 @@
+/* source("../"): Tailwind mira solo el src/ de esta web, no las de todos los clientes. */
+@import "tailwindcss" source("../");
+
+/* La fachada de la peluquería vista desde la acera. Los colores salen de su propia fachada
+   (foto de su ficha de Google, solo para muestrear): el azul noche de la caja de luz del rótulo,
+   el blanco frío de los paneles y el vinilo esmerilado de la cristalera. El rojo es el de los
+   sillones: en la interfaz sale solo en el «hoy» del horario y en el anillo de foco. Va en
+   segundo plano a propósito: la web anterior, el taller, lleva el rojo de su marca (rotacion.md). */
+@theme {
+  --color-fachada: #eef2f5;
+  --color-luz: #ffffff;
+  --color-esmerilado: #e2e8ed;
+  --color-azul: #1b2f44;        /* texto y perfiles: 11:1 sobre el esmerilado */
+  --color-azul-hondo: #14243b;
+  --color-azul-tenue: #4b5e72;  /* texto secundario: 5,4:1 sobre el esmerilado */
+  --color-rojo: #b3261e;        /* 5,3:1 sobre el esmerilado */
+
+  --font-rotulo: "Satisfy", "Brush Script MT", cursive;
+  --font-texto: "Chivo", "Segoe UI", sans-serif;
+
+  /* Curvas de movimiento (criterio de Emil Kowalski): salida fuerte para lo que entra; una
+     entrada-salida suave para la luz, que tiene que verse subir. */
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-luz: cubic-bezier(0.45, 0, 0.25, 1);
+}
+
+/* Medidas de la fachada. El muro es el blanco que queda a los lados de la cristalera; el marco,
+   el perfil grueso de fuera; el perfil, el fino que separa los paños; el travesaño, el que separa
+   un bloque del siguiente. */
+:root {
+  --muro: clamp(0.5rem, 2.2vw, 2rem);
+  --perfil: clamp(5px, 0.5vw, 8px);
+  --marco: calc(var(--perfil) * 1.75);
+  --travesano: calc(var(--perfil) * 2.5);
+  --cab: 5rem;          /* alto de la banda del rótulo */
+  --puerta: 4.75rem;    /* alto de la puerta fija del móvil */
+  --pano-pad: clamp(1.1rem, 2.2vw, 2.25rem);
+  /* El vinilo esmerilado, con la luz del techo detrás (más clara arriba). */
+  --vinilo:
+    radial-gradient(ellipse 120% 80% at 50% -12%, rgb(255 255 255 / 0.7), transparent 72%),
+    var(--color-esmerilado);
+}
+@media (min-width: 900px) and (min-aspect-ratio: 1/1) {
+  :root { --cab: 6.75rem; --puerta: 0rem; }
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    scroll-padding-top: calc(var(--cab) + 0.75rem);
+  }
+  body {
+    font-family: var(--font-texto);
+    color: var(--color-azul);
+    background: var(--color-fachada);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    /* Una palabra que no cabe en su paño se parte en vez de salirse (nombres largos, §13). */
+    overflow-wrap: break-word;
+  }
+  :focus-visible { outline: 3px solid var(--color-rojo); outline-offset: 3px; }
+  ::selection { background: var(--color-azul); color: var(--color-luz); }
+}
+
+/* Las piezas propias van en la capa de componentes: así las utilidades de Tailwind
+   (hidden, sr-only, tamaños…) siguen pudiendo con ellas. */
+@layer components {
+  /* Titulares: Chivo con peso, apretada, como el vinilo cortado de un escaparate. */
+  .titular {
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    line-height: 1.02;
+    text-wrap: balance;
+  }
+  /* El título de cada bloque. Más pequeño que la frase de la portada, que es la que manda. */
+  .h2-bloque {
+    margin: 0;
+    font-size: clamp(1.55rem, 2.3vw, 2.35rem);
+  }
+
+  /* ─── La cristalera: una sola rejilla de paños para toda la página ───
+     El fondo azul del escaparate asoma por los huecos de la rejilla: esos huecos son los perfiles.
+     Entre un bloque y el siguiente, un travesaño más grueso. */
+  .escaparate {
+    margin-inline: var(--muro);
+    padding: var(--marco);
+    background: var(--color-azul);
+    display: grid;
+    gap: var(--travesano);
+    container-type: inline-size;
+  }
+  .panos {
+    --cols: 2;
+    display: grid;
+    grid-template-columns: repeat(var(--cols), minmax(0, 1fr));
+    gap: var(--perfil);
+  }
+  @media (min-width: 900px) {
+    .panos { --cols: 4; }
+  }
+
+  /* Paño de vinilo esmerilado: casi opaco, claro, con la luz del techo detrás. Sin
+     backdrop-filter: el esmerilado es un color sólido. */
+  .pano {
+    position: relative;
+    min-width: 0;
+    padding: var(--pano-pad);
+    background: var(--vinilo);
+  }
+  /* Paño de cristal claro: deja ver lo que hay detrás (una foto o el vídeo) con un brillo de
+     cristal en diagonal. */
+  .pano-claro {
+    position: relative;
+    min-width: 0;
+    overflow: hidden;
+    background: var(--color-azul-hondo);
+  }
+  .pano-claro::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    pointer-events: none;
+    background: linear-gradient(118deg, transparent 38%, rgb(255 255 255 / 0.09) 47%, transparent 58%);
+  }
+  .pano-claro > img,
+  .pano-claro > picture > img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  /* Una ventana: una foto detrás de varios paños de cristal, cruzada por los perfiles, como la
+     portada. La foto ocupa el hueco de todos los paños; encima, cada «vidrio» es transparente y
+     dibuja medio perfil hacia cada lado, así dos vidrios vecinos cierran el perfil entre ellos. */
+  .vidrio {
+    position: relative;
+    z-index: 4;
+    min-width: 0;
+    pointer-events: none;
+    box-shadow: 0 0 0 calc(var(--perfil) / 2 + 0.5px) var(--color-azul);
+  }
+
+  /* ─── ENCENDER: el único gesto de la web ───
+     Cada paño entra apagado (un velo azul tenue, nunca opacidad 0) y se enciende al llegar, con
+     una subida que se ve. El velo solo existe cuando el JS lo pone: sin JS, todo está encendido.
+     Es un fundido, así que no se gatea con prefers-reduced-motion (§7). */
+  .pano::after,
+  .pano-claro::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 3;
+    pointer-events: none;
+    background: var(--color-azul);
+    opacity: 0;
+    transition: opacity 750ms var(--ease-luz);
+    transition-delay: var(--retraso, 0ms);
+  }
+  .pano.apagado::after { opacity: 0.18; transition: none; }
+  .pano-claro.apagado::after { opacity: 0.38; transition: none; }
+
+  /* Botones: se hunden al pulsar, que es lo que confirma que la web te ha oído. */
+  .boton {
+    transition: transform 160ms var(--ease-out), background-color 200ms ease, color 200ms ease, border-color 200ms ease;
+  }
+  .boton:active { transform: scale(0.97); }
+
+  /* El cartel de «abierto / cerrado» que cuelga de la puerta de cualquier tienda: abierto, lleno;
+     cerrado, solo el contorno. */
+  .cartel {
+    width: 1.15em;
+    height: 1.15em;
+    flex: none;
+    color: var(--color-azul);
+  }
+  .cartel-cara { fill: transparent; transition: fill 400ms ease; }
+  [data-abierto="si"] .cartel-cara { fill: currentColor; }
+}

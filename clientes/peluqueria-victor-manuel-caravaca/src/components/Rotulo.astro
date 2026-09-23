@@ -1,0 +1,219 @@
+---
+import { enlaceTelefono, enlaceWhatsapp } from '@plantilla/lib/ficha';
+import type { Ficha } from '@plantilla/lib/ficha';
+import Icono from './Icono.astro';
+import Cartel from './Cartel.astro';
+
+/**
+ * El rótulo: la caja de luz azul noche de su fachada, con su nombre en letra de pincel blanca y
+ * «Peluquería masculina» debajo, como el de verdad. Hecho en HTML, no es una imagen. Hace de
+ * cabecera y se queda arriba al bajar.
+ *
+ * Al cargar se enciende: crece el halo de luz sobre la fachada y se ilumina la cara de la caja.
+ * El nombre se ve desde el primer fotograma; lo que se enciende es la luz, no el texto.
+ * El rótulo de verdad dice también «Desde 2007»; aquí no va porque no está confirmado.
+ */
+interface Props { ficha: Ficha }
+const { ficha } = Astro.props;
+const whatsapp = enlaceWhatsapp(ficha, 'Hola Víctor, quería pedir hora para cortarme el pelo.');
+const telefono = ficha.telefono.replace('+34 ', '');
+---
+
+<header class="banda" data-banda>
+  <div class="banda-interior">
+    <div class="rotulo">
+      <span class="rotulo-halo" aria-hidden="true"></span>
+      <p class="rotulo-caja">
+        <span class="rotulo-nombre" data-texto="Víctor Manuel">Víctor Manuel</span>
+        <span class="rotulo-sub">Peluquería masculina</span>
+      </p>
+    </div>
+
+    <!-- En el móvil, a la derecha del rótulo, el teléfono a la vista (hay quien prefiere llamar);
+         WhatsApp va en la puerta fija de abajo. -->
+    <a href={enlaceTelefono(ficha)} class="banda-tel-movil" aria-label={`Llamar al ${telefono}`}>
+      <Icono nombre="telefono" class="size-4.5" />
+      <span class="tabular-nums">{telefono}</span>
+    </a>
+
+    <!-- En escritorio, a la derecha del rótulo: el cartel de abierto, el teléfono y WhatsApp. -->
+    <nav class="banda-contacto" aria-label="Contacto">
+      <!-- Lo rellena el JS con la hora de Madrid; sin JS no se enseña. -->
+      <p class="banda-estado m-0" data-estado-caja hidden>
+        <Cartel /><span data-estado></span>
+      </p>
+      <a href={enlaceTelefono(ficha)} class="banda-enlace boton">
+        <Icono nombre="telefono" class="size-5" />
+        <span class="tabular-nums">{telefono}</span>
+      </a>
+      <a href={whatsapp} class="banda-enlace banda-whatsapp boton" target="_blank" rel="noopener">
+        <Icono nombre="whatsapp" class="size-5" />
+        Pide hora
+      </a>
+    </nav>
+  </div>
+</header>
+
+<style>
+  .banda {
+    position: sticky;
+    top: 0;
+    z-index: 30;
+    height: var(--cab);
+    background: var(--color-fachada);
+    /* El halo del rótulo ilumina la fachada, pero no se sale de la banda. */
+    overflow: clip;
+    box-shadow: 0 1px 0 rgb(27 47 68 / 0.07);
+  }
+  .banda-interior {
+    height: 100%;
+    margin-inline: var(--muro);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.5rem;
+  }
+
+  /* ── La caja de luz ── */
+  .rotulo {
+    position: relative;
+    height: calc(var(--cab) - 1rem);
+    flex: none;
+  }
+  .rotulo-caja {
+    position: relative;
+    margin: 0;
+    height: 100%;
+    padding: 0.2rem 1.35rem 0.55rem 1.1rem;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    justify-content: center;
+    background: var(--color-azul);
+    color: var(--color-luz);
+    isolation: isolate;
+  }
+  /* El filete blanco de dentro, como el del rótulo real. */
+  .rotulo-caja::after {
+    content: "";
+    position: absolute;
+    inset: 4px;
+    border: 1.5px solid rgb(255 255 255 / 0.92);
+    pointer-events: none;
+  }
+  /* La luz de dentro de la caja: la cara azul se aclara un poco en el centro al encenderse. */
+  .rotulo-caja::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: radial-gradient(ellipse 70% 90% at 50% 50%, rgb(98 140 190 / 0.34), transparent 75%);
+    opacity: 1;
+  }
+  .rotulo-nombre {
+    position: relative;
+    align-self: center;
+    font-family: var(--font-rotulo);
+    font-size: 2.05rem;
+    line-height: 1;
+    white-space: nowrap;
+    /* Satisfy se sale por arriba y por abajo de su caja: se deja sitio para los trazos. */
+    padding: 0.08em 0.1em 0;
+  }
+  /* El resplandor de las letras: una copia desenfocada que se enciende. */
+  .rotulo-nombre::after {
+    content: attr(data-texto);
+    position: absolute;
+    inset: 0;
+    padding: inherit;
+    color: rgb(206 226 255);
+    filter: blur(6px);
+    opacity: 0.7;
+    pointer-events: none;
+  }
+  .rotulo-sub {
+    margin-top: -0.1rem;
+    font-size: 0.66rem;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+  /* El halo: la luz de la caja sobre la fachada. */
+  .rotulo-halo {
+    position: absolute;
+    inset: -70% -22%;
+    /* Luz de LED: blanco azulado, para que se vea sobre el blanco frío del muro. */
+    background: radial-gradient(closest-side, rgb(214 229 250 / 0.95) 30%, rgb(236 243 252 / 0.6) 62%, rgb(255 255 255 / 0) 100%);
+    pointer-events: none;
+  }
+
+  /* ── Encender al cargar (600-800 ms, salida suave, sin parpadeo) ── */
+  @keyframes halo-crece {
+    from { opacity: 0; transform: scale(0.82); }
+    to   { opacity: 1; transform: none; }
+  }
+  @keyframes luz-entra {
+    from { opacity: 0; }
+  }
+  .rotulo-halo { animation: halo-crece 760ms var(--ease-out) 120ms both; }
+  .rotulo-caja::before { animation: luz-entra 700ms var(--ease-out) 120ms both; }
+  .rotulo-nombre::after { animation: luz-entra 700ms var(--ease-out) 200ms both; }
+  /* Con movimiento reducido el halo no crece: solo aparece, con un fundido. */
+  @media (prefers-reduced-motion: reduce) {
+    .rotulo-halo { animation-name: luz-entra; }
+  }
+
+  /* ── Teléfono en el móvil ── */
+  .banda-tel-movil {
+    display: none;
+    min-height: 2.75rem;
+    align-items: center;
+    gap: 0.4rem;
+    font-weight: 700;
+    font-size: 1rem;
+    color: var(--color-azul);
+    text-decoration: none;
+    white-space: nowrap;
+  }
+  @media (min-width: 380px) {
+    .banda-tel-movil { display: inline-flex; }
+  }
+
+  /* ── Contacto (solo escritorio) ── */
+  .banda-contacto { display: none; }
+  .banda-estado {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+    font-size: 0.95rem;
+    color: var(--color-azul-tenue);
+  }
+  .banda-enlace {
+    display: inline-flex;
+    min-height: 2.75rem;
+    align-items: center;
+    gap: 0.5rem;
+    padding-inline: 0.25rem;
+    font-weight: 700;
+    font-size: 1.05rem;
+    color: var(--color-azul);
+    text-decoration: none;
+  }
+  .banda-enlace:hover { text-decoration: underline; text-underline-offset: 0.3em; }
+  .banda-whatsapp {
+    padding-inline: 1.1rem;
+    background: var(--color-azul);
+    color: var(--color-luz);
+  }
+  .banda-whatsapp:hover { text-decoration: none; background: var(--color-azul-hondo); }
+
+  @media (min-width: 900px) and (min-aspect-ratio: 1/1) {
+    .rotulo-caja { padding: 0.35rem 2rem 0.8rem 1.6rem; }
+    .rotulo-caja::after { inset: 6px; }
+    .rotulo-nombre { font-size: 3.05rem; }
+    .rotulo-sub { font-size: 0.8rem; margin-top: -0.2rem; }
+    .banda-contacto { display: flex; align-items: center; gap: 1.5rem; }
+    .banda-tel-movil { display: none; }
+  }
+</style>

@@ -1,0 +1,74 @@
+---
+import '../styles/global.css';
+// Las @font-face van a mano: así entran solo los pesos que se usan, todos con
+// font-display: swap (§8). Satisfy es la letra de pincel de su rótulo, y solo sirve para su
+// nombre; Chivo hace todo lo demás.
+import rotulo400 from '@fontsource/satisfy/files/satisfy-latin-400-normal.woff2?url';
+import texto400 from '@fontsource/chivo/files/chivo-latin-400-normal.woff2?url';
+import texto700 from '@fontsource/chivo/files/chivo-latin-700-normal.woff2?url';
+import texto800 from '@fontsource/chivo/files/chivo-latin-800-normal.woff2?url';
+
+interface Props {
+  titulo: string;
+  descripcion: string;
+  /** Demo: noindex, sin sitemap, sin formulario (§11). */
+  demo?: boolean;
+  schema?: Record<string, unknown>;
+  /** Imagen del LCP: se precarga para que el navegador no espere a parsear el cuerpo (§8). */
+  precarga?: { srcset: string; sizes: string; tipo: string; media?: string }[];
+}
+const { titulo, descripcion, demo = true, schema, precarga = [] } = Astro.props;
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+const fuentes = [
+  { url: rotulo400, familia: 'Satisfy', peso: 400 },
+  { url: texto400, familia: 'Chivo', peso: 400 },
+  { url: texto700, familia: 'Chivo', peso: 700 },
+  { url: texto800, familia: 'Chivo', peso: 800 },
+];
+---
+
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{titulo}</title>
+    <meta name="description" content={descripcion} />
+    {demo && <meta name="robots" content="noindex, nofollow" />}
+    <meta name="theme-color" content="#eef2f5" />
+    <link rel="icon" href={`${base}/favicon.svg`} type="image/svg+xml" />
+    <link rel="preload" as="font" type="font/woff2" href={rotulo400} crossorigin />
+    <link rel="preload" as="font" type="font/woff2" href={texto800} crossorigin />
+    {
+      precarga.map((p) => (
+        <link
+          rel="preload"
+          as="image"
+          type={p.tipo}
+          imagesrcset={p.srcset}
+          imagesizes={p.sizes}
+          media={p.media}
+          fetchpriority="high"
+        />
+      ))
+    }
+    {schema && <script type="application/ld+json" set:html={JSON.stringify(schema)} />}
+    <style
+      is:global
+      set:html={fuentes
+        .map(
+          (f) =>
+            `@font-face{font-family:"${f.familia}";font-style:normal;font-weight:${f.peso};font-display:swap;src:url(${f.url}) format("woff2");}`,
+        )
+        .join('')}
+    />
+  </head>
+  <body class="min-h-dvh">
+    <a
+      href="#contenido"
+      class="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-50 focus:bg-azul focus:px-4 focus:py-2 focus:font-bold focus:text-luz"
+      >Ir al contenido</a
+    >
+    <slot />
+  </body>
+</html>

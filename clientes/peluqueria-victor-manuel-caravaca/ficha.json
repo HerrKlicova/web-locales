@@ -1,0 +1,91 @@
+{
+  "slug": "peluqueria-victor-manuel-caravaca",
+  "demo_token": "3fqkz5",
+  "nombre": "Peluquería de Caballeros - Víctor Manuel",
+  "tipo": "HairSalon",
+  "pueblo": "Caravaca de la Cruz",
+  "direccion": "Av. Juan Carlos I, 45",
+  "cp": "30400",
+  "telefono": "+34 636 58 15 15",
+  "whatsapp": "+34 636 58 15 15",
+  "maps_url": "https://www.google.com/maps/place/Peluquer%C3%ADa+de+Caballeros+-+V%C3%ADctor+Manuel/@38.1024856,-1.8669787,17z/data=!4m7!3m6!1s0xd65ad08bf1533b3:0xcfd81ca709633cd9",
+  "place_id": "ChIJszMVvwitZQ0R2TxjCacc2M8",
+  "coordenadas": [
+    38.1024856,
+    -1.8669787
+  ],
+  "valoracion": 4.8,
+  "num_resenas": 103,
+  "horario": [
+    {
+      "dias": "Lunes a viernes",
+      "horas": "9:30–13:30 y 16:30–21:00"
+    },
+    {
+      "dias": "Sábado",
+      "horas": "9:00–13:30"
+    },
+    {
+      "dias": "Domingo",
+      "horas": "Cerrado"
+    }
+  ],
+  "servicios": [
+    {
+      "nombre": "Corte a tijera",
+      "precio": "[PRECIO]"
+    },
+    {
+      "nombre": "Degradado",
+      "precio": "[PRECIO]"
+    },
+    {
+      "nombre": "Arreglo de barba",
+      "precio": "[PRECIO]"
+    },
+    {
+      "nombre": "Corte infantil",
+      "precio": "[PRECIO]"
+    }
+  ],
+  "resenas": [
+    {
+      "texto": "Peluquero de tijeras auténtico, trato cercano y amable y buena gestión en agenda.",
+      "autor": "Sergio Martínez Suárez",
+      "estrellas": 5
+    },
+    {
+      "texto": "Estábamos de paso por Caravaca y aproveché para cortar el pelo a mis hijos. Víctor súper amable, nos hice hueco para esa misma mañana sin tener cita, nos recomendó varios comercios de la zona donde también quedamos muy satisfechos, les hizo un corte que nos encantó y además a muy buen precio... De 10, voy a tener que pensar en pasarnos todos los meses por Caravaca aunque solo sea por este peluquero!",
+      "autor": "Virginia A.G.",
+      "estrellas": 5
+    },
+    {
+      "texto": "Muy buen peluquero, con mucha paciencia con los niños.  A mi hijo le ha hecho exactamente el corte que quería y muy bien de precio.  Volveremos.",
+      "autor": "Sandra Gonzalez",
+      "estrellas": 5
+    },
+    {
+      "texto": "Más de 10 años yendo y el trato, calidad y resultado siempre de lujo.",
+      "autor": "pedroalarcon25",
+      "estrellas": 5
+    },
+    {
+      "texto": "Trato excelente, buen precio y un artista cortando con la tijera.",
+      "autor": "J RA",
+      "estrellas": 5
+    },
+    {
+      "texto": "Muy atentos y muy rapidos pides hora y se ciñen a ella Cortes perfectos 👌",
+      "autor": "Cristobal Gimenez",
+      "estrellas": 5
+    },
+    {
+      "texto": "Un peluquero como los de antes",
+      "autor": "Juan",
+      "estrellas": 5
+    }
+  ],
+  "anio_apertura": null,
+  "fotos_cedidas": false,
+  "notas": "Datos de su ficha de Google, 23-09-2026. Rótulo parece decir 'Est. 2007' (foto de cliente, sin confirmar): anio_apertura queda null hasta que lo confirme. Google: se recomienda cita, solo efectivo, ideal para niños. Sin redes (el Instagram @victormanuelpeluqueros es de Perú). Las fotos de Google son de clientes: no usar."
+}
