@@ -8,6 +8,7 @@
 // d2ol7oe51mr4n9.cloudfront.net para lo subido). En la sesión de la nube del 23/09 estaban
 // bloqueados: ejecutarlo en el Mac o en una sesión con esos dominios permitidos.
 import sharp from 'sharp';
+import { writeFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 
 const DIR = fileURLToPath(new URL('.', import.meta.url));
@@ -30,9 +31,11 @@ const VARIANTES = {
  * y D). null = todavía no hay foto elegida: se queda el hueco marcado que hay ahora.
  */
 const ELEGIDAS = {
-  'hero-16x9.jpg': null, // A-? — la elige Eugenio
-  'comparador-despues.jpg': null, // D1-?
-  'comparador-antes.jpg': null, // URL de la D2 final (compuesta sobre la D1 elegida)
+  'hero-16x9.jpg': 'A-a', // elegida el 23/09: es «el salón» de todas las demás
+  // D1: edición de A-a (mismo fondo), tal cual salió. D2: edición de D1 compuesta en el sandbox:
+  // fuera del pelo, los píxeles de D1 (fotos/prompts.md).
+  'comparador-despues.jpg': 'https://d2ol7oe51mr4n9.cloudfront.net/user_3JAuaMDVPdsAyTgWQOem3xzwisr/fd8608bc-5924-4934-9d10-02a85a3c100b.jpg',
+  'comparador-antes.jpg': 'https://d2ol7oe51mr4n9.cloudfront.net/user_3JAuaMDVPdsAyTgWQOem3xzwisr/5468f5d9-a92d-4283-9080-ec6e75a4b634.jpg',
   'color-mechas.jpg': null, // B
   'novia-recogido.jpg': null, // C
   'mantilla.jpg': null, // D
@@ -46,8 +49,11 @@ for (const [archivo, cual] of Object.entries(ELEGIDAS)) {
   const url = cual.startsWith('http') ? cual : GENERADAS + VARIANTES[cual];
   const r = await fetch(url);
   if (!r.ok) throw new Error(`${archivo}: ${r.status} al descargar ${url}`);
-  const img = sharp(Buffer.from(await r.arrayBuffer()));
-  const { width, height } = await img.metadata();
-  await img.jpeg({ quality: 88, mozjpeg: true }).toFile(`${DIR}${archivo}`);
+  const datos = Buffer.from(await r.arrayBuffer());
+  const { width, height, format } = await sharp(datos).metadata();
+  // Las finales de Higgsfield ya son JPEG (q95, 4:4:4) y se guardan tal cual: recomprimirlas
+  // rompería la igualdad píxel a píxel de D1 y D2 fuera del pelo. Los PNG sí se pasan a JPEG.
+  if (format === 'jpeg') writeFileSync(`${DIR}${archivo}`, datos);
+  else await sharp(datos).jpeg({ quality: 92, chromaSubsampling: '4:4:4' }).toFile(`${DIR}${archivo}`);
   console.log(`✓ ${archivo} ← ${cual} (${width}×${height})`);
 }

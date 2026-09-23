@@ -7,8 +7,8 @@ permiso escrito (CLAUDE.md §4).
 Modelo pedido: `nano_banana_2` a 2k. El servidor las resolvió con `nano_banana_flash`, como
 pasó con Salutem; salen a 2752×1536 en 16:9.
 
-**Tope de esta web: 30 créditos** (2 por foto). Gastados: **16** (A ×4 y D1 ×4). Quedan 14:
-D2 (hasta 3 intentos = 6) y B, C y D (6) suman 12; hay margen para repetir una sola vez.
+**Tope de esta web: 30 créditos** (2 por foto). Gastados: **22** (A ×4, D1 ×4 descartadas,
+D1 nueva ×2 y D2 ×1). Quedan 8: B, C y D son 6, así que hay margen para repetir una.
 
 Luz y paleta comunes: pared negra mate, banda de piedra beige cálida abajo, luz cálida de
 ventana por la izquierda. Es la fachada del salón: negro arriba y piedra abajo, como la web.
@@ -25,7 +25,20 @@ en amarillo y recortado debajo):
 - A: https://d2ol7oe51mr4n9.cloudfront.net/user_3JAuaMDVPdsAyTgWQOem3xzwisr/4f7fff2d-e7ae-4d1b-a737-eb11fad50d41.jpg
 - D1: https://d2ol7oe51mr4n9.cloudfront.net/user_3JAuaMDVPdsAyTgWQOem3xzwisr/59f88d27-e502-4432-8b03-e1edf081eba8.jpg
 
-## A — Portada 16:9 (4 variantes)
+## Un solo salón: todo sale de A-a
+
+Las cuatro D1 de la primera tanda tenían cada una su fondo, distinto entre sí y distinto del de
+A: cada foto se generaba desde una descripción («pared negra, banda de piedra») y cada una se
+inventaba su salón. Canta demasiado (Eugenio, 23/09). Además, las puntas no convencían.
+
+Desde entonces todo sale de una sola imagen, **A-a** (la portada elegida):
+1. D1 es una **edición de A-a** (misma cámara, pared, piedra y luz; otra mujer, sin manos ni
+   cepillo).
+2. D2 es una **edición de D1**, en la que solo cambia el pelo, y se compone en el sandbox: fuera
+   del pelo, los píxeles de D1 tal cual.
+3. B, C y D, con A-a de referencia.
+
+## A — Portada 16:9 (4 variantes) · elegida A-a
 
 Prompt, tal cual:
 
@@ -49,7 +62,7 @@ Prompt, tal cual:
 | A-c | `e7a4fe9a-ce47-409c-a279-806fbb9c4c00` |
 | A-d | `4675b377-dc6b-4f64-a210-d370c834b134` |
 
-## D1 — Comparador, DESPUÉS, 16:9 (4 variantes)
+## D1 — primera tanda (4 variantes, descartadas)
 
 > Documentary photograph inside a small, modern hair salon in a town in the Murcia region of
 > Spain, late morning. Static camera at shoulder height, directly behind an adult woman seated
@@ -74,27 +87,66 @@ Prompt, tal cual:
 | D1-c | `2c99a25e-0d40-4c48-8140-35616fa2a206` |
 | D1-d | `c5738f46-ca0c-4e5a-8d94-6d9ecd478c52` |
 
-## D2 — Comparador, ANTES (pendiente: se hace sobre la D1 elegida)
+## D1 — Comparador, DESPUÉS: edición de A-a (2 variantes) · elegida la 1
 
-Edición de la D1 elegida, pasada como referencia (`image_references`). Como mucho 3 intentos.
+Referencia: el trabajo de A-a (`218f1ce3…`).
 
-> Edit this exact photograph. Keep everything identical: same framing and crop, same camera
-> position, same woman, same posture and head position, same black cape, same matte black
-> wall and warm beige stone band, same warm window light from the left, same image size.
-> Change only the colour and condition of her hair, keeping exactly the same length,
-> silhouette and position of every lock: the hair is now a flat, uniform dark brown with no
-> shine and no dimension, about 3 cm of visible regrowth at the roots in a slightly different
-> natural brown, and the ends a little frizzy and dry. Nothing else changes. No faces, no
-> mirrors, no text, no logos. Realistic 35mm photography, natural colour, no HDR.
+> Edit this photograph. Keep the background exactly as it is: the same matte black wall, the
+> same band of warm beige stone at the same height, the same warm window light from the left,
+> the same camera position, framing, focus and colour. Remove the stylist's hands, forearms and
+> the round brush completely, and fill that area with the same background. Replace the seated
+> woman with a different adult woman, seen from directly behind at shoulder height, in the same
+> place and at the same size: we only see the back of her head and shoulders, never her face.
+> Plain black cutting cape. Her hair is long and loose, straight with a gentle bend at the very
+> ends, freshly blow-dried with a polished salon finish: a luminous natural blonde with
+> dimension, the root area a slightly deeper soft golden brown that melts seamlessly into
+> lighter, sunlit blonde lengths, with no harsh lines and no stripes. The ends are healthy,
+> thick and precisely cut in a clean, even line, with no split ends, no frizz and no thin
+> see-through tips. Glossy, with a natural band of shine that follows the direction of the
+> hair. No mirrors anywhere, no reflections of people, no faces. No text, no signs, no logos.
+> Realistic 35mm photography, natural colour, no HDR, no filters.
 
-Comprobación de que casan: en el sandbox de Higgsfield (Pillow), diferencia píxel a píxel
-entre D1 y D2 fuera del pelo (bordes, capa, pared y piedra) y búsqueda de desplazamiento. Si
-casan salvo ruido, la D2 final se compone con la máscara de lo que ha cambiado (el pelo): fuera
-de ella, los píxeles de D1 tal cual. Así la línea del comparador no puede enseñar un salto.
+| | Trabajo | Frente a A-a (sandbox, franja izquierda: solo pared y piedra) |
+|---|---|---|
+| **D1 nueva 1 (elegida)** | `d1752848-eb8c-4195-a6a5-4640547ac68b` | canto de la piedra en la misma fila (1105); cámara movida 16 px; alineada, la pared difiere 2,3/255 de media: el mismo fondo |
+| D1 nueva 2 | `0556b7a2-ce06-403e-a01c-16053f0b4836` | piedra 3 px más arriba; pared a 5/255 de media y hasta 70 en zonas: más reinventada |
+
+La D1 elegida va tal cual salió (no se compone con el fondo de A-a: con 2/255 de diferencia no
+hace falta, y componer arriesgaba un halo alrededor del pelo).
+Hoja de las dos: https://d2ol7oe51mr4n9.cloudfront.net/user_3JAuaMDVPdsAyTgWQOem3xzwisr/b372eaa3-3741-46d3-8af5-44ae80e97fa7.jpg
+
+## D2 — Comparador, ANTES: edición de D1 (1 intento)
+
+Referencia: la D1 elegida (`d1752848…`). Trabajo: `ad31f01f-b0bc-4493-aef0-25027f39f1c7`.
+
+> Edit this exact photograph. Keep everything identical: the same framing and crop, the same
+> camera position, the same woman, the same posture and head position, the same black cape,
+> the same background, the same warm window light from the left, the same image size. Change
+> only the colour and condition of her hair, keeping exactly the same length, the same
+> silhouette and the same position of every lock: the hair is now a flat, uniform dark brown
+> with no shine and no dimension, like an old box dye, with about 3 cm of visible regrowth at
+> the roots in a slightly different, lighter natural brown, and the ends a little frizzy and
+> dry. Nothing else changes. No faces, no mirrors, no reflections of people, no text, no logos.
+> Realistic 35mm photography, natural colour, no HDR.
+
+Comprobación y composición en el sandbox de Higgsfield (Pillow + numpy):
+- Mismo tamaño (2752×1536) y **desplazamiento 0** a izquierda y derecha (correlación de fase).
+- Fondo en los laterales antes de componer: 3,0/255 de media (percentil 95: 9,3).
+- Máscara del pelo: diferencia de color, cierre y dilatación a 1/4, solo en el 60 % central,
+  difuminada. Ocupa el 20,2 % del encuadre.
+- **D2 final = D1 fuera del pelo + D2 dentro**: fuera del pelo la diferencia con D1 es **0**; tras
+  guardarlas en JPEG q95 4:4:4, solo el 0,009 % de esos píxeles varía más de 2 niveles (los del
+  borde de la máscara). Dentro del pelo, 63,8/255 de media: el cambio buscado.
+
+Finales (las que baja `descargar.mjs`):
+- D1: https://d2ol7oe51mr4n9.cloudfront.net/user_3JAuaMDVPdsAyTgWQOem3xzwisr/fd8608bc-5924-4934-9d10-02a85a3c100b.jpg
+- D2: https://d2ol7oe51mr4n9.cloudfront.net/user_3JAuaMDVPdsAyTgWQOem3xzwisr/5468f5d9-a92d-4283-9080-ec6e75a4b634.jpg
+- Hoja de revisión (la pareja, el comparador con la línea al 25, 50 y 75 %, recortes 4:5 y el
+  móvil al 40 y 65 %): https://d2ol7oe51mr4n9.cloudfront.net/user_3JAuaMDVPdsAyTgWQOem3xzwisr/4b222421-5e23-414d-bdaf-8a29b5c49810.jpg
 
 ## B, C y D — Fotos de sección 4:5 (pendientes de aprobar A, D1 y D2)
 
-Con A como referencia de estilo. Coletilla para las tres:
+Con A-a como referencia de estilo. Coletilla para las tres:
 
 > same light and palette as the reference image; no faces, no mirrors, no reflections of
 > people; no text, no signs, no logos, no brand names, no labelled bottles; realistic 35mm
@@ -119,4 +171,5 @@ Con A como referencia de estilo. Coletilla para las tres:
 - La acción dentro del 45 % central: de ahí sale el recorte 4:5 del móvil (Astro lo recorta al
   construir, `fit: 'cover'` centrado).
 
-**Ninguna de las 8 está revisada todavía**: desde la sesión de la nube no se pueden ver.
+**Las revisa Eugenio** en las hojas: desde la sesión de la nube no se pueden ver. Las medidas de
+encaje (fondo, desplazamiento, máscara) sí se han hecho aquí, con números.
