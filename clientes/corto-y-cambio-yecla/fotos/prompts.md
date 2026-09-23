@@ -15,15 +15,8 @@ ventana por la izquierda. Es la fachada del salón: negro arriba y piedra abajo,
 
 ## Estado
 
-Las fotos que hay ahora en esta carpeta son **huecos marcados**, del mismo tamaño que las de
-verdad, para montar la página: en la sesión de la nube el CDN de Higgsfield
-(`d8j0ntlcm91z4.cloudfront.net`) está bloqueado por la política de red y no se pueden
-descargar ni mirar desde aquí. `descargar.mjs` las trae en cuanto haya acceso.
-
-Hojas de contacto para elegir (las 4 variantes, con el recorte 4:5 del 45 % central marcado
-en amarillo y recortado debajo):
-- A: https://d2ol7oe51mr4n9.cloudfront.net/user_3JAuaMDVPdsAyTgWQOem3xzwisr/4f7fff2d-e7ae-4d1b-a737-eb11fad50d41.jpg
-- D1: https://d2ol7oe51mr4n9.cloudfront.net/user_3JAuaMDVPdsAyTgWQOem3xzwisr/59f88d27-e502-4432-8b03-e1edf081eba8.jpg
+Las seis fotos están en esta carpeta desde el 23/09 (bajadas con `descargar.mjs`) y revisadas a
+la vista: sin caras, sin texto ni marcas, manos de cinco dedos, el mismo salón en todas.
 
 ## Un solo salón: todo sale de A-a
 
@@ -206,3 +199,15 @@ https://d2ol7oe51mr4n9.cloudfront.net/user_3JAuaMDVPdsAyTgWQOem3xzwisr/b0621d0a-
 
 **Las revisa Eugenio** en las hojas: desde la sesión de la nube no se pueden ver. Las medidas de
 encaje (fondo, desplazamiento, máscara) sí se han hecho aquí, con números.
+
+## Retoques hechos a mano
+
+- **A-a (`hero-16x9.jpg`)**: al fondo, a la derecha de su cabeza y encima del mechón levantado,
+  asomaba una cabeza borrosa de piel clara y pelo oscuro (una persona reflejada o detrás), lo
+  que el prompt prohibía. Se ha sustituido por el mismo trozo de fondo de D1, que es el mismo
+  salón con la cámara 16 px a un lado: elipse difuminada sobre la mancha, limitada por encima
+  del borde del mechón (trazado a mano por tramos), para no tocar el pelo. Queda un leve tono
+  cálido desenfocado sobre el pelo, de unos 10 px en pantalla. Versión retocada:
+  https://d2ol7oe51mr4n9.cloudfront.net/user_3JAuaMDVPdsAyTgWQOem3xzwisr/fb98078f-c667-45d1-bc8e-ad56f2dfbee3.jpg
+  (la original sigue en el trabajo `218f1ce3…`).
+- **D2**: compuesta sobre D1 (ver arriba). D1, B, C y D van tal cual salieron.

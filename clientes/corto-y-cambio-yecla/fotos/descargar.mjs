@@ -5,8 +5,9 @@
 //   node clientes/corto-y-cambio-yecla/fotos/descargar.mjs
 //
 // Necesita acceso a los CDN de Higgsfield (d8j0ntlcm91z4.cloudfront.net para lo generado,
-// d2ol7oe51mr4n9.cloudfront.net para lo subido). En la sesión de la nube del 23/09 estaban
-// bloqueados: ejecutarlo en el Mac o en una sesión con esos dominios permitidos.
+// d2ol7oe51mr4n9.cloudfront.net para lo subido). En una sesión de la nube, el fetch de Node
+// solo pasa por el proxy con NODE_USE_ENV_PROXY=1:
+//   NODE_USE_ENV_PROXY=1 node clientes/corto-y-cambio-yecla/fotos/descargar.mjs
 import sharp from 'sharp';
 import { writeFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
@@ -31,7 +32,9 @@ const VARIANTES = {
  * y D). null = todavía no hay foto elegida: se queda el hueco marcado que hay ahora.
  */
 const ELEGIDAS = {
-  'hero-16x9.jpg': 'A-a', // elegida el 23/09: es «el salón» de todas las demás
+  // A-a, elegida el 23/09 («el salón» de todas las demás), con el retoque de la cabeza borrosa
+  // del fondo (fotos/prompts.md, «Retoques hechos a mano»).
+  'hero-16x9.jpg': 'https://d2ol7oe51mr4n9.cloudfront.net/user_3JAuaMDVPdsAyTgWQOem3xzwisr/fb98078f-c667-45d1-bc8e-ad56f2dfbee3.jpg',
   // D1: edición de A-a (mismo fondo), tal cual salió. D2: edición de D1 compuesta en el sandbox:
   // fuera del pelo, los píxeles de D1 (fotos/prompts.md).
   'comparador-despues.jpg': 'https://d2ol7oe51mr4n9.cloudfront.net/user_3JAuaMDVPdsAyTgWQOem3xzwisr/fd8608bc-5924-4934-9d10-02a85a3c100b.jpg',

@@ -15,7 +15,8 @@ import foto from '../../fotos/hero-16x9.jpg';
    (global.css), con la misma imagen en blanco y negro: mismo srcset, así que no hay una
    segunda descarga. */
 
-const ANCHOS_45 = [480, 720, 960, 1080];
+// 780 cubre el móvil de 412 px a 1,75 de densidad (721 px) sin saltar a 960.
+const ANCHOS_45 = [480, 640, 780, 960, 1080];
 const ANCHOS_169 = [700, 1000, 1300, 1600, 2000];
 const recorte = (w: number) => ({ width: w, height: Math.round((w * 5) / 4) });
 
@@ -28,7 +29,7 @@ const [avif45, webp45, avif169, webp169] = await Promise.all([
 const TAM_169 = '(min-width: 1240px) 668px, (min-width: 1024px) 54vw, calc(100vw - 4rem)';
 
 const alt =
-  'Una peluquera levanta con un cepillo redondo las puntas de una clienta de espaldas, con balayage de raíz castaña a rubio miel';
+  'Unas manos levantan con un cepillo redondo un mechón de una clienta de espaldas: melena ondulada con balayage de raíz castaña a rubio miel';
 const valoracion = ficha.valoracion.toLocaleString('es-ES', { minimumFractionDigits: 1 });
 const whatsapp = enlaceWhatsapp(ficha, 'Hola, quería pedir cita en Corto y Cambio.');
 ---

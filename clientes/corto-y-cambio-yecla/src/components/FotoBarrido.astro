@@ -14,7 +14,7 @@ interface Props {
   class?: string;
 }
 const { src, alt, pie, sizes, class: clase } = Astro.props;
-const ANCHOS = [360, 540, 720, 960, 1200];
+const ANCHOS = [360, 480, 600, 720, 960, 1200];
 const [avif, webp] = await Promise.all([
   getImage({ src, format: 'avif', widths: ANCHOS, width: 1200, quality: 52 }),
   getImage({ src, format: 'webp', widths: ANCHOS, width: 1200, quality: 64 }),
