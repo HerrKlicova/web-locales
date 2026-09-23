@@ -24,11 +24,6 @@ const dudas = [
     respuesta: 'Escríbeme y te digo si hay hueco ese día.',
   },
   {
-    clave: 'pago',
-    pregunta: '¿Se puede pagar con tarjeta?',
-    respuesta: 'No, solo en efectivo.',
-  },
-  {
     clave: 'ninos',
     pregunta: '¿Cortas a niños?',
     respuesta: 'Sí, con paciencia. Y les hago el corte que piden.',
@@ -112,19 +107,20 @@ const dudas = [
   }
   .d-llamar:hover { text-decoration-thickness: 3px; }
 
-  /* Móvil: título; cita a lo ancho (es la respuesta más larga); el resto de dos en dos; cierre. */
-  .d-titulo, .d-cita, .d-precio, .d-cierre { grid-column: 1 / -1; }
+  /* Móvil: título; cita (es la respuesta más larga) y paso a lo ancho; niños | máquina; precio y
+     cierre a lo ancho. */
+  .d-titulo, .d-cita, .d-paso, .d-precio, .d-cierre { grid-column: 1 / -1; }
   /* Móviles estrechos: todas a lo ancho. */
   @media (max-width: 379px) {
     .d-duda { grid-column: 1 / -1; }
   }
 
-  /* Escritorio: título y las seis dudas en dos filas de cuatro, con el cierre al final. */
+  /* Escritorio: título y las cinco dudas en dos filas de cuatro, con el cierre al final. La de la
+     cita, la más larga, ocupa dos paños, como la reseña larga de Virginia. */
   @media (min-width: 900px) {
     .d-titulo { grid-area: 1 / 1; }
-    .d-cita { grid-area: 1 / 2; }
-    .d-paso { grid-area: 1 / 3; }
-    .d-pago { grid-area: 1 / 4; }
+    .d-cita { grid-area: 1 / 2 / 2 / 4; }
+    .d-paso { grid-area: 1 / 4; }
     .d-ninos { grid-area: 2 / 1; }
     .d-maquina { grid-area: 2 / 2; }
     .d-precio { grid-area: 2 / 3; }

@@ -39,9 +39,9 @@ los colores; esa foto es de un cliente y no se usa):
   ahora, hasta las 13:30» / «Ahora cerrado, abrimos a las 16:30» con la hora de Madrid
   (`Estado.astro`; versión corta en la barra) y el cartel colgado de «abierto», lleno o en contorno.
 - **El resto** sigue la misma rejilla, con un travesaño más grueso entre bloques: servicios como
-  lista de precios (puntos guía y el hueco `[PRECIO]` en gris) y «Solo efectivo.» en grande;
+  lista de precios (puntos guía y el hueco `[PRECIO]` en gris);
   horario partido en mañana y tarde (como el vinilo de su puerta) con la fila de hoy encendida y
-  un «hoy» en rojo; las 7 reseñas tal cual; seis dudas y «¿Te guardo hora?»; dónde está, con un
+  un «hoy» en rojo; las 7 reseñas tal cual; cinco dudas y «¿Te guardo hora?»; dónde está, con un
   **plano propio** de OpenStreetMap (`mapa/plano.mjs`, sin iframe ni cookies) y la peluquería
   marcada con su rótulo en pequeño; pie con el rótulo encendido.
 - Las fotos B y C van detrás de varios paños de cristal cruzados por perfiles, como la portada. La
@@ -98,7 +98,7 @@ los colores; esa foto es de un cliente y no se usa):
   piloto rojo (el taller usa pilotos). Ver la comprobación de la fila 5 en `rotacion.md`.
 - **Sin priceRange ni imágenes en el schema**: no hay precios y las fotos son de muestra.
 - **El estado dice «abrimos»** aunque el resto hable en primera persona del singular: es la frase
-  que pidió Eugenio.
+  que pidió Eugenio. El título de servicios, «Qué hacemos», también va en plural por lo mismo.
 
 ## Pendiente
 - **Precios**: los cuatro servicios llevan `[PRECIO]`. Google enseña una franja de 1 a 20 € que no
@@ -109,4 +109,27 @@ los colores; esa foto es de un cliente y no se usa):
   lo dice.
 - Producción (§11): dominio, quitar `noindex`, sitemap y robots, aviso legal con titular y NIF.
 - Borrar el Worker aparte `webs-locales-demo-peluqueria` (ya no hace falta).
-- Nada guardado en git todavía.
+- Publicar la ronda de textos de abajo: está en la rama `claude/determined-pascal-slat3q` y no se
+  puede publicar desde una sesión en la nube (sin acceso a Cloudflare).
+- ¿Se quita también `paymentAccepted: 'Efectivo'` del schema? El «solo efectivo» ya no sale en la
+  página; en los datos para Google sigue hasta que Eugenio diga.
+
+## Ronda de textos de Eugenio (23/09/2026, tarde) — sin publicar
+- Portada: fuera «Si pides hora, a esa hora te siento.». En escritorio, «Corto a tijera, como los
+  de antes.» pasa a un paño alto (filas 2 y 3), como la puerta de enfrente; en el móvil, la calle
+  va justo debajo de la frase. La reserva del paño de texto del móvil baja lo mismo que el texto
+  (`clamp(11.75rem, 27cqw, 14.75rem)`): donde la pantalla limita el vídeo, el vídeo crece y el
+  texto sigue acabando justo encima de la puerta fija (360, 375, 390 × 664, 768 y 834 px, ±4 px);
+  a 320 × 568 la calle, que antes caía 46 px debajo de la puerta, ahora cabe.
+- Servicios: «Lo que hago» pasa a «Qué hacemos» y fuera el paño de «Solo efectivo.». En escritorio
+  el título ocupa los dos paños de la izquierda, como en las opiniones.
+- Dudas: fuera «¿Se puede pagar con tarjeta?». Quedan cinco. En escritorio, la de la cita (la más
+  larga) ocupa dos paños, como la reseña de Virginia; en el móvil, la de «de paso» va a lo ancho
+  para que niños y máquina sigan juntas.
+- Comprobado en local (build de demo servido con `scripts/servir.mjs`): ninguna celda vacía en las
+  rejillas de portada, servicios y dudas (mirado celda a celda con `elementsFromPoint`) ni scroll
+  horizontal a 320, 360, 375, 390, 412, 600, 768, 834, 1024 (de pie y tumbada), 1280, 1440 y
+  1920 px; capturas revisadas a 375, 390, 768 y 1440; Lighthouse móvil 100/100/100 (SEO 63 por el
+  `noindex`), LCP 1,7 s, CLS 0; escritorio 100/100/100, LCP 0,4 s.
+- Ya pasaba antes y sigue: a 600 px de ancho de pie, la calle del hero queda debajo de la puerta
+  fija al abrir (antes −35 px, ahora −27 px).
