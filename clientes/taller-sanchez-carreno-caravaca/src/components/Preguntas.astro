@@ -1,7 +1,5 @@
 ---
-import type { Ficha, Resena } from '@plantilla/lib/ficha';
-
-type ResenaDoble = Resena & { texto_en?: string };
+import type { Ficha } from '@plantilla/lib/ficha';
 import Icono from './Icono.astro';
 
 /**
@@ -10,25 +8,23 @@ import Icono from './Icono.astro';
  * de §10. A sangre: la pregunta a un lado y la reseña al otro, de borde a borde.
  *
  * La reseña va entera y sin tocar, pero la frase que contesta la pregunta sale en blanco y el
- * resto en gris: se lee la respuesta de un vistazo sin recortar a nadie. La pregunta en inglés se
- * contesta con la parte inglesa de la reseña de Dominic Olds, que la escribió en los dos idiomas.
+ * resto en gris: se lee la respuesta de un vistazo sin recortar a nadie.
  */
 interface Props { ficha: Ficha; valoracion: number; numResenas: number }
 const { ficha, valoracion, numResenas } = Astro.props;
 const nota = valoracion.toLocaleString('es-ES', { minimumFractionDigits: 1 });
 
-const emparejar = (autor: string) => (ficha.resenas as ResenaDoble[]).find((r) => r.autor === autor);
+const emparejar = (autor: string) => ficha.resenas.find((r) => r.autor === autor);
 // Cada duda con la reseña que de verdad la contesta, y la frase exacta que la contesta.
 const bloques = [
   { pregunta: '¿Me va a costar lo que me digáis?', autor: 'Jonathan José Diaz Jumbo', destacar: 'destacan por su honestidad al explicar los problemas y las soluciones, sin sorpresas desagradables.' },
   { pregunta: '¿Puedo fiarme de vosotros?', autor: 'Pedro Miguel', destacar: 'Profesionales, puedes confiar en ellos.' },
   { pregunta: '¿Sale caro?', autor: 'My Life', destacar: 'Se ajustan al máximo en el precio' },
   { pregunta: '¿Tardáis mucho?', autor: 'Santi Torralba', destacar: 'A UN BUEN PRECIO Y RÁPIDO.' },
-  { pregunta: 'I don’t speak much Spanish.', autor: 'Dominic Olds', idioma: 'en', destacar: 'They speak some English as well which is really helpful.' },
 ].flatMap((b) => {
   const resena = emparejar(b.autor);
   if (!resena) return [];
-  const texto = b.idioma === 'en' && resena.texto_en ? resena.texto_en : resena.texto;
+  const texto = resena.texto;
   const i = texto.indexOf(b.destacar);
   // Si la frase no está (la reseña cambió), se enseña entera en blanco: nunca se inventa nada.
   const partes = i < 0 ? { antes: '', frase: texto, despues: '' } : { antes: texto.slice(0, i), frase: b.destacar, despues: texto.slice(i + b.destacar.length) };
@@ -60,9 +56,9 @@ const bloques = [
     {
       bloques.map((b) => (
         <li class="opinion margen">
-          <h3 class="ancha m-0 text-[clamp(1.4rem,2.3vw,2.2rem)]" lang={b.idioma}>{b.pregunta}</h3>
+          <h3 class="ancha m-0 text-[clamp(1.4rem,2.3vw,2.2rem)]">{b.pregunta}</h3>
           <div>
-            <blockquote class="opinion-cita m-0 max-w-[60ch] text-lg leading-relaxed sm:text-xl" lang={b.idioma}>
+            <blockquote class="opinion-cita m-0 max-w-[60ch] text-lg leading-relaxed sm:text-xl">
               <p class="m-0">«{b.partes.antes}<mark>{b.partes.frase}</mark>{b.partes.despues}»</p>
             </blockquote>
             <p class="m-0 mt-4 flex items-center gap-3 text-niebla">

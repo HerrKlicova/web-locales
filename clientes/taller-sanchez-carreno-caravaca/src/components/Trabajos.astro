@@ -49,12 +49,11 @@ const trabajos = [
         ))
       }
     </ul>
-    <p class="m-0 mt-8 max-w-[40ch] text-niebla">
-      ¿Lo tuyo no está en la lista?{' '}
-      <a href={whatsapp} class="enlace font-semibold text-blanco" target="_blank" rel="noopener">
-        Pídenos presupuesto por WhatsApp
-      </a>{' '}
-      y te decimos si te lo podemos hacer.
+    {/* Enlace suelto, no dentro de una frase: el relleno vertical le da los 44 px de toque. */}
+    <p class="m-0 mt-5">
+      <a href={whatsapp} class="enlace inline-block py-3 font-semibold text-blanco" target="_blank" rel="noopener">
+        Consúltanos en WhatsApp
+      </a>
     </p>
   </div>
 </section>

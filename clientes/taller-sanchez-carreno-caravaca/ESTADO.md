@@ -34,10 +34,9 @@ mantiene la escena del capó y el cuadro; cambia todo lo demás.
 4. **Lo que hacemos** (`Trabajos.astro`): foto con la persiana que sube (solo transform).
 5. **Horario** (`Horario.astro`): esfera de 24 h, tramo 7-15 encendido y aguja con la hora de
    Caravaca; «Abierto ahora / Ahora está cerrado» con piloto blanco; la cita, con su frase de la bio.
-6. **La nave** (`Taller.astro`): mosaico de borde a borde en escritorio, tira en móvil.
+6. **El taller** (`Taller.astro`): mosaico de borde a borde en escritorio, tira en móvil.
 7. **Preguntas** (`Preguntas.astro`): cada duda con la reseña que la contesta; la frase que contesta
-   en blanco y el resto de la reseña en gris, entera. La pregunta en inglés, con la parte inglesa
-   de la reseña de Dominic Olds (`texto_en` en la ficha).
+   en blanco y el resto de la reseña en gris, entera. Cuatro preguntas, todas en castellano.
 8. **Instagram** (`Instagram.astro`): su feed de verdad con el visor oficial de perfil, **al pulsar**
    (antes no se pide nada a Meta). Para producción, si da acceso a su cuenta, se puede pintar con el
    diseño de la web usando la API de Instagram (token largo + reconstrucción diaria).
@@ -78,6 +77,16 @@ comprobaron idénticas a lo publicado antes de subir. Para la próxima vez:
 solo la propia: `CLIENTE=taller-sanchez-carreno-caravaca DEMO=true PRODUCCION= npx astro build`
 (ya hecho el 23/09 a las 16:21) y luego `npx wrangler deploy`, que sube `dist/demo` entero: antes,
 comprobar que las demás carpetas de `dist/demo` son lo último publicado.
+
+### Ronda de textos de Eugenio (23/09/2026, tarde) — sin publicar todavía
+- Hero: «Profesionales del sector. De lunes a viernes, de 7:00 a 15:00.» («Profesionales» sale de
+  las reseñas de Pedro Miguel y My Life).
+- «Sin sorpresas al pagar» pasa a «sin sorpresas», en el remate del capó y en el cuadro.
+- El cuadro: «¿Se te ha encendido un testigo?».
+- Lo que hacemos: debajo de la lista, solo el enlace «Consúltanos en WhatsApp».
+- Horario: solo «Sin cerrar a mediodía.»
+- Fotos: el título pasa de «La nave» a «El taller» y el aviso queda en «Fotografías de muestra.»
+- Preguntas: fuera la pregunta en inglés (reseña de Dominic Olds).
 
 ---
 
@@ -259,7 +268,7 @@ Los bloques son los campos del impreso:
 ## Lo que falta
 1. **Decidir la reseña de Santi Torralba**, que está entera en MAYÚSCULAS en Google. Ahora mismo
    se muestra tal cual, en «¿Tardáis mucho?». O se deja así o se quita esa pregunta y quedan
-   cuatro. Pasarla a minúsculas sería reescribirla, así que eso no se hace.
+   tres. Pasarla a minúsculas sería reescribirla, así que eso no se hace.
 2. **Fotos reales del taller.** Las siete son de Higgsfield. En cuanto el cliente ceda fotos,
    se sustituyen (§6, prioridad 1) y se quita la de la fachada.
 3. `impeccable`: no se ha pasado ni `critique` ni `polish` (paso 6 de §2).
@@ -271,8 +280,8 @@ Los bloques son los campos del impreso:
   servicios va sin columna de precio.
 - **Servicios que sí se pueden nombrar**, porque salen de sus reseñas: mecánica general,
   reparación, y **pasar la ITV** (lo dice la reseña de My Life). Nada más.
-- **Se manejan en inglés** (reseña de Dominic Olds): útil en Caravaca, donde hay residentes
-  británicos. Puede ir como una línea, sin inventar que tengan servicio en inglés.
+- **Nada en inglés en la página.** Eugenio pidió quitar la pregunta en inglés (23/09/2026). La
+  reseña de Dominic Olds sigue en la ficha, con su `texto_en`, pero no sale.
 - La reseña de **Santi Torralba está en MAYÚSCULAS** en el original. Pendiente de decidir: o se
   muestra tal cual o se deja fuera. No se pasa a minúsculas, que sería reescribirla.
 - Nada del Facebook (el coche abandonado hace 27 años) ni de Empresite (C.B. de hace ~7 años) se
