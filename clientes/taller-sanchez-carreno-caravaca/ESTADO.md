@@ -78,7 +78,9 @@ solo la propia: `CLIENTE=taller-sanchez-carreno-caravaca DEMO=true PRODUCCION= n
 (ya hecho el 23/09 a las 16:21) y luego `npx wrangler deploy`, que sube `dist/demo` entero: antes,
 comprobar que las demás carpetas de `dist/demo` son lo último publicado.
 
-### Ronda de textos de Eugenio (23/09/2026, tarde) — sin publicar todavía
+### Ronda de textos de Eugenio (23/09/2026, tarde) — publicada el 23/09/2026 a las 18:05
+(versión del Worker `939ca770…`; solo cambió la página del taller, las otras cinco demos se comprobaron
+idénticas a lo publicado antes de subir y siguen bien a 390 y 1440 px)
 - Hero: «Profesionales del sector. De lunes a viernes, de 7:00 a 15:00.» («Profesionales» sale de
   las reseñas de Pedro Miguel y My Life).
 - «Sin sorpresas al pagar» pasa a «sin sorpresas», en el remate del capó y en el cuadro.
