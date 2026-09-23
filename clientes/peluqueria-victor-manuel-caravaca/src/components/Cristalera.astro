@@ -86,17 +86,14 @@ const SIZES = '100vw';
     <div class="cristalera-penumbra" aria-hidden="true"></div>
   </div>
 
-  <!-- Vinilo esmerilado con el texto. En escritorio son tres paños de la columna izquierda; en
-       el móvil, un solo paño de lado a lado debajo del vídeo. -->
+  <!-- Vinilo esmerilado con el texto. En escritorio son dos paños de la columna izquierda, el de
+       abajo alto como la puerta; en el móvil, un solo paño de lado a lado debajo del vídeo. -->
   <div class="hero-texto">
     <div class="hero-linea hero-linea-1">
       <h1 id="titulo" class="titular hero-h1">Peluquería de caballeros en Caravaca de la Cruz</h1>
     </div>
     <div class="hero-linea hero-linea-2">
       <p class="titular hero-voz">Corto a tijera, como los de antes.</p>
-    </div>
-    <div class="hero-linea hero-linea-3">
-      <p class="titular hero-voz-2">Si pides hora, a esa hora te siento.</p>
       <p class="hero-calle">{ficha.direccion}</p>
     </div>
   </div>
@@ -152,7 +149,7 @@ const SIZES = '100vw';
   .cristalera {
     /* Lo que se reserva para el paño del texto crece con el ancho, como su letra: en una tablet de
        pie el texto es más grande y, si no, la última línea caía debajo de la puerta fija. */
-    --reserva-texto: clamp(13.5rem, 32cqw, 17rem);
+    --reserva-texto: clamp(11.75rem, 27cqw, 14.75rem);
     --alto-video: clamp(15rem, min(125cqw, calc(100svh - var(--cab) - var(--puerta) - var(--reserva-texto))), 64rem);
     --fila: calc((var(--alto-video) - var(--perfil)) / 2);
     position: relative;
@@ -227,15 +224,8 @@ const SIZES = '100vw';
     font-size: clamp(1.6rem, 8cqw, 2.5rem);
     line-height: 1;
   }
-  .hero-voz-2 {
-    margin: 0;
-    font-size: clamp(1.08rem, 4.9cqw, 1.55rem);
-    font-weight: 700;
-    line-height: 1.15;
-  }
   .hero-calle { margin: 0.55rem 0 0; font-size: 0.95rem; color: var(--color-azul-tenue); }
   .hero-linea-2 { margin-top: 0.55rem; }
-  .hero-linea-3 { margin-top: 0.45rem; }
 
   .hero-numero,
   .puerta { display: none; }
@@ -298,7 +288,8 @@ const SIZES = '100vw';
     .v5 { display: block; grid-area: 3 / 2; }
     .v6 { display: block; grid-area: 3 / 3; }
 
-    /* Los tres paños de texto de la columna izquierda. */
+    /* Los dos paños de texto de la columna izquierda: el titular en el montante y la frase en un
+       paño alto, filas 2 y 3, como la puerta de enfrente. */
     .hero-texto { display: contents; }
     .hero-linea {
       position: relative;
@@ -313,11 +304,9 @@ const SIZES = '100vw';
       background: var(--vinilo);
     }
     .hero-linea-1 { grid-row: 1; justify-content: flex-start; }
-    .hero-linea-2 { grid-row: 2; }
-    .hero-linea-3 { grid-row: 3; justify-content: space-between; }
+    .hero-linea-2 { grid-row: 2 / 4; }
     .hero-h1 { font-size: clamp(1.15rem, 1.55vw, 1.7rem); max-width: 17ch; }
     .hero-voz { font-size: clamp(2rem, 3.4vw, 3.8rem); max-width: 9ch; }
-    .hero-voz-2 { font-size: clamp(1.3rem, 1.85vw, 2.05rem); font-weight: 800; }
     .hero-calle { display: none; }
 
     /* El montante: número de la calle pintado en el cristal, encima de la puerta. */
@@ -439,7 +428,6 @@ const SIZES = '100vw';
     .hero-linea-1::after { animation-delay: 780ms; }
     .hero-numero::after { animation-delay: 830ms; }
     .hero-linea-2::after { animation-delay: 860ms; }
-    .hero-linea-3::after { animation-delay: 940ms; }
     .puerta-hoja::after { animation-delay: 1020ms; }
   }
   /* En el móvil el velo es el del paño único; en escritorio, el de cada paño. */

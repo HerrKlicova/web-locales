@@ -8,9 +8,9 @@ import type { Ficha } from '@plantilla/lib/ficha';
  * Lo que hace, con su precio, como una lista de precios de peluquería: el nombre y, a la derecha,
  * tras los puntos, el precio. Mientras no haya precios, el hueco [PRECIO] va en su sitio, en gris:
  * se lee como sitio reservado, no como un fallo ni como un botón.
- * Escritorio: título arriba a la izquierda y el efectivo debajo, los cuatro servicios en el centro
- * y la foto de la tijera y el peine detrás de dos paños de cristal a la derecha.
- * Móvil: título y foto arriba, servicios de dos en dos y el efectivo a lo ancho.
+ * Escritorio: título en un paño alto a la izquierda, los cuatro servicios en el centro y la foto de
+ * la tijera y el peine detrás de dos paños de cristal a la derecha.
+ * Móvil: título y foto arriba, y los servicios de dos en dos.
  */
 interface Props { ficha: Ficha; foto: ImageMetadata }
 const { ficha, foto } = Astro.props;
@@ -26,7 +26,7 @@ const lineas: Record<string, string> = {
 
 <section id="servicios" class="panos servicios" aria-labelledby="servicios-titulo">
   <div class="pano s-titulo">
-    <h2 id="servicios-titulo" class="titular h2-bloque">Lo que hago</h2>
+    <h2 id="servicios-titulo" class="titular h2-bloque">Qué hacemos</h2>
   </div>
 
   {
@@ -41,11 +41,6 @@ const lineas: Record<string, string> = {
       </div>
     ))
   }
-
-  <div class="pano s-efectivo">
-    <p class="titular s-efectivo-t">Solo efectivo.</p>
-    <p class="s-efectivo-n">Aquí no se paga con tarjeta.</p>
-  </div>
 
   <div class="pano-claro s-foto">
     <Picture
@@ -81,20 +76,13 @@ const lineas: Record<string, string> = {
   .s-puntos { flex: 1; min-width: 1.5rem; border-bottom: 2px dotted rgb(27 47 68 / 0.35); transform: translateY(-0.25em); }
   .s-hueco { font-size: 0.95rem; font-weight: 700; letter-spacing: 0.02em; color: var(--color-azul-tenue); white-space: nowrap; }
 
-  /* Solo efectivo: la duda que más se escapa, dicha en grande. */
-  .s-efectivo { display: flex; flex-direction: column; justify-content: flex-end; gap: 0.35rem; }
-  .s-efectivo-t { margin: 0; font-size: clamp(1.45rem, 2.1vw, 2.1rem); }
-  .s-efectivo-n { margin: 0; font-size: 1.02rem; color: var(--color-azul-tenue); }
-
-  /* Móvil: título | foto; servicios de dos en dos; efectivo a lo ancho. */
+  /* Móvil: título | foto; servicios de dos en dos. */
   .s-titulo { grid-area: 1 / 1; }
   .s-foto { grid-area: 1 / 2; min-height: 12rem; }
-  .s-efectivo { grid-column: 1 / -1; }
   .s-v1, .s-v2 { display: none; }
 
   @media (min-width: 900px) {
-    .s-titulo { grid-area: 1 / 1; }
-    .s-efectivo { grid-area: 2 / 1; }
+    .s-titulo { grid-area: 1 / 1 / 3 / 2; }
     .s-item-1 { grid-area: 1 / 2; }
     .s-item-2 { grid-area: 1 / 3; }
     .s-item-3 { grid-area: 2 / 2; }
