@@ -1,0 +1,204 @@
+/* Tailwind solo mira las clases de esta web (src/), no las de los demás clientes del repo. */
+@import "tailwindcss" source("../");
+
+/* Los tres colores de su logotipo: el negro del fondo, el blanco de las herramientas y el rojo de
+   la rueda. Las fotos van en blanco y negro (fotos/bn/), así que el rojo es el único color de la
+   página y solo sale donde lo pondría un coche: la rueda del logo, los testigos, la aguja, el
+   piloto del plano y el botón de escribir. El ámbar es el del testigo de motor, y solo sale ahí. */
+@theme {
+  --color-negro: #000;
+  --color-cristal: #070707;   /* el cristal del cuadro de instrumentos */
+  --color-carbon: #111;       /* superficies elevadas: el mapa, la barra fija */
+  --color-grafito: #262626;   /* filetes */
+  --color-humo: #8a8a8a;      /* texto terciario, solo en tamaños grandes o decorativo (5,9:1) */
+  --color-niebla: #adadad;    /* texto secundario (9,6:1 sobre negro) */
+  --color-blanco: #f4f4f2;
+  --color-rojo: #d2101a;      /* el de la rueda del logo; con texto blanco encima da 5,5:1 */
+  --color-rojo-hondo: #a50c14;
+  --color-rojo-luz: #ff3326;  /* el brillo de un testigo encendido: solo halos y puntos de luz */
+  --color-ambar: #f2a51a;
+
+  --font-ancha: "SC Grotesk Ancha", "SC Ancha Respaldo", "Arial Black", sans-serif;
+  --font-texto: "SC Grotesk", "Segoe UI", system-ui, sans-serif;
+
+  /* Curvas (criterio de Emil Kowalski): salida fuerte para lo que entra, entrada-salida para lo
+     que se desplaza en pantalla, y la de «encender» para las luces, que llegan casi de golpe y se
+     asientan despacio, como un filamento. */
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+  --ease-luz: cubic-bezier(0.12, 0.9, 0.2, 1);
+}
+
+/* Respaldo con las medidas de la ancha: mientras llega la fuente, el titular ocupa lo mismo y no
+   empuja los botones al cambiar (CLS). Arial Black ensanchada un 8 %. */
+@font-face {
+  font-family: "SC Ancha Respaldo";
+  src: local("Arial Black"), local("Arial Bold"), local("Arial");
+  size-adjust: 104%;
+  ascent-override: 92%;
+  descent-override: 24%;
+}
+
+@layer base {
+  html {
+    background: var(--color-negro);
+    color-scheme: dark;
+    scrollbar-color: #3a3a3a var(--color-negro);
+    scroll-behavior: smooth;
+    -webkit-tap-highlight-color: transparent;
+  }
+  body {
+    font-family: var(--font-texto);
+    font-size: 1.0625rem;
+    line-height: 1.5;
+    color: var(--color-blanco);
+    background: var(--color-negro);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+  @media (min-width: 1024px) {
+    body { font-size: 1.125rem; }
+  }
+  :focus-visible { outline: 2px solid var(--color-blanco); outline-offset: 3px; border-radius: 2px; }
+  ::selection { background: var(--color-rojo); color: #fff; }
+  img, video, svg { max-width: 100%; }
+}
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+}
+
+/* Piezas de la web. Van en la capa «components» para que las utilidades de Tailwind (hidden,
+   min-h-11, px-4…) les puedan ganar: sin capa, estas reglas ganarían siempre. */
+@layer components {
+  /* La ancha: titulares, nombres y cifras. En minúscula de frase, que en ancha se lee con más
+     elegancia que en mayúsculas; las mayúsculas quedan para el nombre del taller. El interlineado
+     no baja de 1: la ancha lleva las tildes altas y chocan con la línea de arriba. */
+  .ancha {
+    font-family: var(--font-ancha);
+    font-weight: 700;
+    letter-spacing: -0.022em;
+    line-height: 1.02;
+    text-wrap: balance;
+  }
+  .nombre {
+    font-family: var(--font-ancha);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.01em;
+  }
+
+  /* Márgenes de la web a sangre: nada de columna centrada, el contenido respira con el ancho. */
+  .margen { padding-inline: clamp(1.25rem, 5vw, 6rem); }
+
+  /* Botones en píldora, como la insignia redonda del logo y los destacados de su Instagram. */
+  .boton {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.6rem;
+    min-height: 3.25rem;
+    padding-inline: clamp(1rem, 4vw, 1.5rem);
+    border-radius: 999px;
+    font-weight: 600;
+    font-size: 1.0625rem;
+    line-height: 1.1;
+    white-space: nowrap;
+    transition: transform 160ms var(--ease-out), background-color 200ms ease, border-color 200ms ease, color 200ms ease;
+  }
+  .boton:active { transform: scale(0.97); }
+  /* El icono no encoge nunca: con el texto sin partir, a 360 px se aplastaba hasta 8 px. */
+  .boton > svg { flex-shrink: 0; }
+  .boton-rojo { background: var(--color-rojo); color: #fff; }
+  .boton-linea { box-shadow: inset 0 0 0 1.5px rgb(244 244 242 / 0.45); color: var(--color-blanco); }
+  .boton-blanco { background: var(--color-blanco); color: var(--color-negro); }
+  @media (hover: hover) and (pointer: fine) {
+    .boton-rojo:hover { background: var(--color-rojo-hondo); }
+    .boton-linea:hover { box-shadow: inset 0 0 0 1.5px var(--color-blanco); background: rgb(244 244 242 / 0.06); }
+    .boton-blanco:hover { background: #fff; }
+  }
+
+  /* Enlace de texto: subrayado fino que se engorda al pasar. */
+  .enlace {
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.28em;
+    text-decoration-color: rgb(244 244 242 / 0.4);
+    transition: text-decoration-color 200ms ease, color 200ms ease;
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .enlace:hover { text-decoration-color: var(--color-rojo); }
+  }
+}
+
+/* La persiana: cada foto está detrás de una persiana metálica, la de la nave, que sube al entrar
+   la foto en pantalla; la foto se asienta con un zum muy corto. Solo se mueve con transform (§7):
+   la persiana es una capa que se va hacia arriba, la foto no se recorta. Va atado al scroll (CSS,
+   sin JS), así que una foto que ya ha pasado siempre está descubierta, aunque el navegador restaure
+   el scroll a media página. Sin soporte de animation-timeline no hay persiana: la foto se ve. */
+/* Fuera de la animación la persiana está subida (translateY(-101%)): si la línea de tiempo no
+   llega a funcionar, la foto se ve igual. `.persiana-md` es la misma persiana solo en escritorio
+   (en la tira deslizable del móvil no hay scroll vertical al que atarla). */
+@supports (animation-timeline: view()) {
+  .persiana { position: relative; overflow: hidden; view-timeline: --persiana block; }
+  .persiana::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+    /* Lamas de chapa: una junta fina cada 14 px sobre gris casi negro. */
+    background: repeating-linear-gradient(to bottom, #0e0e0e 0 13px, #1b1b1b 13px 14px);
+    transform: translateY(-101%);
+    animation: persiana-sube linear both;
+    animation-timeline: --persiana;
+    animation-range: entry 10% cover 42%;
+  }
+  .persiana :where(img) {
+    animation: persiana-zum linear both;
+    animation-timeline: --persiana;
+    animation-range: entry 10% cover 55%;
+  }
+  @media (min-width: 900px) {
+    .persiana-md { position: relative; overflow: hidden; view-timeline: --persiana block; }
+    .persiana-md::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      pointer-events: none;
+      background: repeating-linear-gradient(to bottom, #0e0e0e 0 13px, #1b1b1b 13px 14px);
+      transform: translateY(-101%);
+      animation: persiana-sube linear both;
+      animation-timeline: --persiana;
+      animation-range: entry 10% cover 42%;
+    }
+    .persiana-md :where(img) {
+      animation: persiana-zum linear both;
+      animation-timeline: --persiana;
+      animation-range: entry 10% cover 55%;
+    }
+  }
+}
+@keyframes persiana-sube {
+  from { transform: translateY(0); }
+  to   { transform: translateY(-101%); }
+}
+@keyframes persiana-zum {
+  from { transform: scale(1.08); }
+  to   { transform: scale(1); }
+}
+/* Movimiento reducido: sin persiana ni zum; la foto aparece con un fundido corto (§7). */
+@media (prefers-reduced-motion: reduce) {
+  @supports (animation-timeline: view()) {
+    .persiana::after, .persiana-md::after { transform: none; opacity: 0; animation-name: fundido-fuera; animation-range: entry 0% entry 60%; }
+    .persiana :where(img), .persiana-md :where(img) { animation: none; }
+  }
+}
+@keyframes fundido-fuera {
+  from { opacity: 1; }
+  to   { opacity: 0; }
+}
+
+/* Estrellas de valoración: blancas, no rojas (en rojo parecerían un aviso). */
+.estrellas { display: inline-flex; gap: 0.12em; color: var(--color-blanco); }

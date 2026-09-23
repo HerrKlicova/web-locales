@@ -1,0 +1,67 @@
+{
+  "slug": "taller-sanchez-carreno-caravaca",
+  "demo_token": "q4r8tz",
+  "nombre": "Taller mecánico Sánchez Carreño",
+  "tipo": "AutoRepair",
+  "pueblo": "Caravaca de la Cruz",
+  "direccion": "Av. Ctra. de Granada, 49",
+  "cp": "30400",
+  "telefono": "+34 686 30 94 62",
+  "whatsapp": "+34 686 30 94 62",
+  "instagram": "carrenomotor.1988",
+  "maps_url": "https://maps.google.com/?cid=17547292777763420541",
+  "place_id": "ChIJna5YNf6sZQ0Rfbld1M-BhPM",
+  "coordenadas": [
+    38.098276,
+    -1.866577
+  ],
+  "valoracion": 4.9,
+  "num_resenas": 99,
+  "horario": [
+    {
+      "dias": "Lunes a viernes",
+      "horas": "7:00–15:00"
+    },
+    {
+      "dias": "Sábado y domingo",
+      "horas": "Cerrado"
+    }
+  ],
+  "servicios": [
+    {
+      "nombre": "Mecánica general",
+      "precio": ""
+    }
+  ],
+  "resenas": [
+    {
+      "texto": "Trato personalizado para cada cliente. Profesionales, puedes confiar en ellos. Incluso mi padre que es de Cehegín está encantado. Muy recomendable.",
+      "autor": "Pedro Miguel",
+      "estrellas": 5
+    },
+    {
+      "texto": "CONTENTO Y SATISFECHO CON EL SERVICIO DE ÉSTE TALLER, CALIDAD PRECIO Y PROFESIONALIDAD + RAPIDEZ. LO RECOMIENDO PARA ARREGLAR O REPARAR VUESTRO COCHE A UN BUEN PRECIO Y RÁPIDO.",
+      "autor": "Santi Torralba",
+      "estrellas": 5
+    },
+    {
+      "texto": "Excelente taller mecánico. Desde el primer contacto, se nota el buen trato y la profesionalidad del equipo. Son muy eficientes, cumpliendo siempre con los tiempos acordados. Además, destacan por su honestidad al explicar los problemas y las soluciones, sin sorpresas desagradables.",
+      "autor": "Jonathan José Diaz Jumbo",
+      "estrellas": 5
+    },
+    {
+      "texto": "Excelente taller con personal muy servicial. También hablan algo de inglés, lo cual es muy útil. El precio por su trabajo de calidad es muy bueno. Muy recomendable.",
+      "autor": "Dominic Olds",
+      "estrellas": 5,
+      "texto_en": "Excellent workshop with very helpful staff. They speak some English as well which is really helpful. The pricing for their quality work is very good. Highly recommended."
+    },
+    {
+      "texto": "Trato impecable y personalizado. Son unos profesionales ya que tienen muchos años de experiencia y se nota que les gusta lo que hacen. Siempre me dan dado solución a lo que me haya pasado en el coche. Últimamente hasta me pasan la ITV!! Se ajustan al máximo en el precio así que recomendable 100×100.",
+      "autor": "My Life",
+      "estrellas": 5
+    }
+  ],
+  "anio_apertura": null,
+  "fotos_cedidas": false,
+  "notas": "Ficha de Google consultada el 22/09/2026 (place_id ChIJna5YNf6sZQ0Rfbld1M-BhPM): nombre 'Taller mecánico Sánchez Carreño' (con minúscula en 'mecánico', así figura), 4,9 con 99 reseñas, horario L-V 7:00-15:00 y fines de semana cerrado, coordenadas y teléfono. Ese horario zanja la contradicción de los directorios de terceros: el que decía L-V 7-15 y fines de semana cerrado es el bueno; el de 9-14/16-20 con sábados es falso y no se usa. Las 5 reseñas son las que devuelve la API de Google, copiadas en su español original. Dos están recortadas, no reescritas: a la de Pedro Miguel se le han quitado dos emojis del final y a la de Jonathan José Diaz Jumbo la última frase (era muy larga). La de Santi Torralba está en mayúsculas en el original: pendiente de decidir si se muestra así o se deja fuera. La de Dominic Olds la escribió su autor en inglés y en español: la parte en español va en «texto» y la inglesa, tal cual, en «texto_en» (la usa la pregunta en inglés; comprobado con la Places API el 23/09/2026). Datos de servicio que salen de las propias reseñas, no inventados: pasan la ITV (My Life) y hablan algo de inglés (Dominic Olds). Sin precios: no hay ninguno publicado, así que no se pone ninguno. C.B. registrada hace ~7 años según Empresite; el taller físico parece más antiguo (coche abandonado en el garaje desde hace 27 años, según su Facebook, posible negocio familiar): nada de esto se publica como dato porque no está confirmado. Sin logo conocido. Sin fotos reales todavía: usar Higgsfield (prioridad 2 de §6). Instagram (@carrenomotor.1988, consultado el 23/09/2026 con el visor público de perfil): bio «Taller de reparación de automóviles», «CEO @josecarreno.abrete», «Para pedir cita o presupuesto: 686 30 94 62», «Ctra. Granada Nº49, Caravaca 30400»; 1408 seguidores y 83 publicaciones. Su logotipo (rueda roja con llave y destornillador blancos sobre negro) está redibujado en vectorial en src/lib/logo.mjs. En sus textos aparecen datos que NO están en la web porque no se han confirmado con el taller: un fijo (968 703 251), un correo (tallersanchezcarreno@gmail.com), un servicio de financiación de reparaciones (hasta 1000 € en 12 meses, mínimo 180 €, en una publicación de 2024) y destacados de coches de ocasión («OCASIÓN», «VENDIDO»). El «1988» del nombre de la cuenta tampoco se publica como año de apertura hasta que lo confirmen."
+}

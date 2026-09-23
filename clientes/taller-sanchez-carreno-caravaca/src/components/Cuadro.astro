@@ -1,0 +1,217 @@
+---
+import { enlaceTelefono, enlaceWhatsapp } from '@plantilla/lib/ficha';
+import type { Ficha } from '@plantilla/lib/ficha';
+import Icono from './Icono.astro';
+
+/**
+ * El cuadro al girar la llave. Los testigos del salpicadero se encienden todos a la vez, como al
+ * dar el contacto, y se apagan uno a uno. Solo se queda la luz de motor, en ámbar: la avería, que
+ * es el dolor n.º 1 de investigacion.md. Es el mismo gesto de toda la web: encender.
+ *
+ * Los colores son los de un cuadro de verdad: rojo para lo que hay que parar ya y ámbar para lo
+ * que avisa. La luz de motor es ámbar en todos los coches; en rojo, un mecánico lo vería mal.
+ *
+ * El estado por defecto (sin JS, con movimiento reducido o si el observador no salta) ya es el
+ * final: la luz de motor encendida y las demás apagadas. El JS solo lo apaga todo antes de que
+ * llegues y hace la secuencia una vez. Solo se anima la opacidad de la capa encendida (§7).
+ */
+interface Props { ficha: Ficha }
+const { ficha } = Astro.props;
+const whatsapp = enlaceWhatsapp(ficha, 'Hola, se me ha encendido una luz en el cuadro del coche. ¿Cuándo puedo llevarlo?');
+
+const TESTIGOS = [
+  { id: 'bateria', nombre: 'Batería', color: 'rojo' },
+  { id: 'aceite', nombre: 'Presión de aceite', color: 'rojo' },
+  { id: 'motor', nombre: 'Motor', color: 'ambar', queda: true },
+  { id: 'temperatura', nombre: 'Temperatura del motor', color: 'rojo' },
+  { id: 'freno', nombre: 'Frenos', color: 'rojo' },
+  { id: 'neumaticos', nombre: 'Presión de neumáticos', color: 'ambar' },
+];
+// Orden en que se apagan tras el contacto: salteado, como en un cuadro de verdad.
+const ORDEN_APAGADO: Record<string, number> = { freno: 0, bateria: 1, neumaticos: 2, aceite: 3, temperatura: 4, motor: 5 };
+---
+
+<section id="cuadro" class="cuadro margen" aria-labelledby="cuadro-titulo" data-cuadro>
+  <svg width="0" height="0" class="absolute" aria-hidden="true" focusable="false">
+    <defs>
+      {/* Pictogramas de trazo de los testigos, dibujados a mano sobre 48 × 48. */}
+      <symbol id="t-bateria" viewBox="0 0 48 48">
+        <rect x="7" y="15" width="34" height="22" rx="2.5" />
+        <path d="M13 15v-4h7v4M28 15v-4h7v4M13 26h7M28 26h7M31.5 22.5v7" />
+      </symbol>
+      <symbol id="t-aceite" viewBox="0 0 48 48">
+        <path d="M7 22h4l3-3h8l2 3h6l11-5v3l-9 11H11l-4-5z" />
+        <path d="M18 19v-4M14 15h8" />
+        <path d="M42 29c0 2-1.3 3.4-2.8 3.4S36.4 31 36.4 29s2.8-4.8 2.8-4.8S42 27 42 29z" />
+      </symbol>
+      <symbol id="t-motor" viewBox="0 0 48 48">
+        <path d="M13 18h17l5 5h3v-3h3v14h-3v-3h-3l-4 5H17l-4-5z" />
+        <path d="M18 18v-4h8v4M15 14h14M13 23H8M8 20v6" />
+      </symbol>
+      <symbol id="t-temperatura" viewBox="0 0 48 48">
+        <path d="M21 8v20.5a5.5 5.5 0 1 0 6 0V8a3 3 0 0 0-6 0z" />
+        <path d="M27 12h5M27 17h5M27 22h5" />
+        <path d="M6 40c3-2.5 6-2.5 9 0s6 2.5 9 0 6-2.5 9 0 6 2.5 9 0" />
+      </symbol>
+      <symbol id="t-freno" viewBox="0 0 48 48">
+        <circle cx="24" cy="24" r="11" />
+        <path d="M24 17.5v8.5M24 30.5v.01" />
+        <path d="M10 13a17 17 0 0 0 0 22M38 13a17 17 0 0 1 0 22" />
+      </symbol>
+      <symbol id="t-neumaticos" viewBox="0 0 48 48">
+        <path d="M11 11v18c0 6.5 5 9.5 13 9.5s13-3 13-9.5V11" />
+        <path d="M11 39v3M17.5 40v3M24 40.5v3M30.5 40v3M37 39v3" />
+        <path d="M24 17v10M24 31v.01" />
+      </symbol>
+    </defs>
+  </svg>
+
+  {/* El cuadro: una fila de testigos detrás del cristal ahumado del salpicadero. */}
+  <div class="cuadro-panel">
+    <ul class="cuadro-testigos" role="list">
+      {
+        TESTIGOS.map((t) => (
+          <li
+            class:list={['testigo', `testigo--${t.color}`, t.queda && 'queda']}
+            style={`--orden:${ORDEN_APAGADO[t.id]}`}
+          >
+            <svg class="testigo-apagado" viewBox="0 0 48 48" aria-hidden="true"><use href={`#t-${t.id}`} /></svg>
+            <svg class="testigo-encendido" viewBox="0 0 48 48" aria-hidden="true"><use href={`#t-${t.id}`} /></svg>
+            <span class="sr-only">{t.nombre}{t.queda ? ' (encendida)' : ''}</span>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+
+  <div class="cuadro-pie">
+    <div>
+      <h2 id="cuadro-titulo" class="ancha m-0 max-w-[14ch] text-[clamp(2.1rem,5vw,4.75rem)]">
+        ¿Se te ha encendido esta luz?
+      </h2>
+      <p class="m-0 mt-5 max-w-[34ch] text-lg leading-snug text-niebla sm:text-xl">
+        Tráelo y miramos qué le pasa. Te lo explicamos claro y sin sorpresas al pagar.
+      </p>
+    </div>
+    <div class="flex gap-3 sm:flex-wrap">
+      <a href={whatsapp} class="boton boton-rojo flex-1 sm:flex-none sm:px-7" target="_blank" rel="noopener">
+        <Icono nombre="whatsapp" class="size-5.5" />
+        Escribir por WhatsApp
+      </a>
+      <a href={enlaceTelefono(ficha)} class="boton boton-linea hidden sm:inline-flex">
+        <Icono nombre="telefono" class="size-5" />
+        {ficha.telefono.replace('+34 ', '')}
+      </a>
+    </div>
+  </div>
+</section>
+
+<style>
+  .cuadro {
+    position: relative;
+    padding-block: clamp(5rem, 14svh, 9rem);
+    background: var(--color-negro);
+  }
+  /* El panel: el cristal ahumado del cuadro, con un filete y un reflejo muy tenue arriba, que es
+     como se ve un cuadro apagado cuando le da la luz de la calle. */
+  .cuadro-panel {
+    position: relative;
+    padding: clamp(2rem, 5.5vw, 4.5rem) clamp(1.25rem, 5vw, 5rem);
+    border-radius: clamp(1.75rem, 5vw, 4rem);
+    background: var(--color-cristal);
+    box-shadow: inset 0 0 0 1px #1c1c1c, inset 0 1px 0 rgb(255 255 255 / 0.06);
+    overflow: hidden;
+  }
+  .cuadro-panel::before {
+    content: '';
+    position: absolute;
+    inset: 0 0 55% 0;
+    background: linear-gradient(to bottom, rgb(255 255 255 / 0.035), transparent);
+    pointer-events: none;
+  }
+  .cuadro-testigos {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: clamp(1.75rem, 4vw, 3rem) clamp(1rem, 3vw, 2.5rem);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  @media (min-width: 768px) {
+    .cuadro-testigos { grid-template-columns: repeat(6, 1fr); }
+  }
+  .cuadro-pie {
+    display: grid;
+    gap: 2rem;
+    margin-top: clamp(3rem, 7svh, 4.5rem);
+  }
+  @media (min-width: 900px) {
+    .cuadro-pie { grid-template-columns: 1fr auto; align-items: end; }
+  }
+
+  .testigo { position: relative; aspect-ratio: 1; max-width: 7.5rem; justify-self: center; width: 100%; }
+  .testigo svg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    fill: none;
+    stroke-width: 2.3;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  /* Apagado: el pictograma se intuye bajo el cristal, como en un cuadro real. */
+  .testigo-apagado { stroke: #1f1f1f; }
+  /* Encendido: su color y el halo. Solo se anima la opacidad de esta capa. */
+  .testigo-encendido { opacity: 0; }
+  .testigo--rojo .testigo-encendido { stroke: #ff3b2f; filter: drop-shadow(0 0 5px rgb(255 51 38 / 0.8)) drop-shadow(0 0 16px rgb(210 16 26 / 0.55)); }
+  .testigo--ambar .testigo-encendido { stroke: var(--color-ambar); filter: drop-shadow(0 0 5px rgb(242 165 26 / 0.8)) drop-shadow(0 0 18px rgb(242 165 26 / 0.4)); }
+
+  /* Estado final, que es también el de por defecto: solo la luz de motor. */
+  .testigo.queda .testigo-encendido { opacity: 1; }
+
+  /* La secuencia (la pone el JS): todo apagado → contacto → se apagan de uno en uno. */
+  .cuadro[data-estado='apagado'] .testigo-encendido { opacity: 0; }
+  .cuadro[data-estado='contacto'] .testigo-encendido { opacity: 1; transition: opacity 90ms linear; }
+  .cuadro[data-estado='listo'] .testigo:not(.queda) .testigo-encendido {
+    transition: opacity 240ms var(--ease-out) calc(var(--orden) * 150ms);
+  }
+</style>
+
+<script>
+  // Dar el contacto: una sola vez, cuando el cuadro está bien a la vista. Si el cuadro ya está
+  // en pantalla o por encima al cargar (el navegador restauró el scroll), no se toca nada: se ve
+  // el estado final. Temporizador de seguridad por si el observador no salta (§7).
+  const cuadro = document.querySelector<HTMLElement>('[data-cuadro]');
+  const reducido = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  if (cuadro && !reducido && 'IntersectionObserver' in window) requestAnimationFrame(() => {
+    const panel = cuadro.querySelector<HTMLElement>('.cuadro-panel')!;
+    const pendiente = panel.getBoundingClientRect().top > window.innerHeight;
+
+    if (pendiente) {
+      cuadro.dataset.estado = 'apagado';
+      let hecho = false;
+      let seguridad = 0;
+      const arrancar = () => {
+        if (hecho) return;
+        hecho = true;
+        window.clearTimeout(seguridad);
+        io.disconnect();
+        cuadro.dataset.estado = 'contacto';
+        // Lo que dura la comprobación de un cuadro de verdad antes de apagar los testigos.
+        window.setTimeout(() => { cuadro.dataset.estado = 'listo'; }, 900);
+      };
+      const io = new IntersectionObserver(
+        ([e]) => {
+          if (!e.isIntersecting) return;
+          // En cuanto asoma, se arma el seguro; la secuencia sale al verse casi entero.
+          if (!seguridad) seguridad = window.setTimeout(arrancar, 1600);
+          if (e.intersectionRatio >= 0.6) arrancar();
+        },
+        { threshold: [0, 0.05, 0.6] },
+      );
+      io.observe(panel);
+    }
+  });
+</script>

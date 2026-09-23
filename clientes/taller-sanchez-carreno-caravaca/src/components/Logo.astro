@@ -1,0 +1,18 @@
+---
+/**
+ * El logotipo de Sánchez Carreño (el dibujo está en src/lib/logo.mjs, compartido con el favicon y
+ * con la imagen para compartir). `insignia` lo pone dentro de su círculo negro, como en su foto de
+ * perfil; sin él va solo el dibujo, que necesita fondo negro detrás.
+ */
+import { logoSVG } from '../lib/logo.mjs';
+
+interface Props {
+  insignia?: boolean;
+  class?: string;
+  /** Texto alternativo. Vacío = decorativo. */
+  alt?: string;
+}
+const { insignia = false, class: clase = '', alt = '' } = Astro.props;
+---
+
+<Fragment set:html={logoSVG({ insignia, clase, alt })} />

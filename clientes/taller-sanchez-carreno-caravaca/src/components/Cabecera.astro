@@ -1,0 +1,133 @@
+---
+import { enlaceTelefono, enlaceWhatsapp } from '@plantilla/lib/ficha';
+import type { Ficha } from '@plantilla/lib/ficha';
+import Logo from './Logo.astro';
+import Icono from './Icono.astro';
+
+/**
+ * La cabecera: la insignia y el nombre, como en su perfil de Instagram. En escritorio va fija,
+ * transparente sobre el capó y con fondo negro en cuanto se sale de él; lleva los anclas de la
+ * página y «Pedir cita», que es como lo dicen ellos en la bio («Para pedir cita o presupuesto»).
+ * En el móvil se queda arriba del todo y no persigue: abajo ya va la barra de WhatsApp y llamar.
+ */
+interface Props { ficha: Ficha }
+const { ficha } = Astro.props;
+const cita = enlaceWhatsapp(ficha, 'Hola, quería pedir cita para el coche.');
+const anclas = [
+  { href: '#trabajos', texto: 'Trabajos' },
+  { href: '#horario', texto: 'Horario' },
+  { href: '#opiniones', texto: 'Opiniones' },
+  { href: '#donde', texto: 'Dónde estamos' },
+];
+---
+
+<header class="cabecera" data-cabecera>
+  <div class="cabecera-fila margen">
+    <a href="#contenido" class="cabecera-marca" aria-label="Sánchez Carreño, ir al principio">
+      <Logo insignia class="size-12 shrink-0 lg:size-14" />
+      <span class="nombre text-base leading-none lg:text-[1.1rem]">Sánchez Carreño</span>
+    </a>
+    <nav class="cabecera-nav" aria-label="Secciones">
+      <ul class="flex items-center gap-7 xl:gap-9">
+        {anclas.map((a) => <li><a href={a.href} class="cabecera-ancla">{a.texto}</a></li>)}
+      </ul>
+    </nav>
+    <div class="cabecera-acciones">
+      <a href={enlaceTelefono(ficha)} class="boton boton-linea min-h-11 px-4 text-base" aria-label={`Llamar al ${ficha.telefono.replace('+34 ', '')}`}>
+        <Icono nombre="telefono" class="size-4.5" />
+        {ficha.telefono.replace('+34 ', '')}
+      </a>
+      <a href={cita} class="boton boton-cita min-h-11 px-5 text-base" target="_blank" rel="noopener">
+        <Icono nombre="whatsapp" class="size-5" />
+        Pedir cita
+      </a>
+    </div>
+  </div>
+</header>
+
+<style>
+  .cabecera {
+    position: absolute;
+    inset: 0 0 auto;
+    z-index: 50;
+    padding-top: env(safe-area-inset-top);
+    transition: background-color 250ms ease, box-shadow 250ms ease;
+  }
+  .cabecera-fila {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 2rem;
+    height: 4.5rem;
+  }
+  .cabecera-marca { display: inline-flex; align-items: center; gap: 0.8rem; min-height: 44px; }
+  .cabecera-nav, .cabecera-acciones { display: none; }
+  .cabecera-ancla {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    font-size: 0.975rem;
+    color: var(--color-blanco);
+  }
+  /* El subrayado sale del centro, en rojo, como un piloto que se enciende. */
+  .cabecera-ancla::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0.55rem;
+    height: 1.5px;
+    background: var(--color-rojo);
+    transform: scaleX(0);
+    transition: transform 240ms var(--ease-out);
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .cabecera-ancla:hover::after { transform: scaleX(1); }
+  }
+
+  @media (min-width: 1024px) {
+    .cabecera { position: fixed; }
+    .cabecera-fila { height: 5.25rem; }
+    .cabecera-nav { display: block; margin-left: auto; }
+    .cabecera-acciones { display: flex; gap: 0.75rem; }
+    /* Fuera del capó, fondo negro opaco y un filete: el texto de abajo ya no se transparenta. */
+    :global(html[data-cabecera='solida']) .cabecera {
+      background: rgb(0 0 0 / 0.97);
+      box-shadow: inset 0 -1px 0 var(--color-grafito);
+    }
+    /* «Pedir cita» va en línea sobre el capó, donde el botón rojo es el del titular (un solo rojo
+       por pantalla), y se enciende en rojo en cuanto el titular se ha ido. */
+    .boton-cita { box-shadow: inset 0 0 0 1.5px rgb(244 244 242 / 0.45); color: var(--color-blanco); }
+    :global(html[data-cabecera='solida']) .boton-cita { background: var(--color-rojo); box-shadow: none; color: #fff; }
+    @media (hover: hover) and (pointer: fine) {
+      .boton-cita:hover { box-shadow: inset 0 0 0 1.5px var(--color-blanco); background: rgb(244 244 242 / 0.06); }
+      :global(html[data-cabecera='solida']) .boton-cita:hover { background: var(--color-rojo-hondo); box-shadow: none; }
+    }
+  }
+  @media (min-width: 1024px) and (max-width: 1180px) {
+    .cabecera-acciones a:first-child { display: none; }
+  }
+</style>
+
+<script>
+  // Fondo sólido en cuanto la cabecera deja de estar sobre el capó (solo escritorio, que es donde
+  // va fija). Sin JS se queda transparente, y como el resto de la web es negro, se lee igual.
+  const capo = document.querySelector<HTMLElement>('[data-capo]');
+  let pendiente = false;
+  const pintar = () => {
+    pendiente = false;
+    // Transparente solo mientras la escena del capó llena la pantalla; en cuanto empieza a subir,
+    // su remate pasaría por detrás del menú.
+    const fin = capo ? capo.getBoundingClientRect().bottom : 0;
+    document.documentElement.dataset.cabecera = fin > window.innerHeight - 2 ? 'transparente' : 'solida';
+  };
+  const programar = () => {
+    if (pendiente) return;
+    pendiente = true;
+    requestAnimationFrame(pintar);
+  };
+  window.addEventListener('scroll', programar, { passive: true });
+  window.addEventListener('resize', programar, { passive: true });
+  programar();
+</script>

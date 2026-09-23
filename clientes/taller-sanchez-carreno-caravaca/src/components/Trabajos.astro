@@ -1,0 +1,73 @@
+---
+import { Picture } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
+import { enlaceWhatsapp } from '@plantilla/lib/ficha';
+import type { Ficha } from '@plantilla/lib/ficha';
+
+/**
+ * Lo que hacen. A sangre: la foto de las manos en el motor ocupa media pantalla de alto a alto
+ * y los trabajos van al lado. Sin precios: no hay ninguno publicado y no se inventa ninguno
+ * (§10). La ITV sale de la reseña de My Life; «revisión y puesta a punto» y «pedir cita o
+ * presupuesto» son palabras suyas, de su Instagram.
+ */
+interface Props { ficha: Ficha; foto: ImageMetadata }
+const { ficha, foto } = Astro.props;
+const whatsapp = enlaceWhatsapp(ficha, 'Hola, quería pedir presupuesto para el coche.');
+
+const trabajos = [
+  { nombre: 'Mecánica general', texto: 'Revisión y puesta a punto: aceite, filtros, frenos, correas.' },
+  { nombre: 'Averías', texto: 'Miramos qué falla y te explicamos qué tiene el coche.' },
+  { nombre: 'La ITV', texto: 'Te preparamos el coche y te lo pasamos nosotros.' },
+];
+---
+
+<section id="trabajos" class="trabajos" aria-labelledby="trabajos-titulo">
+  <div class="trabajos-foto persiana">
+    <Picture
+      src={foto}
+      alt="Manos de mecánico con una llave fija sobre el motor de un coche"
+      formats={['avif', 'webp']}
+      widths={[480, 760, 928]}
+      sizes="(min-width: 900px) 50vw, 100vw"
+      quality={55}
+      loading="lazy"
+      decoding="async"
+      pictureAttributes={{ class: 'block h-full' }}
+      class="block h-full w-full object-cover"
+    />
+  </div>
+
+  <div class="trabajos-texto margen">
+    <h2 id="trabajos-titulo" class="ancha m-0 text-[clamp(2.1rem,4.4vw,4.4rem)]">Lo que hacemos</h2>
+    <ul class="m-0 mt-10 list-none p-0 md:mt-14">
+      {
+        trabajos.map((t) => (
+          <li class="trabajo">
+            <h3 class="ancha m-0 text-[clamp(1.45rem,2.3vw,2.2rem)]">{t.nombre}</h3>
+            <p class="m-0 mt-2 max-w-[38ch] text-niebla">{t.texto}</p>
+          </li>
+        ))
+      }
+    </ul>
+    <p class="m-0 mt-8 max-w-[40ch] text-niebla">
+      ¿Lo tuyo no está en la lista?{' '}
+      <a href={whatsapp} class="enlace font-semibold text-blanco" target="_blank" rel="noopener">
+        Pídenos presupuesto por WhatsApp
+      </a>{' '}
+      y te decimos si te lo podemos hacer.
+    </p>
+  </div>
+</section>
+
+<style>
+  .trabajos { display: grid; background: var(--color-negro); }
+  .trabajos-foto { aspect-ratio: 4 / 5; overflow: hidden; }
+  .trabajos-texto { padding-block: clamp(4rem, 11svh, 8rem); }
+  .trabajo { padding-block: clamp(1.4rem, 3svh, 2rem); border-top: 1px solid var(--color-grafito); }
+  .trabajo:last-child { border-bottom: 1px solid var(--color-grafito); }
+  @media (min-width: 900px) {
+    .trabajos { grid-template-columns: 1fr 1fr; min-height: 100svh; }
+    .trabajos-foto { aspect-ratio: auto; }
+    .trabajos-texto { align-self: center; padding-inline: clamp(3rem, 6vw, 7rem); }
+  }
+</style>

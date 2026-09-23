@@ -1,0 +1,116 @@
+---
+import type { Ficha, Resena } from '@plantilla/lib/ficha';
+
+type ResenaDoble = Resena & { texto_en?: string };
+import Icono from './Icono.astro';
+
+/**
+ * Las dudas reales de antes de dejar el coche (investigacion.md), contestada cada una con una
+ * reseña de Google copiada tal cual y con su nombre (§10). Resuelve a la vez el punto 5 y el 6
+ * de §10. A sangre: la pregunta a un lado y la reseña al otro, de borde a borde.
+ *
+ * La reseña va entera y sin tocar, pero la frase que contesta la pregunta sale en blanco y el
+ * resto en gris: se lee la respuesta de un vistazo sin recortar a nadie. La pregunta en inglés se
+ * contesta con la parte inglesa de la reseña de Dominic Olds, que la escribió en los dos idiomas.
+ */
+interface Props { ficha: Ficha; valoracion: number; numResenas: number }
+const { ficha, valoracion, numResenas } = Astro.props;
+const nota = valoracion.toLocaleString('es-ES', { minimumFractionDigits: 1 });
+
+const emparejar = (autor: string) => (ficha.resenas as ResenaDoble[]).find((r) => r.autor === autor);
+// Cada duda con la reseña que de verdad la contesta, y la frase exacta que la contesta.
+const bloques = [
+  { pregunta: '¿Me va a costar lo que me digáis?', autor: 'Jonathan José Diaz Jumbo', destacar: 'destacan por su honestidad al explicar los problemas y las soluciones, sin sorpresas desagradables.' },
+  { pregunta: '¿Puedo fiarme de vosotros?', autor: 'Pedro Miguel', destacar: 'Profesionales, puedes confiar en ellos.' },
+  { pregunta: '¿Sale caro?', autor: 'My Life', destacar: 'Se ajustan al máximo en el precio' },
+  { pregunta: '¿Tardáis mucho?', autor: 'Santi Torralba', destacar: 'A UN BUEN PRECIO Y RÁPIDO.' },
+  { pregunta: 'I don’t speak much Spanish.', autor: 'Dominic Olds', idioma: 'en', destacar: 'They speak some English as well which is really helpful.' },
+].flatMap((b) => {
+  const resena = emparejar(b.autor);
+  if (!resena) return [];
+  const texto = b.idioma === 'en' && resena.texto_en ? resena.texto_en : resena.texto;
+  const i = texto.indexOf(b.destacar);
+  // Si la frase no está (la reseña cambió), se enseña entera en blanco: nunca se inventa nada.
+  const partes = i < 0 ? { antes: '', frase: texto, despues: '' } : { antes: texto.slice(0, i), frase: b.destacar, despues: texto.slice(i + b.destacar.length) };
+  return [{ ...b, resena, partes }];
+});
+---
+
+<section id="opiniones" class="opiniones" aria-labelledby="opiniones-titulo">
+  <div class="opiniones-cabeza margen">
+    <h2 id="opiniones-titulo" class="ancha m-0 max-w-[16ch] text-[clamp(2.1rem,4.4vw,4.4rem)]">
+      Lo que preguntan antes de traer el coche
+    </h2>
+    <a href={ficha.maps_url} class="opiniones-nota" target="_blank" rel="noopener">
+      <span class="ancha text-[clamp(3rem,6vw,5.5rem)] leading-none">{nota}</span>
+      <span class="flex flex-col gap-1.5">
+        <span class="estrellas" role="img" aria-label={`${nota} de 5 estrellas`}>
+          {Array.from({ length: 5 }).map(() => <Icono nombre="estrella" class="size-4.5" />)}
+        </span>
+        <span class="text-niebla">{numResenas} reseñas en Google</span>
+      </span>
+    </a>
+  </div>
+
+  <p class="margen m-0 mt-6 max-w-[60ch] text-niebla">
+    Las contestan nuestros clientes, con sus reseñas de Google tal y como las escribieron.
+  </p>
+
+  <ul class="m-0 mt-12 list-none p-0 md:mt-16">
+    {
+      bloques.map((b) => (
+        <li class="opinion margen">
+          <h3 class="ancha m-0 text-[clamp(1.4rem,2.3vw,2.2rem)]" lang={b.idioma}>{b.pregunta}</h3>
+          <div>
+            <blockquote class="opinion-cita m-0 max-w-[60ch] text-lg leading-relaxed sm:text-xl" lang={b.idioma}>
+              <p class="m-0">«{b.partes.antes}<mark>{b.partes.frase}</mark>{b.partes.despues}»</p>
+            </blockquote>
+            <p class="m-0 mt-4 flex items-center gap-3 text-niebla">
+              <span class="estrellas" role="img" aria-label={`${b.resena.estrellas} de 5 estrellas`}>
+                {Array.from({ length: b.resena.estrellas }).map(() => <Icono nombre="estrella" class="size-3.5" />)}
+              </span>
+              <span class="font-semibold text-blanco">{b.resena.autor}</span>
+            </p>
+          </div>
+        </li>
+      ))
+    }
+  </ul>
+
+  <p class="margen m-0 mt-10">
+    <a href={ficha.maps_url} class="boton boton-linea" target="_blank" rel="noopener">
+      <Icono nombre="google" class="size-5" />
+      Ver las {numResenas} reseñas en Google
+    </a>
+  </p>
+</section>
+
+<style>
+  .opiniones {
+    padding-block: clamp(5rem, 14svh, 9rem);
+    background: var(--color-negro);
+    border-top: 1px solid var(--color-grafito);
+  }
+  .opiniones-cabeza {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+  }
+  @media (min-width: 900px) {
+    .opiniones-cabeza { flex-direction: row; align-items: flex-end; justify-content: space-between; }
+  }
+  .opiniones-nota { display: inline-flex; align-items: center; gap: 1.1rem; flex-shrink: 0; }
+  .opinion {
+    display: grid;
+    gap: 1rem;
+    padding-block: clamp(1.75rem, 4svh, 2.75rem);
+    border-top: 1px solid var(--color-grafito);
+  }
+  .opinion:last-child { border-bottom: 1px solid var(--color-grafito); }
+  /* La reseña en gris y la frase que contesta en blanco (sigue siendo la reseña entera). */
+  .opinion-cita { color: var(--color-niebla); }
+  .opinion-cita mark { background: none; color: var(--color-blanco); }
+  @media (min-width: 900px) {
+    .opinion { grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: 3rem; }
+  }
+</style>

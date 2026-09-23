@@ -1,0 +1,139 @@
+---
+import { direccionCompleta, enlaceTelefono, enlaceWhatsapp } from '@plantilla/lib/ficha';
+import type { Ficha } from '@plantilla/lib/ficha';
+import Icono from './Icono.astro';
+import Logo from './Logo.astro';
+
+/**
+ * El pie: el nombre de borde a borde, que se enciende de izquierda a derecha al llegar, como el
+ * rótulo de la nave cuando se da la luz por la mañana. Debajo, la insignia, el contacto y la letra
+ * pequeña.
+ */
+interface Props {
+  ficha: Ficha;
+  instagram: string;
+  /** Solo en producción y si el cliente lo acepta (§12). */
+  credito?: { marca: string; url: string } | null;
+  titular?: string;
+  nif?: string;
+}
+const { ficha, instagram, credito = null, titular = '[TITULAR]', nif = '[NIF]' } = Astro.props;
+const whatsapp = enlaceWhatsapp(ficha, 'Hola, quería pedir cita para el coche.');
+const enlace = 'inline-flex min-h-11 items-center gap-3 transition-colors duration-200 hover:text-white';
+const resumen = 'inline-flex min-h-11 cursor-pointer list-none items-center underline decoration-grafito underline-offset-4 transition-colors duration-200 hover:text-blanco';
+---
+
+<footer id="contacto" class="pie pb-32 pt-[clamp(4rem,11svh,7rem)] lg:pb-14">
+  {/* El nombre, a todo lo ancho. Decorativo: el nombre está escrito también debajo. */}
+  <p class="pie-nombre nombre m-0" aria-hidden="true">
+    <span class="pie-nombre-apagado"><span>Sánchez</span> <span>Carreño</span></span>
+    <span class="pie-nombre-luz"><span><span>Sánchez</span> <span>Carreño</span></span></span>
+  </p>
+
+  <div class="margen mt-12 grid gap-10 md:mt-16 md:grid-cols-[1fr_auto]">
+    <div class="flex items-start gap-5">
+      <Logo insignia class="size-16 shrink-0 sm:size-20" alt="Logotipo de Sánchez Carreño" />
+      <div class="text-niebla">
+        <p class="m-0 font-semibold text-blanco">Taller mecánico Sánchez Carreño</p>
+        <p class="m-0 mt-1">{direccionCompleta(ficha)}</p>
+        <p class="m-0 mt-1">De lunes a viernes, de 7:00 a 15:00.</p>
+      </div>
+    </div>
+    <ul class="m-0 list-none space-y-1 p-0 text-lg">
+      <li>
+        <a href={whatsapp} class={enlace} target="_blank" rel="noopener">
+          <Icono nombre="whatsapp" class="size-5 text-rojo" />
+          WhatsApp
+        </a>
+      </li>
+      <li>
+        <a href={enlaceTelefono(ficha)} class={enlace}>
+          <Icono nombre="telefono" class="size-5 text-rojo" />
+          {ficha.telefono.replace('+34 ', '')}
+        </a>
+      </li>
+      <li>
+        <a href={`https://www.instagram.com/${instagram}/`} class={enlace} target="_blank" rel="noopener">
+          <Icono nombre="instagram" class="size-5 text-rojo" />
+          @{instagram}
+        </a>
+      </li>
+    </ul>
+  </div>
+
+  <div class="margen mt-12 border-t border-grafito pt-5 text-sm text-niebla">
+    <div class="flex flex-wrap gap-x-7 gap-y-2">
+      <details>
+        <summary class={resumen}>Aviso legal</summary>
+        <div class="mt-3 max-w-[70ch] space-y-2">
+          <p>Titular de esta web: {titular}, con NIF {nif}, con domicilio en {direccionCompleta(ficha)}. Contacto: {ficha.telefono}.</p>
+          <p>El contenido de esta web (textos, fotos y marca) pertenece a su titular. No se permite copiarlo sin permiso.</p>
+        </div>
+      </details>
+      <details>
+        <summary class={resumen}>Privacidad</summary>
+        <div class="mt-3 max-w-[70ch] space-y-2">
+          <p>
+            Esta web no tiene formularios ni guarda datos personales. Si nos escribes por WhatsApp o llamas por teléfono, tus datos
+            los trata {titular} solo para atender tu petición, según el Reglamento (UE) 2016/679.
+          </p>
+          <p>Puedes pedir acceso, corrección o borrado de tus datos llamando al {ficha.telefono}.</p>
+        </div>
+      </details>
+      <details>
+        <summary class={resumen}>Cookies</summary>
+        <div class="mt-3 max-w-[70ch] space-y-2">
+          <p>
+            Esta web no usa cookies propias ni de seguimiento. El plano está dibujado en la propia web y no carga nada de fuera. Si
+            pulsas «Ver nuestras publicaciones», se cargan desde Instagram y Meta puede usar sus propias cookies.
+          </p>
+        </div>
+      </details>
+    </div>
+    <p class="m-0 mt-6">
+      © {new Date().getFullYear()} Taller mecánico Sánchez Carreño.
+      {credito && (<>{' '}Web hecha por <a href={credito.url} class="underline hover:text-blanco">{credito.marca}</a>.</>)}
+    </p>
+  </div>
+</footer>
+
+<style>
+  .pie { container-type: inline-size; background: var(--color-negro); border-top: 1px solid var(--color-grafito); }
+
+  /* El rótulo llena el ancho justo entre los márgenes. «SÁNCHEZ CARREÑO» en la ancha mide
+     11,23 veces su cuerpo (medido en el navegador); se divide por 11,4 para dejar aire. En el móvil
+     va en dos líneas, al doble de tamaño: «CARREÑO», la palabra más ancha, mide 5,58 (entre 5,7).
+     Unidades de contenedor y no vw: 100vw incluye la barra de scroll y se saldría. */
+  .pie-nombre {
+    position: relative;
+    margin-inline: clamp(1.25rem, 5vw, 6rem);
+    font-size: calc((100cqi - 2 * clamp(1.25rem, 5vw, 6rem)) / 11.4);
+    line-height: 1.12;
+    letter-spacing: -0.01em;
+    white-space: nowrap;
+    view-timeline: --rotulo block;
+  }
+  .pie-nombre-apagado { color: #1c1c1c; }
+  .pie-nombre-luz { position: absolute; inset: 0; overflow: hidden; color: var(--color-blanco); }
+  .pie-nombre-luz > span { display: block; }
+  @container (max-width: 40rem) {
+    .pie-nombre { font-size: calc((100cqi - 2 * clamp(1.25rem, 5vw, 6rem)) / 5.7); line-height: 1.1; }
+    .pie-nombre span span { display: block; }
+  }
+
+  /* Encender de izquierda a derecha solo con transform: la ventana entra desde la izquierda y el
+     texto de dentro va en sentido contrario, así que las letras no se mueven, se encienden. */
+  @supports (animation-timeline: view()) {
+    .pie-nombre-luz { animation: luz-ventana linear both; animation-timeline: --rotulo; animation-range: entry 30% contain 25%; }
+    .pie-nombre-luz > span { animation: luz-texto linear both; animation-timeline: --rotulo; animation-range: entry 30% contain 25%; }
+  }
+  @keyframes luz-ventana { from { transform: translateX(-100%); } to { transform: translateX(0); } }
+  @keyframes luz-texto { from { transform: translateX(100%); } to { transform: translateX(0); } }
+  @media (prefers-reduced-motion: reduce) {
+    @supports (animation-timeline: view()) {
+      .pie-nombre-luz { animation-name: fundido-dentro; }
+      .pie-nombre-luz > span { animation: none; }
+    }
+  }
+  @keyframes fundido-dentro { from { opacity: 0; } to { opacity: 1; } }
+</style>

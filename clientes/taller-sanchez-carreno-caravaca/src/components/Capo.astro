@@ -1,0 +1,525 @@
+---
+import { getImage } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
+import { enlaceTelefono, enlaceWhatsapp } from '@plantilla/lib/ficha';
+import type { Ficha } from '@plantilla/lib/ficha';
+import Icono from './Icono.astro';
+
+/**
+ * El hero y el capó. La escena ocupa toda la pantalla y se queda fija mientras bajas: el
+ * scroll mueve el vídeo, el capó sube y el motor queda a la vista con sus piezas señaladas por un
+ * punto rojo que se enciende, como un testigo.
+ *
+ * - Vídeo y fotos en blanco y negro (fotos/bn/, fotos/capo/procesar.sh --bn): el rojo de la página
+ *   es el del logotipo y no compite con el verde y el óxido de la nave.
+ * - El primer fotograma del vídeo está también como <img>: es el LCP y se ve desde el primer
+ *   frame (§7). El vídeo se pone encima cuando ya puede pintar, y como empieza en el mismo
+ *   fotograma, el cambio no se nota.
+ * - Sin JS, o con movimiento reducido, no hay pista larga ni vídeo: se ve la foto fija.
+ * - En horizontal el marco es 16:9 y cubre la pantalla; en vertical es un recorte 4:5 del centro.
+ *   Se elige por orientación y no por ancho: un móvil tumbado o el zoom al 200 % también son
+ *   horizontales. Las piezas van en % del marco y caen sobre la misma pieza en cualquier pantalla.
+ */
+interface Fotograma { escritorio: ImageMetadata; movil: ImageMetadata }
+interface Props { ficha: Ficha; inicio: Fotograma; final: Fotograma; valoracion: number; numResenas: number }
+const { ficha, inicio, final, valoracion, numResenas } = Astro.props;
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+const whatsapp = enlaceWhatsapp(ficha, 'Hola, quería pedir cita para el coche.');
+const nota = valoracion.toLocaleString('es-ES', { minimumFractionDigits: 1 });
+
+// Recorte de móvil: 4:5 centrado sobre un fotograma 16:9 de 1920 × 1080 (864 px de ancho,
+// empezando en x = 528). Las etiquetas se pasan de un sistema al otro con esto.
+const RECORTE = { x: 528, ancho: 864, total: 1920 };
+const aMovil = (x: number) => ((x / 100) * RECORTE.total - RECORTE.x) / RECORTE.ancho * 100;
+
+// Las piezas que se miran en una revisión, sobre el motor abierto (en % del fotograma 16:9).
+// `lado` dice hacia dónde sale el rótulo en escritorio y `ladoMovil` en el recorte 4:5.
+const PIEZAS = [
+  // Medidas sobre el último fotograma del vídeo de Kling (fotos/capo/final.jpg, 1920 × 1080).
+  { nombre: 'Filtro de aire', x: 36.5, y: 58.3, lado: 'arriba', ladoMovil: 'arriba' },
+  { nombre: 'Aceite', x: 52.1, y: 60.9, lado: 'abajo', ladoMovil: 'abajo' },
+  { nombre: 'Refrigerante', x: 55.5, y: 56.5, lado: 'arriba', ladoMovil: 'arriba' },
+  { nombre: 'Batería', x: 62, y: 61.1, lado: 'derecha', ladoMovil: 'abajo' },
+] as const;
+
+const imagen = (img: ImageMetadata, format: 'avif' | 'webp', anchos: number[]) =>
+  getImage({ src: img, format, widths: anchos, width: anchos.at(-1), quality: 50 });
+const ANCHOS_ESCRITORIO = [960, 1440, 1920];
+const ANCHOS_MOVIL = [480, 720, 864];
+const inicioAvif = await imagen(inicio.escritorio, 'avif', ANCHOS_ESCRITORIO);
+const inicioWebp = await imagen(inicio.escritorio, 'webp', ANCHOS_ESCRITORIO);
+const inicioMovilAvif = await imagen(inicio.movil, 'avif', ANCHOS_MOVIL);
+const inicioMovilWebp = await imagen(inicio.movil, 'webp', ANCHOS_MOVIL);
+const finalAvif = await imagen(final.escritorio, 'avif', ANCHOS_ESCRITORIO);
+const finalMovilAvif = await imagen(final.movil, 'avif', ANCHOS_MOVIL);
+
+// Los mismos tamaños que la precarga de index.astro: si no casan, el navegador baja dos veces.
+const SIZES_ESCRITORIO = 'max(112vw, 199svh)';
+const SIZES_MOVIL = 'min(100vw, calc((100svh - 22rem) * 0.8))';
+---
+
+<section class="capo" aria-labelledby="capo-titulo" data-capo>
+  <div class="capo-escena" data-escena>
+    <div class="capo-marco" data-marco>
+      <picture class="absolute inset-0 block">
+        <source media="(max-aspect-ratio: 1/1)" type="image/avif" srcset={inicioMovilAvif.srcSet.attribute} sizes={SIZES_MOVIL} />
+        <source media="(max-aspect-ratio: 1/1)" type="image/webp" srcset={inicioMovilWebp.srcSet.attribute} sizes={SIZES_MOVIL} />
+        <source type="image/avif" srcset={inicioAvif.srcSet.attribute} sizes={SIZES_ESCRITORIO} />
+        <source type="image/webp" srcset={inicioWebp.srcSet.attribute} sizes={SIZES_ESCRITORIO} />
+        <img
+          src={inicioWebp.src}
+          width={inicio.escritorio.width}
+          height={inicio.escritorio.height}
+          alt="Un coche blanco antiguo con el capó cerrado, aparcado dentro de la nave del taller, entre armarios y el panel de herramientas"
+          loading="eager"
+          fetchpriority="high"
+          decoding="async"
+          class="block h-full w-full object-cover"
+        />
+      </picture>
+
+      {/* Con movimiento reducido no hay recorrido: se enseña directamente el capó abierto. */}
+      <picture class="capo-final absolute inset-0 block" aria-hidden="true">
+        <source media="(max-aspect-ratio: 1/1)" type="image/avif" srcset={finalMovilAvif.srcSet.attribute} sizes={SIZES_MOVIL} />
+        <source type="image/avif" srcset={finalAvif.srcSet.attribute} sizes={SIZES_ESCRITORIO} />
+        <img src={finalAvif.src} alt="" loading="lazy" decoding="async" class="block h-full w-full object-cover" />
+      </picture>
+
+      <video
+        class="capo-video absolute inset-0 h-full w-full object-cover"
+        data-video
+        data-src={`${base}/video/capo-bn-1080.mp4`}
+        data-src-movil={`${base}/video/capo-bn-movil.mp4`}
+        muted
+        playsinline
+        preload="none"
+        aria-hidden="true"
+      ></video>
+
+      {/* Las piezas del motor. Decorativas: lo que hacemos está escrito en la sección de abajo. */}
+      <ul class="capo-piezas" aria-hidden="true">
+        {
+          PIEZAS.map((p) => (
+            <li
+              class={`capo-pieza d-${p.lado} m-${p.ladoMovil}`}
+              style={`--x:${p.x}%;--y:${p.y}%;--xm:${aMovil(p.x).toFixed(2)}%`}
+              data-pieza
+            >
+              <span class="capo-punto" />
+              <span class="capo-linea" />
+              <span class="capo-rotulo">{p.nombre}</span>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+
+    {/* Velo para que el titular y la cabecera se lean sobre la foto; no es decoración. */}
+    <div class="capo-velo" aria-hidden="true"></div>
+
+    <div class="capo-texto margen" data-texto>
+      <h1 id="capo-titulo" class="ancha capo-titulo m-0">Taller mecánico en Caravaca de la Cruz</h1>
+      <p class="capo-entradilla m-0">
+        Abrimos a las 7 de la mañana. De lunes a viernes, hasta las 3 de la tarde y sin cerrar a mediodía.
+      </p>
+      <div class="capo-botones">
+        <a href={whatsapp} class="boton boton-rojo flex-1 sm:flex-none sm:px-7" target="_blank" rel="noopener" aria-label="Escribir por WhatsApp">
+          <Icono nombre="whatsapp" class="size-5.5" />
+          <span class="sm:hidden">WhatsApp</span>
+          <span class="hidden sm:inline">Escribir por WhatsApp</span>
+        </a>
+        <a href={enlaceTelefono(ficha)} class="boton boton-linea flex-1 sm:flex-none" aria-label={`Llamar al ${ficha.telefono.replace('+34 ', '')}`}>
+          <Icono nombre="telefono" class="size-5" />
+          <span class="sm:hidden">Llamar</span>
+          <span class="hidden sm:inline">{ficha.telefono.replace('+34 ', '')}</span>
+        </a>
+      </div>
+      <a href={ficha.maps_url} class="capo-nota" target="_blank" rel="noopener">
+        <span class="estrellas" aria-hidden="true">
+          {Array.from({ length: 5 }).map(() => <Icono nombre="estrella" class="size-3.5" />)}
+        </span>
+        <span><strong class="font-semibold">{nota}</strong> en Google, con {numResenas} reseñas</span>
+      </a>
+    </div>
+
+    <p class="capo-pista-aviso" aria-hidden="true" data-aviso>
+      <span class="capo-pista-linea"></span>
+      Baja y abrimos el capó
+    </p>
+
+    {/* El remate, con el motor ya abierto. «Sin sorpresas» sale de una reseña real
+         (investigacion.md): «honestidad al explicar los problemas y las soluciones, sin
+         sorpresas desagradables». */}
+    <div class="capo-cierre margen" data-cierre>
+      <p class="ancha capo-cierre-titulo m-0">Abrimos, miramos y te lo explicamos</p>
+      <p class="m-0 mt-4 max-w-[30ch] text-lg leading-snug text-blanco sm:text-xl">Te decimos qué le pasa al coche, sin sorpresas al pagar.</p>
+    </div>
+  </div>
+</section>
+
+<style>
+  /* Sin JS: la escena mide una pantalla y se ve la foto con el capó cerrado. */
+  .capo { position: relative; background: var(--color-negro); }
+  .capo-escena {
+    position: relative;
+    height: 100svh;
+    min-height: 20rem;
+    overflow: hidden;
+    background: var(--color-negro);
+  }
+  /* Con JS y movimiento permitido, la sección se estira y la escena se queda pegada. */
+  .capo.con-recorrido { height: 280svh; }
+  .capo.con-recorrido .capo-escena { position: sticky; top: 0; }
+
+  /* Escritorio: el marco 16:9 cubre la pantalla entera, recortando lo que sobre. */
+  .capo-marco {
+    position: absolute;
+    left: 60%;
+    top: 50%;
+    width: max(112vw, 199svh);
+    aspect-ratio: 16 / 9;
+    translate: -50% -50%;
+    container-type: inline-size;
+  }
+
+  .capo-video { opacity: 0; }
+  .capo:not(.con-recorrido) .capo-cierre { display: none; }
+  .capo-video.lista { opacity: 1; }
+  .capo-final { opacity: 0; }
+
+  .capo-velo {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background:
+      linear-gradient(to bottom, rgb(0 0 0 / 0.72) 0, rgb(0 0 0 / 0) 11rem),
+      linear-gradient(to top, rgb(0 0 0 / 0.94) 0%, rgb(0 0 0 / 0.6) 30%, transparent 60%),
+      linear-gradient(to right, rgb(0 0 0 / 0.78) 0%, rgb(0 0 0 / 0.3) 38%, transparent 62%);
+  }
+  .capo-texto {
+    position: absolute;
+    inset-inline: 0;
+    bottom: clamp(2.25rem, 8svh, 5.5rem);
+    will-change: transform, opacity;
+  }
+  .capo-titulo {
+    max-width: 13ch;
+    font-size: min(clamp(1.85rem, 4.9vw, 5.4rem), 10.5svh);
+  }
+  .capo-entradilla {
+    margin-top: clamp(0.9rem, 2svh, 1.4rem);
+    max-width: 34ch;
+    font-size: clamp(1rem, 1.35vw, 1.3rem);
+    line-height: 1.45;
+    color: var(--color-blanco);
+  }
+  .capo-botones { display: flex; gap: 0.75rem; margin-top: clamp(1.25rem, 3svh, 2rem); }
+  .capo-nota {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    min-height: 44px;
+    margin-top: 0.6rem;
+    font-size: 0.95rem;
+    color: var(--color-niebla);
+    transition: color 200ms ease;
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .capo-nota:hover { color: var(--color-blanco); }
+  }
+
+  /* La pista: una línea fina con una gota de luz roja que baja, como invitando a seguir. */
+  .capo-pista-aviso {
+    position: absolute;
+    right: clamp(1.25rem, 5vw, 6rem);
+    bottom: clamp(2.25rem, 8svh, 5.5rem);
+    margin: 0;
+    display: none;
+    align-items: center;
+    gap: 0.9rem;
+    font-size: 0.95rem;
+    color: var(--color-niebla);
+  }
+  .capo.con-recorrido .capo-pista-aviso { display: inline-flex; }
+  .capo-pista-linea {
+    position: relative;
+    width: 1px;
+    height: 3rem;
+    overflow: hidden;
+    background: rgb(244 244 242 / 0.25);
+  }
+  .capo-pista-linea::after {
+    content: '';
+    position: absolute;
+    left: -1px;
+    top: 0;
+    width: 3px;
+    height: 0.9rem;
+    border-radius: 2px;
+    background: var(--color-rojo-luz);
+    box-shadow: 0 0 8px var(--color-rojo-luz);
+    transform: translateY(-1rem);
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .capo-pista-linea::after { animation: gota 2.2s var(--ease-in-out) infinite; }
+  }
+  @keyframes gota {
+    0% { transform: translateY(-1rem); opacity: 0; }
+    20% { opacity: 1; }
+    80% { opacity: 1; }
+    100% { transform: translateY(3rem); opacity: 0; }
+  }
+
+  /* Las piezas: un punto rojo que se enciende sobre la pieza, un hilo blanco que se dibuja y el
+     nombre en una placa negra. */
+  .capo-piezas { position: absolute; inset: 0; margin: 0; padding: 0; list-style: none; pointer-events: none; }
+  .capo-pieza { position: absolute; left: var(--x); top: var(--y); opacity: 0; }
+  .capo-punto {
+    position: absolute;
+    width: 0.75rem;
+    height: 0.75rem;
+    translate: -50% -50%;
+    border-radius: 50%;
+    background: #ff5146;
+    box-shadow: 0 0 0 3px rgb(210 16 26 / 0.45), 0 0 14px 2px rgb(255 51 38 / 0.85), 0 0 34px 6px rgb(255 51 38 / 0.35);
+  }
+  .capo-linea {
+    position: absolute;
+    height: 1px;
+    width: clamp(3rem, 7vw, 7rem);
+    background: rgb(244 244 242 / 0.85);
+    transform-origin: left center;
+    transform: scaleX(var(--trazo, 0));
+  }
+  .capo-rotulo {
+    position: absolute;
+    white-space: nowrap;
+    font-family: var(--font-texto);
+    font-weight: 600;
+    font-size: clamp(0.9rem, 1.05vw, 1.1rem);
+    letter-spacing: 0.01em;
+    color: var(--color-blanco);
+    background: rgb(0 0 0 / 0.78);
+    border-radius: 999px;
+    padding: 0.4em 0.9em 0.42em;
+    box-shadow: inset 0 0 0 1px rgb(244 244 242 / 0.14);
+  }
+  @media (min-aspect-ratio: 1001/1000) {
+    .d-derecha .capo-linea { left: 0; top: 0; }
+    .d-derecha .capo-rotulo { left: clamp(3.3rem, 7.4vw, 7.4rem); top: 0; translate: 0 -50%; }
+    .d-arriba .capo-linea, .d-abajo .capo-linea { left: 0; width: 1px; height: clamp(3rem, 9svh, 6rem); transform: scaleY(var(--trazo, 0)); }
+    .d-arriba .capo-linea { bottom: 0; transform-origin: center bottom; }
+    .d-arriba .capo-rotulo { left: 0; bottom: clamp(3.2rem, 9.5svh, 6.3rem); translate: -50% 0; }
+    .d-abajo .capo-linea { top: 0; transform-origin: center top; }
+    .d-abajo .capo-rotulo { left: 0; top: clamp(3.2rem, 9.5svh, 6.3rem); translate: -50% 0; }
+  }
+  @media (max-aspect-ratio: 1/1) {
+    .m-arriba .capo-linea, .m-abajo .capo-linea { left: 0; width: 1px; height: 2.6rem; transform: scaleY(var(--trazo, 0)); }
+    .m-arriba .capo-linea { bottom: 0; transform-origin: center bottom; }
+    .m-arriba .capo-rotulo { left: 0; bottom: 2.75rem; translate: -50% 0; }
+    .m-abajo .capo-linea { top: 0; transform-origin: center top; }
+    .m-abajo .capo-rotulo { left: 0; top: 2.75rem; translate: -50% 0; }
+  }
+
+  /* El remate ocupa el sitio que deja el titular. */
+  .capo-cierre {
+    position: absolute;
+    left: 0;
+    bottom: clamp(2.25rem, 8svh, 5.5rem);
+    opacity: 0;
+    pointer-events: none;
+  }
+  .capo-cierre-titulo { max-width: 13ch; font-size: min(clamp(1.9rem, 4vw, 4.2rem), 9svh); }
+  .capo.con-recorrido .capo-cierre { will-change: transform, opacity; }
+
+  /* Pantalla vertical (móvil o tablet de pie): la escena se parte en dos. Arriba el titular sobre
+     negro; abajo el marco 4:5 del coche a todo lo ancho. Un 16:9 cubriendo una pantalla vertical
+     tendría que ampliarse tanto que cortaría el coche. */
+  @media (max-aspect-ratio: 1/1) {
+    /* El marco deja 22 rem arriba para la cabecera y el texto. En un móvil sigue siendo todo el
+       ancho (390 × 844 da 394 px); en una tablet de pie, el coche se centra más pequeño. */
+    .capo-escena { --mw: min(100vw, calc((100svh - 22rem) * 0.8)); }
+    .capo-marco {
+      left: 50%;
+      top: auto;
+      bottom: 0;
+      width: var(--mw);
+      aspect-ratio: 4 / 5;
+      translate: -50% 0;
+    }
+    .capo-pieza { left: var(--xm); }
+    .capo-velo {
+      background: linear-gradient(to bottom, var(--color-negro) 0%, var(--color-negro) calc(100% - var(--mw) * 1.25), rgb(0 0 0 / 0.55) calc(100% - var(--mw) * 1.25 + 4rem), transparent calc(100% - var(--mw) * 1.25 + 8rem));
+    }
+    .capo-texto { top: 4.75rem; bottom: auto; }
+    .capo-pista-aviso { display: none !important; }
+    .capo-titulo { font-size: clamp(1.8rem, 8.6vw, 3.4rem); }
+    .capo-entradilla { font-size: 1rem; }
+    .capo-nota { margin-top: 0.35rem; font-size: 0.9rem; }
+    .capo-rotulo { font-size: 0.85rem; }
+    .capo-cierre { top: 4.75rem; bottom: auto; }
+    .capo-cierre-titulo { font-size: clamp(1.8rem, 8.2vw, 3.2rem); }
+  }
+
+  /* Con el coche muy pequeño (móviles bajos, de 320 a 375 px) los nombres de las piezas se pisarían
+     entre sí: se quedan solo los puntos de luz. */
+  @container (max-width: 300px) {
+    .capo-linea, .capo-rotulo { display: none; }
+  }
+
+  /* Horizontal y bajo (móvil tumbado, zoom al 200 %): el texto se aprieta para caber entre la
+     cabecera y el borde de abajo, y la nota de Google se queda para la sección de opiniones. */
+  @media (min-aspect-ratio: 1001/1000) and (max-height: 520px) {
+    .capo-texto, .capo-cierre, .capo-pista-aviso { bottom: 1rem; }
+    .capo-entradilla { margin-top: 0.5rem; max-width: 44ch; font-size: 0.95rem; }
+    .capo-botones { margin-top: 0.75rem; }
+    .capo-nota { display: none; }
+    /* Tan bajo, los nombres de abajo caerían sobre el remate: se quedan los puntos de luz. */
+    .capo-linea, .capo-rotulo { display: none; }
+  }
+  /* En horizontal por debajo de 1024 px también sale la barra fija de abajo: el remate se queda
+     por encima de ella. */
+  @media (min-aspect-ratio: 1001/1000) and (max-width: 1023px) {
+    .capo .capo-cierre { bottom: calc(5.5rem + env(safe-area-inset-bottom)); }
+  }
+
+  /* Movimiento reducido (§7): el recorrido atado al scroll es intrusivo, así que fuera. Se
+     enseña el capó ya abierto, con sus piezas, y un fundido corto al entrar. */
+  @media (prefers-reduced-motion: reduce) {
+    .capo-final { opacity: 1; transition: opacity 600ms ease; }
+  }
+  @media (prefers-reduced-motion: reduce) and (max-aspect-ratio: 1/1) {
+    .capo-pieza { opacity: 1; --trazo: 1; }
+  }
+</style>
+
+<script>
+  // El recorrido. El scroll dentro de la sección da un avance de 0 a 1 que mueve tres cosas:
+  // el titular se va, el vídeo avanza hasta el capó abierto y las piezas se encienden una a una.
+  // Se pide como mucho un salto de fotograma a la vez: si el decodificador va lento, se salta
+  // al último objetivo al terminar (así no se amontonan peticiones en móviles modestos).
+  const capo = document.querySelector<HTMLElement>('[data-capo]');
+  const reducido = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  if (capo && !reducido) {
+    const video = capo.querySelector<HTMLVideoElement>('[data-video]')!;
+    const fotoFinal = capo.querySelector<HTMLElement>('.capo-final');
+    const texto = capo.querySelector<HTMLElement>('[data-texto]')!;
+    const aviso = capo.querySelector<HTMLElement>('[data-aviso]');
+    const piezas = [...capo.querySelectorAll<HTMLElement>('[data-pieza]')];
+    const cierre = capo.querySelector<HTMLElement>('[data-cierre]');
+    const escena = capo.querySelector<HTMLElement>('[data-escena]')!;
+    const marco = capo.querySelector<HTMLElement>('[data-marco]')!;
+    const velo = capo.querySelector<HTMLElement>('.capo-velo');
+    const barra = document.querySelector<HTMLElement>('[data-barra-fija]');
+    // Lo que ocupa la barra fija de abajo (en móvil y tablet), para no bajar el coche debajo de ella.
+    let holgura = 0;
+    const medirBarra = () => { holgura = barra && getComputedStyle(barra).display !== 'none' ? barra.offsetHeight + 8 : 0; };
+    // «Vertical» y no «móvil»: una tablet de pie también usa el marco 4:5 (mismo criterio que el CSS).
+    // Si la pantalla cambia de orientación (tablet que se gira, ventana que se estrecha), se cambia
+    // de vídeo: el recorte 4:5 estirado a 16:9 se vería enorme.
+    const vertical = window.matchMedia('(max-aspect-ratio: 1/1)');
+    let movil = vertical.matches;
+    const clamp = (x: number) => Math.min(1, Math.max(0, x));
+    const tramo = (p: number, desde: number, hasta: number) => clamp((p - desde) / (hasta - desde));
+    // Salida fuerte, la misma curva que el resto de la web (--ease-out).
+    const salida = (t: number) => 1 - Math.pow(1 - t, 3);
+
+    capo.classList.add('con-recorrido');
+
+    // El vídeo se pide cuando la página ya ha pintado, y se enseña cuando puede dibujar.
+    const cargar = () => {
+      video.src = (movil ? video.dataset.srcMovil : video.dataset.src) ?? '';
+      video.preload = 'auto';
+      video.load();
+    };
+    // Hasta que el vídeo puede pintar (4G lenta, o si falla), el scroll funde la foto del capó
+    // cerrado con la del abierto: nunca se señalan las piezas sobre un capó cerrado.
+    let videoListo = false;
+    video.addEventListener('loadeddata', () => {
+      videoListo = true;
+      video.classList.add('lista');
+      programar();
+    }, { once: true });
+    if (document.readyState === 'complete') cargar();
+    else window.addEventListener('load', cargar, { once: true });
+    vertical.addEventListener('change', () => {
+      movil = vertical.matches;
+      marco.style.transform = '';
+      if (velo) velo.style.transform = '';
+      videoListo = false;
+      video.classList.remove('lista');
+      video.addEventListener('loadeddata', () => { videoListo = true; video.classList.add('lista'); programar(); }, { once: true });
+      cargar();
+      alScroll();
+    });
+
+    let objetivo = 0;
+    let pendiente = false;
+    const avance = () => {
+      const r = capo.getBoundingClientRect();
+      return clamp(-r.top / Math.max(1, capo.offsetHeight - window.innerHeight));
+    };
+    const pintar = () => {
+      pendiente = false;
+      const p = objetivo;
+
+      // 1. El titular sube y se apaga en el primer tercio.
+      const t = salida(tramo(p, 0.04, 0.3));
+      texto.style.transform = `translateY(${-t * 3}rem)`;
+      texto.style.opacity = String(1 - t);
+      texto.style.visibility = t >= 1 ? 'hidden' : '';
+      document.documentElement.dataset.barra = p > 0.28 ? 'si' : 'no';
+      if (aviso) aviso.style.opacity = String(1 - tramo(p, 0.02, 0.1));
+
+      // 1b. En vertical el marco va abajo y el titular arriba. Cuando el titular se va, el coche
+      //     sube al centro de la pantalla para abrir el capó ahí, y al final baja otra vez para
+      //     dejar sitio al remate.
+      if (movil) {
+        const hueco = Math.max(0, escena.clientHeight - marco.offsetHeight);
+        const sube = salida(tramo(p, 0.04, 0.3));
+        const baja = salida(tramo(p, 0.82, 0.95));
+        const y = `translateY(${-(hueco / 2) * sube + Math.max(0, hueco / 2 - holgura) * baja}px)`;
+        marco.style.transform = y;
+        // El velo de móvil es sólido hasta donde empieza el marco: sube con él, o le tapa el capó.
+        if (velo) velo.style.transform = y;
+      }
+
+      // 2. El capó: el vídeo va de principio a fin entre el 8 % y el 78 % del recorrido.
+      if (fotoFinal) fotoFinal.style.opacity = videoListo ? '0' : String(tramo(p, 0.35, 0.72));
+      if (videoListo && video.duration && !video.seeking) {
+        const tv = tramo(p, 0.08, 0.78) * Math.max(0, video.duration - 0.05);
+        if (Math.abs(video.currentTime - tv) > 0.02) video.currentTime = tv;
+      }
+
+      // 3. Las piezas se encienden al final, escalonadas: el punto llega casi de golpe, como
+      //    un testigo, y el hilo y el nombre le siguen.
+      piezas.forEach((pieza, i) => {
+        const inicio = 0.74 + i * 0.045;
+        const k = salida(tramo(p, inicio, inicio + 0.1));
+        pieza.style.opacity = String(Math.min(1, k * 1.6));
+        pieza.style.setProperty('--trazo', String(k));
+      });
+
+      // 4. El remate sube y aparece cuando ya está todo señalado.
+      if (cierre) {
+        const c = salida(tramo(p, 0.84, 0.97));
+        cierre.style.opacity = String(c);
+        cierre.style.transform = `translateY(${(1 - c) * 1.5}rem)`;
+      }
+    };
+    function programar() {
+      if (pendiente) return;
+      pendiente = true;
+      requestAnimationFrame(pintar);
+    }
+    const alScroll = () => { objetivo = avance(); programar(); };
+    window.addEventListener('resize', medirBarra, { passive: true });
+    video.addEventListener('seeked', programar);
+    window.addEventListener('scroll', alScroll, { passive: true });
+    window.addEventListener('resize', alScroll, { passive: true });
+    // La primera lectura, en el siguiente fotograma: leer medidas nada más cargar obligaría al
+    // navegador a maquetar antes de tiempo.
+    requestAnimationFrame(() => { medirBarra(); alScroll(); });
+  }
+</script>

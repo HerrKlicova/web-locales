@@ -1,0 +1,53 @@
+---
+import { enlaceTelefono, enlaceWhatsapp } from '@plantilla/lib/ficha';
+import type { Ficha } from '@plantilla/lib/ficha';
+import Icono from './Icono.astro';
+
+/** Barra fija abajo en móvil y tablet, a partir de la primera pantalla (§10). */
+interface Props { ficha: Ficha }
+const { ficha } = Astro.props;
+const whatsapp = enlaceWhatsapp(ficha, 'Hola, quería pedir cita para el coche.');
+---
+
+<div class="barra-fija" data-barra-fija>
+  <a href={whatsapp} class="boton boton-rojo flex-1" target="_blank" rel="noopener">
+    <Icono nombre="whatsapp" class="size-5.5" />
+    WhatsApp
+  </a>
+  <a href={enlaceTelefono(ficha)} class="boton boton-linea flex-1">
+    <Icono nombre="telefono" class="size-5" />
+    Llamar
+  </a>
+</div>
+
+<style>
+  /* Fondo opaco y sin desenfoque: sobre negro el desenfoque solo dejaba ver sombras de lo que
+     pasaba por detrás, y en el móvil obligaba a recalcularlo en cada fotograma del vídeo. */
+  .barra-fija {
+    position: fixed;
+    inset: auto 0 0;
+    z-index: 40;
+    display: flex;
+    gap: 0.6rem;
+    padding: 0.7rem clamp(1rem, 4vw, 1.5rem) max(0.7rem, env(safe-area-inset-bottom));
+    background: rgb(0 0 0 / 0.96);
+    box-shadow: inset 0 1px 0 var(--color-grafito);
+    transition: transform 320ms var(--ease-out);
+  }
+  @media (min-width: 1024px) { .barra-fija { display: none; } }
+  /* Mientras los botones del hero están a la vista, la barra se esconde (html[data-barra='no']):
+     lo marca la escena del capó y, si no hay recorrido, el script de abajo. Sin JS se ve siempre. */
+  :global(html[data-barra='no']) .barra-fija { transform: translateY(115%); }
+</style>
+
+<script>
+  // Sin recorrido del capó (movimiento reducido) nadie marca data-barra, y los botones del hero y
+  // los de la barra salían a la vez. Aquí se esconde la barra mientras se ven los del hero.
+  const recorrido = document.querySelector('.capo.con-recorrido');
+  const botones = document.querySelector('.capo-botones');
+  if (!recorrido && botones && 'IntersectionObserver' in window) {
+    new IntersectionObserver(([e]) => {
+      document.documentElement.dataset.barra = e.isIntersecting ? 'no' : 'si';
+    }).observe(botones);
+  }
+</script>

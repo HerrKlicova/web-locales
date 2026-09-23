@@ -1,0 +1,320 @@
+---
+import { indicesDia, tramos } from '@plantilla/lib/horario';
+import { enlaceTelefono, enlaceWhatsapp } from '@plantilla/lib/ficha';
+import type { Ficha } from '@plantilla/lib/ficha';
+
+/**
+ * El horario, en un reloj de salpicadero: una esfera de 24 horas como la de un cuentarrevoluciones,
+ * con el tramo en que el taller está abierto encendido en blanco y una aguja roja que marca la hora
+ * de ahora en Caravaca. Al llegar, la aguja hace el barrido de cuando se da el contacto (sube hasta
+ * el final y vuelve) y se queda en la hora: el mismo gesto de encender de toda la web.
+ *
+ * Es el argumento fuerte de esta web (investigacion.md): casi todos los talleres de Caravaca abren
+ * a las 9 y cierran a mediodía; este abre a las 7 y no cierra hasta las 3. En la esfera se ve de un
+ * vistazo: un solo arco, sin corte a mediodía. Los datos salen tal cual de su ficha de Google.
+ *
+ * Sin JS se ve la esfera con el tramo abierto y el horario escrito; la aguja, la hora y el «abierto
+ * ahora» solo salen con JS, que es quien sabe qué hora es.
+ */
+interface Props { ficha: Ficha }
+const { ficha } = Astro.props;
+const whatsapp = enlaceWhatsapp(ficha, 'Hola, quería pedir cita para el coche.');
+
+// Días y tramos de apertura, sacados de la ficha (el primer tramo con horas).
+const abierto = ficha.horario.flatMap((h) => tramos(h.horas).map((t) => ({ dias: indicesDia(h.dias), t })));
+const [desde, hasta] = abierto[0].t.map((hhmm) => { const [h, m] = hhmm.split(':').map(Number); return h + m / 60; });
+const diasAbierto = [...new Set(abierto.flatMap((a) => a.dias))];
+
+// Geometría de la esfera (viewBox 600 × 520): 270° de recorrido, de las 0 abajo a la izquierda a
+// las 24 abajo a la derecha, pasando por las 12 arriba.
+const C = { x: 300, y: 290 };
+const angulo = (h: number) => -135 + (270 * h) / 24; // grados, 0 = arriba, sentido horario
+const punto = (h: number, r: number) => {
+  const a = (angulo(h) * Math.PI) / 180;
+  return [+(C.x + r * Math.sin(a)).toFixed(2), +(C.y - r * Math.cos(a)).toFixed(2)];
+};
+const arco = (h1: number, h2: number, r: number) => {
+  const [x1, y1] = punto(h1, r);
+  const [x2, y2] = punto(h2, r);
+  const grande = angulo(h2) - angulo(h1) > 180 ? 1 : 0;
+  return `M${x1} ${y1}A${r} ${r} 0 ${grande} 1 ${x2} ${y2}`;
+};
+const R_ARCO = 262;
+const marcas = Array.from({ length: 49 }, (_, i) => i / 2).map((h) => {
+  const mayor = h % 3 === 0;
+  const hora = Number.isInteger(h);
+  const [x1, y1] = punto(h, R_ARCO - 16);
+  const [x2, y2] = punto(h, R_ARCO - (mayor ? 44 : hora ? 30 : 23));
+  return { h, mayor, hora, x1, y1, x2, y2, dentro: h >= desde && h <= hasta };
+});
+const rotulos = [0, 3, 6, 9, 12, 15, 18, 21, 24].map((h) => {
+  const [x, y] = punto(h, R_ARCO - 76);
+  return { h, x, y, dentro: h >= desde && h <= hasta };
+});
+const TRAMOS_HORA = Array.from({ length: Math.ceil(hasta - desde) }, (_, i) => {
+  const h1 = desde + i;
+  const h2 = Math.min(hasta, h1 + 1);
+  const solape = h2 < hasta ? 0.04 : 0;
+  return { i, d: arco(h1, h2 + solape, R_ARCO), primero: i === 0, ultimo: h2 >= hasta };
+});
+const horaTexto = (h: number) => `${Math.floor(h)}:${String(Math.round((h % 1) * 60)).padStart(2, '0')}`;
+---
+
+<section id="horario" class="horario margen" aria-labelledby="horario-titulo" data-horario data-desde={desde} data-hasta={hasta} data-dias={diasAbierto.join(',')}>
+  <div class="horario-esfera" data-esfera>
+    <svg viewBox="0 0 600 520" class="block w-full" role="img" aria-label={`Esfera de 24 horas con el horario de apertura encendido, de ${horaTexto(desde)} a ${horaTexto(hasta)}`}>
+      {/* La pista de todo el día, apagada. */}
+      <path d={arco(0, 24, R_ARCO)} class="esfera-pista" />
+      {/* El tramo abierto, encendido: un solo arco, sin corte a mediodía. Va en trozos de una hora
+          que se encienden seguidos al llegar, de las 7 a las 15. */}
+      <g class="esfera-abierto">
+        {TRAMOS_HORA.map((t) => <path d={t.d} class:list={['esfera-tramo', t.primero && 'primero', t.ultimo && 'ultimo']} style={`--i:${t.i}`} />)}
+      </g>
+      <g class="esfera-marcas">
+        {marcas.map((m) => <line x1={m.x1} y1={m.y1} x2={m.x2} y2={m.y2} class:list={[m.mayor ? 'mayor' : m.hora ? 'hora' : 'media', m.dentro && 'dentro']} />)}
+      </g>
+      <g class="esfera-rotulos">
+        {rotulos.map((r) => <text x={r.x} y={r.y} class:list={[r.dentro && 'dentro']} dominant-baseline="central" text-anchor="middle">{r.h}</text>)}
+      </g>
+      {/* La lectura digital, en el hueco de abajo, como en los cuadros de ahora. Solo con JS. */}
+      <g class="esfera-lectura" data-lectura>
+        <text x="300" y="420" text-anchor="middle" class="esfera-hora" data-hora>--:--</text>
+        <text x="300" y="463" text-anchor="middle" class="esfera-estado" data-estado-texto>hora de Caravaca</text>
+      </g>
+      {/* La aguja: dibujada apuntando a las 12 y girada con transform. Solo con JS. */}
+      <g class="esfera-aguja" data-aguja>
+        <path d="M296.5 300 L298.8 58 Q300 50 301.2 58 L303.5 300 Z" class="aguja-cuerpo" />
+        <circle cx="300" cy="290" r="19" class="aguja-tapa" />
+        <circle cx="300" cy="290" r="6" class="aguja-eje" />
+      </g>
+    </svg>
+  </div>
+
+  <div class="horario-texto">
+    <h2 id="horario-titulo" class="m-0 text-lg font-semibold text-niebla sm:text-xl">De lunes a viernes</h2>
+    <p class="ancha horario-horas m-0">
+      <span>{horaTexto(desde)}</span><span class="horario-raya" aria-hidden="true"></span><span class="sr-only"> a </span><span>{horaTexto(hasta)}</span>
+    </p>
+    <p class="m-0 mt-6 max-w-[30ch] text-lg leading-snug sm:text-xl">
+      Sin cerrar a mediodía. Puedes dejar el coche antes de entrar a trabajar y recogerlo a la hora de comer.
+    </p>
+    <p class="horario-ahora" data-ahora hidden><span class="horario-led" aria-hidden="true"></span><span data-ahora-texto></span></p>
+    <dl class="m-0 mt-8 max-w-md">
+      {
+        ficha.horario.map((h) => (
+          <div class="horario-fila" data-dias={indicesDia(h.dias).join(',')}>
+            <dt>{h.dias}</dt>
+            <dd class="m-0 font-semibold">{h.horas.replace('–', ' a ')}</dd>
+          </div>
+        ))
+      }
+    </dl>
+    {/* «Para pedir cita o presupuesto» es la frase de su bio de Instagram. */}
+    <p class="m-0 mt-6 max-w-md text-niebla">
+      Para pedir cita o presupuesto,{' '}
+      <a href={whatsapp} class="enlace font-semibold text-blanco" target="_blank" rel="noopener">escríbenos por WhatsApp</a>{' '}
+      o llama al{' '}
+      <a href={enlaceTelefono(ficha)} class="enlace font-semibold whitespace-nowrap text-blanco">{ficha.telefono.replace('+34 ', '')}</a>.
+    </p>
+  </div>
+</section>
+
+<style>
+  .horario {
+    display: grid;
+    gap: clamp(2.5rem, 6vw, 5rem);
+    align-items: center;
+    padding-block: clamp(5rem, 14svh, 9rem);
+    background: var(--color-negro);
+    border-top: 1px solid var(--color-grafito);
+  }
+  @media (min-width: 960px) {
+    .horario { grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr); }
+  }
+  .horario-esfera { width: min(100%, 40rem); justify-self: center; }
+
+  .esfera-pista { fill: none; stroke: #1c1c1c; stroke-width: 2; }
+  .esfera-abierto { filter: drop-shadow(0 0 6px rgb(244 244 242 / 0.4)); }
+  .esfera-tramo { fill: none; stroke: var(--color-blanco); stroke-width: 7; stroke-linecap: butt; }
+  .esfera-tramo.primero, .esfera-tramo.ultimo { stroke-linecap: round; }
+  .esfera-marcas line { stroke: #3a3a3a; stroke-width: 2; stroke-linecap: round; }
+  .esfera-marcas .media { stroke: #262626; stroke-width: 1.5; }
+  .esfera-marcas .mayor { stroke: #6f6f6f; stroke-width: 3; }
+  .esfera-marcas .dentro { stroke: #cfcfcf; }
+  .esfera-rotulos text { font-family: var(--font-ancha); font-weight: 700; font-size: 25px; fill: var(--color-humo); }
+  .esfera-rotulos .dentro { fill: var(--color-blanco); }
+  .esfera-hora { font-family: var(--font-ancha); font-weight: 700; font-size: 50px; fill: var(--color-blanco); letter-spacing: -0.02em; }
+  .esfera-estado { font-family: var(--font-texto); font-weight: 600; font-size: 21px; fill: var(--color-niebla); }
+
+  /* Aguja y lectura: solo con JS (sin JS no sabemos qué hora es). */
+  .esfera-aguja, .esfera-lectura { opacity: 0; }
+  .horario[data-reloj] .esfera-aguja, .horario[data-reloj] .esfera-lectura { opacity: 1; transition: opacity 400ms ease; }
+  .esfera-aguja {
+    transform-box: view-box;
+    transform-origin: 300px 290px;
+    transform: rotate(var(--giro, -135deg));
+  }
+  .aguja-cuerpo { fill: #ff3b2f; filter: drop-shadow(0 0 5px rgb(255 51 38 / 0.7)); }
+  .aguja-tapa { fill: #0b0b0b; stroke: #2a2a2a; stroke-width: 2; }
+  .aguja-eje { fill: var(--color-rojo); }
+
+  /* Encendido del tramo abierto: el JS lo apaga antes de llegar y lo enciende hora a hora
+     (70 ms entre una y otra, 180 ms cada una: menos de 900 ms en total). */
+  .horario[data-luz='apagada'] .esfera-tramo { opacity: 0; }
+  .horario[data-luz='encendida'] .esfera-tramo { transition: opacity 180ms var(--ease-luz) calc(150ms + var(--i) * 70ms); }
+
+  .horario-horas {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    column-gap: 0.28em;
+    margin-top: 0.75rem;
+    font-size: clamp(2.6rem, 10.5vw, 5.8rem);
+    line-height: 0.95;
+    letter-spacing: -0.035em;
+  }
+  @media (min-width: 960px) {
+    .horario-horas { font-size: clamp(3rem, 5.4vw, 6rem); }
+  }
+  /* La raya entre las dos horas: dibujada, no un guion largo (§5). */
+  .horario-raya {
+    display: inline-block;
+    width: 0.5em;
+    height: 0.075em;
+    background: var(--color-rojo);
+    transform: translateY(-0.3em);
+  }
+
+  .horario-ahora {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.7rem;
+    margin: 1.75rem 0 0;
+    font-weight: 600;
+  }
+  .horario-ahora[hidden] { display: none; }
+  .horario-led {
+    width: 0.7rem;
+    height: 0.7rem;
+    border-radius: 50%;
+    background: #3a3a3a;
+    flex-shrink: 0;
+    margin-top: 0.42em;
+  }
+  .horario[data-abierto] .horario-led {
+    background: var(--color-blanco);
+    box-shadow: 0 0 0 3px rgb(244 244 242 / 0.22), 0 0 12px rgb(244 244 242 / 0.7);
+  }
+  .horario-fila {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    padding-block: 0.8rem;
+    border-bottom: 1px solid var(--color-grafito);
+  }
+  .horario-fila[aria-current] dt::after { content: ' (hoy)'; color: var(--color-niebla); font-weight: 400; }
+</style>
+
+<script>
+  // Hora de Caravaca (no la del dispositivo: alguien de fuera también ve si está abierto).
+  const seccion = document.querySelector<HTMLElement>('[data-horario]');
+  if (seccion) {
+    const desde = Number(seccion.dataset.desde);
+    const hasta = Number(seccion.dataset.hasta);
+    const diasAbierto = (seccion.dataset.dias ?? '').split(',').filter(Boolean).map(Number);
+    const aguja = seccion.querySelector<SVGGElement>('[data-aguja]')!;
+    const horaEl = seccion.querySelector<SVGTextElement>('[data-hora]')!;
+    const estadoEl = seccion.querySelector<SVGTextElement>('[data-estado-texto]')!;
+    const ahora = seccion.querySelector<HTMLElement>('[data-ahora]')!;
+    const ahoraTexto = seccion.querySelector<HTMLElement>('[data-ahora-texto]')!;
+    const reducido = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const giro = (h: number) => -135 + (270 * h) / 24;
+    const hh = (h: number) => `${Math.floor(h)}:${String(Math.round((h % 1) * 60)).padStart(2, '0')}`;
+    const DIAS = ['lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado', 'domingo'];
+
+    const leer = () => {
+      const partes = Object.fromEntries(
+        new Intl.DateTimeFormat('en-GB', { timeZone: 'Europe/Madrid', hour: '2-digit', minute: '2-digit', hourCycle: 'h23', weekday: 'short' })
+          .formatToParts(new Date())
+          .map((p) => [p.type, p.value]),
+      );
+      const dia = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].indexOf(partes.weekday);
+      const hora = Number(partes.hour) + Number(partes.minute) / 60;
+      return { dia, hora, texto: `${partes.hour}:${partes.minute}` };
+    };
+    // El siguiente día que abre, contando desde mañana.
+    const proximo = (dia: number) => {
+      for (let i = 1; i <= 7; i++) {
+        const d = (dia + i) % 7;
+        if (diasAbierto.includes(d)) return i === 1 ? 'mañana' : `el ${DIAS[d]}`;
+      }
+      return '';
+    };
+
+    const actualizar = () => {
+      const { dia, hora, texto } = leer();
+      const abreHoy = diasAbierto.includes(dia);
+      const abierto = abreHoy && hora >= desde && hora < hasta;
+      horaEl.textContent = texto;
+      estadoEl.textContent = abierto ? 'abierto ahora' : 'cerrado ahora';
+      seccion.toggleAttribute('data-abierto', abierto);
+      ahoraTexto.textContent = abierto
+        ? `Abierto ahora. Cerramos a las ${hh(hasta)}.`
+        : abreHoy && hora < desde
+          ? `Ahora está cerrado. Hoy abrimos a las ${hh(desde)}.`
+          : `Ahora está cerrado. Abrimos ${proximo(dia)} a las ${hh(desde)}.`;
+      ahora.hidden = false;
+      document.querySelectorAll<HTMLElement>('#horario .horario-fila').forEach((fila) => {
+        const dias = (fila.dataset.dias ?? '').split(',').filter(Boolean).map(Number);
+        fila.toggleAttribute('aria-current', dias.includes(dia));
+        if (dias.includes(dia)) fila.setAttribute('aria-current', 'date');
+      });
+      return hora;
+    };
+
+    const hora = actualizar();
+    seccion.dataset.reloj = '';
+    aguja.style.setProperty('--giro', `${giro(hora)}deg`);
+    window.setInterval(() => aguja.style.setProperty('--giro', `${giro(actualizar())}deg`), 30_000);
+
+    // El barrido y el encendido, una sola vez y solo si la esfera aún no se ha visto al cargar
+    // (si el navegador restaura el scroll por debajo, se queda quieta en su sitio). Seguro de 500 ms
+    // por si el observador no salta (§7).
+    const esfera = seccion.querySelector<HTMLElement>('[data-esfera]')!;
+    requestAnimationFrame(() => {
+      if (!reducido && 'IntersectionObserver' in window && esfera.getBoundingClientRect().top > window.innerHeight) {
+        seccion.dataset.luz = 'apagada';
+        aguja.style.setProperty('--giro', `${giro(0)}deg`);
+        let hecho = false;
+        let seguro = 0;
+        const encender = () => {
+          if (hecho) return;
+          hecho = true;
+          window.clearTimeout(seguro);
+          io.disconnect();
+          seccion.dataset.luz = 'encendida';
+          const destino = giro(leer().hora);
+          // Como en un cuadro al dar el contacto: la aguja sube hasta el final y vuelve a su sitio.
+          aguja.animate(
+            [
+              { transform: `rotate(${giro(0)}deg)`, easing: 'cubic-bezier(0.55, 0, 0.35, 1)' },
+              { transform: `rotate(${giro(24)}deg)`, offset: 0.4, easing: 'cubic-bezier(0.23, 1, 0.32, 1)' },
+              { transform: `rotate(${destino}deg)` },
+            ],
+            { duration: 900, delay: 150, fill: 'backwards' },
+          );
+          aguja.style.setProperty('--giro', `${destino}deg`);
+        };
+        const io = new IntersectionObserver(
+          ([e]) => {
+            if (!e.isIntersecting) return;
+            if (!seguro) seguro = window.setTimeout(encender, 500);
+            if (e.intersectionRatio >= 0.45) encender();
+          },
+          { threshold: [0, 0.05, 0.45] },
+        );
+        io.observe(esfera);
+      }
+    });
+  }
+</script>

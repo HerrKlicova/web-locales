@@ -1,0 +1,88 @@
+---
+// Taller Sánchez Carreño. La web lleva los tres colores de su logotipo (negro, blanco y el rojo de
+// la rueda) y entra por el capó: el hero es el coche en la nave y, al bajar, el capó se abre y deja
+// el motor a la vista. Fotos y vídeo en blanco y negro (fotos/bn/). Todo a sangre, de borde a borde.
+import { getImage } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
+import Layout from '../layouts/Layout.astro';
+import Cabecera from '../components/Cabecera.astro';
+import Capo from '../components/Capo.astro';
+import Cuadro from '../components/Cuadro.astro';
+import Trabajos from '../components/Trabajos.astro';
+import Horario from '../components/Horario.astro';
+import Taller from '../components/Taller.astro';
+import Preguntas from '../components/Preguntas.astro';
+import Instagram from '../components/Instagram.astro';
+import Donde from '../components/Donde.astro';
+import Pie from '../components/Pie.astro';
+import BarraFija from '../components/BarraFija.astro';
+import { schemaLocalBusiness } from '@plantilla/lib/schema';
+import type { Ficha } from '@plantilla/lib/ficha';
+
+import fichaJson from '../../ficha.json';
+import inicioEscritorio from '../../fotos/bn/capo-inicio.jpg';
+import inicioMovil from '../../fotos/bn/capo-inicio-movil.jpg';
+import finalEscritorio from '../../fotos/bn/capo-final.jpg';
+import finalMovil from '../../fotos/bn/capo-final-movil.jpg';
+import fotoManos from '../../fotos/bn/manos-motor.jpg';
+import fotoHero from '../../fotos/bn/taller-hero.jpg';
+import fotoElevador from '../../fotos/bn/elevador.jpg';
+import fotoCarro from '../../fotos/bn/carro-herramienta.jpg';
+import fotoBanco from '../../fotos/bn/banco-trabajo.jpg';
+import fotoNave from '../../fotos/bn/taller-nave.jpg';
+
+const ficha = fichaJson as unknown as Ficha & { place_id?: string; instagram: string };
+const valoracion = (fichaJson as { valoracion: number }).valoracion;
+const numResenas = (fichaJson as { num_resenas: number }).num_resenas;
+
+const titulo = `Sánchez Carreño — Taller mecánico en ${ficha.pueblo}`;
+const descripcion = `Taller mecánico en ${ficha.pueblo}, abierto de lunes a viernes de 7:00 a 15:00 sin cerrar a mediodía. Mecánica general, averías y ITV. Escríbenos por WhatsApp o llama al ${ficha.telefono}.`;
+const schema = {
+  ...schemaLocalBusiness(ficha, Astro.site?.href),
+  aggregateRating: { '@type': 'AggregateRating', ratingValue: valoracion, reviewCount: numResenas },
+  sameAs: [`https://www.instagram.com/${ficha.instagram}/`],
+};
+const demo = import.meta.env.PRODUCCION !== 'true';
+
+// Se precarga el primer fotograma del capó, que es el LCP: el vertical y el horizontal, cada uno
+// con su media query (las mismas que los <source> de Capo.astro) para que se baje solo uno.
+const pre = async (img: ImageMetadata, anchos: number[]) =>
+  getImage({ src: img, format: 'avif', widths: anchos, width: anchos.at(-1), quality: 50 });
+const preEscritorio = await pre(inicioEscritorio, [960, 1440, 1920]);
+const preMovil = await pre(inicioMovil, [480, 720, 864]);
+const fotos = [
+  { src: fotoHero, alt: 'La nave del taller con un coche subido en el elevador de dos columnas y el portón abierto a la calle' },
+  { src: fotoNave, alt: 'Otra vista de la nave, con el coche elevado y las herramientas en la pared' },
+  { src: fotoElevador, alt: 'Coche en el elevador visto de lado, con la suspensión delantera a la vista' },
+  { src: fotoCarro, alt: 'Carro de herramienta con un cajón abierto lleno de llaves usadas' },
+  { src: fotoBanco, alt: 'Banco de trabajo con el tornillo de banco, piezas y un trapo' },
+];
+
+const precarga = [
+  { srcset: preMovil.srcSet.attribute, sizes: 'min(100vw, calc((100svh - 22rem) * 0.8))', tipo: 'image/avif', media: '(max-aspect-ratio: 1/1)' },
+  { srcset: preEscritorio.srcSet.attribute, sizes: 'max(112vw, 199svh)', tipo: 'image/avif', media: '(min-aspect-ratio: 1001/1000)' },
+];
+---
+
+<Layout titulo={titulo} descripcion={descripcion} demo={demo} schema={schema} precarga={precarga}>
+  <Cabecera ficha={ficha} />
+  <main id="contenido">
+    <Capo
+      ficha={ficha}
+      inicio={{ escritorio: inicioEscritorio, movil: inicioMovil }}
+      final={{ escritorio: finalEscritorio, movil: finalMovil }}
+      valoracion={valoracion}
+      numResenas={numResenas}
+    />
+    <Cuadro ficha={ficha} />
+    <Trabajos ficha={ficha} foto={fotoManos} />
+    <Horario ficha={ficha} />
+    <Taller fotos={fotos} />
+    <Preguntas ficha={ficha} valoracion={valoracion} numResenas={numResenas} />
+    <Instagram cuenta={ficha.instagram} nombre="Sánchez Carreño" />
+    <Donde ficha={ficha} />
+  </main>
+
+  <Pie ficha={ficha} instagram={ficha.instagram} />
+  <BarraFija ficha={ficha} />
+</Layout>

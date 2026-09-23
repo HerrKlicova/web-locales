@@ -1,0 +1,159 @@
+---
+import Icono from './Icono.astro';
+import Logo from './Logo.astro';
+
+/**
+ * Su Instagram (@carrenomotor.1988). El feed es el de verdad y se actualiza solo: es el visor
+ * oficial de perfil de Instagram (instagram.com/<cuenta>/embed), que enseña sus últimas
+ * publicaciones sin que el taller tenga que conectar nada. No se copia ni se guarda ninguna foto
+ * suya (§6): se ven desde Instagram.
+ *
+ * Se carga solo al pulsar: hasta entonces la página no pide nada a Meta ni deja que ponga cookies
+ * (la política de cookies del pie lo explica). La ventana mide ya lo mismo que el visor, con su
+ * cabecera, para que al cargar no salte nada; el visor entra con un fundido cuando ha pintado (el
+ * de Instagram es blanco y, sin eso, se veía un fogonazo). Si en 10 s no ha llegado (bloqueadores),
+ * se ofrece abrir el perfil en Instagram.
+ *
+ * En producción, si el taller da acceso a su cuenta (API de Instagram), el feed se puede pintar
+ * con el diseño de la web en vez del visor de Instagram: ver ESTADO.md.
+ *
+ * Lo que publican sale de sus propios textos: consejos de la ITV, recordatorios de revisión antes
+ * de las vacaciones y el día a día del taller.
+ */
+interface Props { cuenta: string; nombre: string }
+const { cuenta, nombre } = Astro.props;
+const perfil = `https://www.instagram.com/${cuenta}/`;
+const visor = `https://www.instagram.com/${cuenta}/embed/`;
+---
+
+<section id="instagram" class="instagram margen" aria-labelledby="instagram-titulo">
+  <div class="instagram-texto">
+    <h2 id="instagram-titulo" class="ancha m-0 max-w-[14ch] text-[clamp(2.1rem,4.4vw,4.4rem)]">
+      El día a día del taller
+    </h2>
+    <p class="m-0 mt-6 max-w-[34ch] text-lg leading-snug text-niebla sm:text-xl">
+      En Instagram: consejos para la ITV, revisiones antes de las vacaciones y lo que va pasando por la nave.
+    </p>
+    <a href={perfil} class="instagram-cuenta" target="_blank" rel="noopener">
+      <Icono nombre="instagram" class="size-7 shrink-0 sm:size-8" />
+      <span class="ancha">@{cuenta}</span>
+    </a>
+  </div>
+
+  <div class="instagram-ventana" data-instagram data-src={visor}>
+    {/* Esqueleto con la forma del visor de perfil: cabecera y seis publicaciones. */}
+    <div class="instagram-esqueleto" data-esqueleto>
+      <div class="instagram-perfil">
+        <Logo insignia class="size-[5.5rem] shrink-0" />
+        <span class="flex flex-col">
+          <span class="font-semibold">{cuenta}</span>
+          <span class="text-sm text-niebla">{nombre}</span>
+        </span>
+      </div>
+      <div class="instagram-carga">
+        {/* Enlace de verdad: sin JS abre su perfil; con JS carga aquí el visor. */}
+        <a href={perfil} class="boton boton-blanco" target="_blank" rel="noopener" data-instagram-boton>
+          <Icono nombre="instagram" class="size-5" />
+          Ver nuestras publicaciones
+        </a>
+        <span class="text-sm text-niebla" data-instagram-estado aria-live="polite">Se cargan desde Instagram</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .instagram {
+    display: grid;
+    gap: clamp(2.5rem, 5vw, 4rem);
+    align-items: center;
+    padding-block: clamp(5rem, 14svh, 9rem);
+    background: var(--color-negro);
+    border-top: 1px solid var(--color-grafito);
+  }
+  @media (min-width: 960px) {
+    .instagram { grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr); }
+  }
+  .instagram-cuenta {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.8rem;
+    min-height: 44px;
+    margin-top: 2rem;
+    font-size: clamp(1.15rem, 2.2vw, 1.9rem);
+    overflow-wrap: anywhere;
+    transition: color 200ms ease;
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .instagram-cuenta:hover { color: #fff; text-decoration: underline; text-decoration-color: var(--color-rojo); text-decoration-thickness: 2px; text-underline-offset: 0.25em; }
+  }
+
+  /* La ventana: mide lo mismo con el esqueleto que con el visor (cabecera + dos filas de tres). */
+  .instagram-ventana {
+    position: relative;
+    container-type: inline-size;
+    width: 100%;
+    max-width: 44rem;
+    justify-self: center;
+    border-radius: 1.5rem;
+    overflow: hidden;
+    background: var(--color-carbon);
+    box-shadow: inset 0 0 0 1px var(--color-grafito);
+  }
+  /* Medidas del visor de Instagram (medido a 350, 450, 637 y 704 px): cabecera de unos 150 px con
+     la foto de perfil a 88 px, y dos filas de tres publicaciones cuadradas. */
+  .instagram-esqueleto { display: flex; flex-direction: column; height: calc(66.667cqi + 10rem); }
+  .instagram-perfil { display: flex; align-items: center; gap: 1.25rem; height: 9.75rem; flex-shrink: 0; padding-inline: 1.25rem; box-shadow: inset 0 -1px 0 var(--color-grafito); }
+  .instagram-carga {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    padding: 1rem;
+    text-align: center;
+  }
+  .instagram-ventana :global(iframe) {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    border: 0;
+    background: var(--color-negro);
+    opacity: 0;
+    transition: opacity 400ms var(--ease-out);
+  }
+  .instagram-ventana.con-feed :global(iframe) { opacity: 1; }
+  .instagram-ventana.con-feed .instagram-esqueleto { visibility: hidden; }
+</style>
+
+<script>
+  // El visor de Instagram, solo al pulsar. Entra con un fundido cuando ha cargado; si no llega en
+  // 10 s (un bloqueador, sin conexión), el aviso ofrece abrir el perfil en Instagram.
+  const caja = document.querySelector<HTMLElement>('[data-instagram]');
+  const boton = caja?.querySelector<HTMLAnchorElement>('[data-instagram-boton]');
+  const estado = caja?.querySelector<HTMLElement>('[data-instagram-estado]');
+  if (caja && boton && estado) {
+    boton.addEventListener('click', (e) => {
+      e.preventDefault();
+      if (caja.querySelector('iframe')) return;
+      estado.textContent = 'Cargando las publicaciones…';
+      const iframe = document.createElement('iframe');
+      iframe.src = caja.dataset.src ?? '';
+      iframe.title = 'Últimas publicaciones de Instagram de Sánchez Carreño';
+      iframe.referrerPolicy = 'strict-origin-when-cross-origin';
+      iframe.setAttribute('scrolling', 'no');
+      iframe.addEventListener('load', () => {
+        caja.classList.add('con-feed');
+        iframe.focus({ preventScroll: true });
+      }, { once: true });
+      caja.append(iframe);
+      window.setTimeout(() => {
+        if (caja.classList.contains('con-feed')) return;
+        estado.textContent = 'No se han podido cargar aquí. Pulsa el botón para verlas en Instagram.';
+        boton.addEventListener('click', () => window.open(boton.href, '_blank', 'noopener'), { once: true });
+      }, 10_000);
+    });
+  }
+</script>
