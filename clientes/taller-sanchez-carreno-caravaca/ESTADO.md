@@ -87,6 +87,7 @@ comprobar que las demás carpetas de `dist/demo` son lo último publicado.
 - Horario: solo «Sin cerrar a mediodía.»
 - Fotos: el título pasa de «La nave» a «El taller» y el aviso queda en «Fotografías de muestra.»
 - Preguntas: fuera la pregunta en inglés (reseña de Dominic Olds).
+- Instagram: «…y lo que va pasando por el taller» (antes, «por la nave»).
 
 ---
 
