@@ -51,12 +51,14 @@
   @media (prefers-reduced-motion: no-preference) {
     html { scroll-behavior: smooth; }
   }
+  /* Foco y selección en piedra al sol: el amarillo se reserva para la línea, la C, el botón
+     principal y la fila de hoy. */
   :focus-visible {
-    outline: 3px solid var(--color-amarillo-vivo);
+    outline: 3px solid var(--color-sol);
     outline-offset: 3px;
   }
   ::selection {
-    background: var(--color-amarillo);
+    background: var(--color-sol);
     color: var(--color-fachada);
   }
 }
