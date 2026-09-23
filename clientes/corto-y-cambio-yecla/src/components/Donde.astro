@@ -1,0 +1,113 @@
+---
+import Icono from './Icono.astro';
+import { ficha } from '../lib/datos';
+import { direccionCompleta } from '@plantilla/lib/ficha';
+import { trazoC, GROSOR } from '../lib/marca';
+
+/* Dónde estamos. Nombre y dirección idénticos a su ficha de Google («Corto Y Cambio»,
+   «C. de S. Ramón, 172»). «Cómo llegar» abre la ruta; «Ver en Google», su ficha.
+   El mapa solo se carga al pulsar: no pesa en la primera carga ni trae cookies de Google. */
+const [lat, lng] = ficha.coordenadas;
+const srcMapa = `https://www.google.com/maps?q=${lat},${lng}&z=17&hl=es&output=embed`;
+const comoLlegar = `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`;
+---
+
+<section id="donde" class="contenedor py-14 md:py-20" aria-labelledby="donde-titulo">
+  <div class="rejilla">
+    <div>
+      <h2 id="donde-titulo" class="titulo-piedra m-0 text-[clamp(2.1rem,4.6vw,3.25rem)]">Dónde estamos</h2>
+      <div class="mt-6 flex items-start gap-5">
+        <!-- La fachada en pequeño: negra, con la C amarilla en el cristal y el zócalo de piedra. -->
+        <svg class="fachada-mini shrink-0" viewBox="0 0 88 110" aria-hidden="true" focusable="false">
+          <rect width="88" height="110" fill="#0d0505" />
+          <rect x="22" y="26" width="44" height="66" fill="#343434" />
+          <rect y="92" width="88" height="18" fill="#bf9f78" />
+          <rect y="92" width="88" height="2" fill="#f4dcb5" />
+          <svg x="28" y="36" width="32" height="32" viewBox="0 0 100 100">
+            <path d={trazoC()} fill="none" stroke="#f0c806" stroke-width={GROSOR * 1.6} stroke-linecap="butt" />
+          </svg>
+        </svg>
+        <p class="m-0 text-[1.1875rem] leading-snug">Busca la fachada negra con la C amarilla.</p>
+      </div>
+      <address class="mt-6 text-[1.125rem] not-italic leading-snug">
+        <strong class="font-semibold">{ficha.nombre}</strong><br />
+        {direccionCompleta(ficha)}
+      </address>
+      <div class="mt-7 flex flex-wrap gap-3">
+        <a class="boton boton-tinta" href={comoLlegar} target="_blank" rel="noopener">
+          <Icono nombre="ruta" class="size-5" />
+          Cómo llegar
+        </a>
+        <a class="boton boton-contorno" href={ficha.maps_url} target="_blank" rel="noopener">
+          <Icono nombre="google" class="size-5" />
+          Ver en Google
+        </a>
+      </div>
+    </div>
+
+    <div class="mapa" data-mapa data-src={srcMapa}>
+      <div class="mapa-aviso">
+        <Icono nombre="mapa" class="size-9" />
+        <button type="button" class="boton boton-tinta" data-mapa-boton>Ver el mapa</button>
+        <span class="text-[0.9375rem] text-tinta-2">Al abrirlo se carga un mapa de Google.</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  const caja = document.querySelector<HTMLElement>('[data-mapa]');
+  const boton = caja?.querySelector<HTMLButtonElement>('[data-mapa-boton]');
+  if (caja && boton) {
+    boton.addEventListener('click', () => {
+      const iframe = document.createElement('iframe');
+      iframe.src = caja.dataset.src ?? '';
+      iframe.title = 'Mapa de Google con la situación de Corto Y Cambio';
+      iframe.loading = 'lazy';
+      iframe.referrerPolicy = 'no-referrer-when-downgrade';
+      iframe.className = 'mapa-iframe';
+      caja.replaceChildren(iframe);
+      iframe.focus();
+    });
+  }
+</script>
+
+<style>
+  .rejilla {
+    display: grid;
+    gap: 2.5rem;
+  }
+  @media (min-width: 900px) {
+    .rejilla {
+      grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+      gap: 4rem;
+      align-items: start;
+    }
+  }
+  .fachada-mini { width: 3.5rem; height: auto; }
+  .mapa {
+    position: relative;
+    aspect-ratio: 4 / 3;
+    overflow: hidden;
+    border: 1px solid rgb(13 5 5 / 0.22);
+    background: rgb(244 220 181 / 0.45);
+  }
+  .mapa-aviso {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    padding: 1rem;
+    text-align: center;
+  }
+  .mapa :global(.mapa-iframe) {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    border: 0;
+  }
+</style>

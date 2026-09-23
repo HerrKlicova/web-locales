@@ -1,0 +1,228 @@
+@import "tailwindcss";
+
+/* La página es su fachada: negro arriba, piedra abajo y un solo cambio de material a mitad
+   de página, como la junta entre la fachada y el zócalo. Colores muestreados de la foto de
+   su fachada (propietario, 2023; Street View, febrero de 2024).
+
+   Contrastes medidos (WCAG):
+   - sol #F4DCB5 sobre fachada #0D0505 ........ 15,1:1  texto principal en la mitad negra
+   - sombra #BF9F78 sobre fachada ............. 8,1:1   texto secundario en la mitad negra
+   - fachada sobre amarillo #E6C00F ........... 11,4:1  el botón principal
+   - tinta #0D0505 sobre piedra #DFC49D ....... 12,0:1  texto en la mitad de piedra
+   - tinta-2 #343434 sobre piedra ............. 7,4:1   secundario en la mitad de piedra
+   El amarillo nunca va en texto sobre piedra: no llega a 1,1:1. Allí solo es línea. */
+@theme {
+  --color-fachada: #0d0505; /* negro de la fachada (no negro puro) */
+  --color-placa: #343434; /* gris de la placa del rótulo */
+  --color-amarillo: #e6c00f; /* amarillo del rótulo */
+  --color-amarillo-vivo: #f0c806; /* el más vivo: la línea y la C */
+  --color-sol: #f4dcb5; /* piedra del zócalo al sol */
+  --color-sombra: #bf9f78; /* piedra del zócalo a la sombra */
+  /* El fondo de la mitad de abajo. La piedra al sol se parecía demasiado al crema de
+     Salutem (#F1E9DF): se tira hacia la sombra (60 % sol, 40 % sombra). */
+  --color-piedra: #dfc49d;
+  --color-tinta: #0d0505;
+  --color-tinta-2: #343434;
+
+  --font-rotulo: "Bodoni Moda Variable", "Bodoni 72", Didot, "Bodoni MT", Georgia, serif;
+  --font-texto: "Albert Sans", "Gill Sans", "Segoe UI", system-ui, sans-serif;
+
+  --ease-salida: cubic-bezier(0.22, 1, 0.36, 1);
+  /* El barrido: ease-out cúbico. El de arriba corre casi todo el ancho en los primeros
+     300 ms y el final no se ve; este reparte el recorrido por los 860 ms. */
+  --ease-barrido: cubic-bezier(0.33, 1, 0.68, 1);
+}
+
+@layer base {
+  html {
+    background: var(--color-fachada);
+    scroll-padding-top: 1rem;
+  }
+  body {
+    font-family: var(--font-texto);
+    font-size: 1.0625rem;
+    line-height: 1.55;
+    color: var(--color-sol);
+    background: var(--color-fachada);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    overflow-wrap: break-word;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    html { scroll-behavior: smooth; }
+  }
+  :focus-visible {
+    outline: 3px solid var(--color-amarillo-vivo);
+    outline-offset: 3px;
+  }
+  ::selection {
+    background: var(--color-amarillo);
+    color: var(--color-fachada);
+  }
+}
+
+@layer components {
+/* ---- Materiales ---------------------------------------------------------
+   .fachada: la mitad negra (cabecera, portada, comparador y servicios).
+   .zocalo: la mitad de piedra (horario, reseñas, dudas, dónde y pie). La junta es un
+   filete de piedra al sol: el canto de arriba del zócalo, que es el que coge la luz. */
+.fachada {
+  background: var(--color-fachada);
+  color: var(--color-sol);
+}
+.zocalo {
+  background: var(--color-piedra);
+  color: var(--color-tinta);
+}
+.junta { border-top: 4px solid var(--color-sol); }
+.zocalo :focus-visible { outline-color: var(--color-tinta); }
+.zocalo ::selection { background: var(--color-fachada); color: var(--color-piedra); }
+
+/* ---- Letra --------------------------------------------------------------
+   Bodoni Moda solo en los titulares grandes de la mitad negra, con el tamaño óptico
+   automático: a partir de unos 90 px usa el corte de 96 pt, el de trazo más fino.
+   Albert Sans para todo lo demás, también los titulares de la mitad de piedra. */
+.rotulo {
+  font-family: var(--font-rotulo);
+  font-weight: 400;
+  font-optical-sizing: auto;
+  line-height: 0.98;
+  letter-spacing: -0.012em;
+  text-wrap: balance;
+}
+.titulo-piedra {
+  font-family: var(--font-texto);
+  font-weight: 600;
+  line-height: 1.08;
+  letter-spacing: -0.02em;
+  text-wrap: balance;
+}
+.prosa { max-width: 60ch; text-wrap: pretty; }
+
+.contenedor {
+  width: 100%;
+  max-width: 1240px;
+  margin-inline: auto;
+  padding-inline: 1.25rem;
+}
+@media (min-width: 640px) { .contenedor { padding-inline: 2rem; } }
+@media (min-width: 1024px) { .contenedor { padding-inline: 2.5rem; } }
+
+/* ---- Botones ------------------------------------------------------------
+   Rectos, como la placa del rótulo. El amarillo solo en el principal y solo sobre negro:
+   en la mitad de piedra el botón es negro, un trozo de fachada. */
+.boton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  min-height: 3.25rem;
+  padding: 0.8rem 1.35rem;
+  border-radius: 3px;
+  font-weight: 600;
+  font-size: 1.0625rem;
+  line-height: 1.1;
+  text-align: center;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .boton { transition: background-color 180ms ease-out, color 180ms ease-out, border-color 180ms ease-out; }
+}
+.boton-principal { background: var(--color-amarillo); color: var(--color-fachada); }
+.boton-principal:hover { background: var(--color-amarillo-vivo); }
+.boton-secundario { border: 1.5px solid var(--color-sombra); color: var(--color-sol); }
+.boton-secundario:hover { border-color: var(--color-sol); background: var(--color-placa); }
+.boton-tinta { background: var(--color-fachada); color: var(--color-sol); }
+.boton-tinta:hover { background: var(--color-placa); }
+.boton-contorno { border: 1.5px solid var(--color-tinta); color: var(--color-tinta); }
+.boton-contorno:hover { background: rgb(13 5 5 / 0.07); }
+@media (max-width: 380px) {
+  .boton { font-size: 1rem; padding-inline: 1rem; gap: 0.5rem; }
+}
+
+/* ---- Huecos -------------------------------------------------------------
+   Un dato que falta se ve como hueco a propósito ([PRECIO], [CONFIRMAR]…), no como un
+   fallo: recuadro de trazo discontinuo, letra de la web y el color secundario. */
+.hueco {
+  display: inline-block;
+  padding: 0.12em 0.5em;
+  border: 1px dashed currentColor;
+  border-radius: 2px;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  line-height: 1.5;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+  color: var(--color-sombra);
+}
+.zocalo .hueco { color: var(--color-tinta-2); }
+}
+
+/* ---- El barrido ---------------------------------------------------------
+   El gesto de la web: la línea amarilla del comparador cruza la foto de izquierda a
+   derecha y deja detrás el color. Delante de la línea, la foto en blanco y negro (como su
+   logo); detrás, en color (como su fachada).
+
+   Encima de la foto en color va una capa con la misma imagen en blanco y negro. La capa se
+   desplaza a la derecha (translateX) y su foto, al revés, lo mismo a la izquierda: la foto
+   se queda quieta y lo que la capa deja atrás es la foto en color de debajo. Solo transform,
+   nunca clip-path. La línea es el borde izquierdo de la capa.
+
+   La capa no existe (display: none) si no hay movimiento: sin JavaScript en la portada,
+   sin soporte de animation-timeline en las fotos de sección o con reducción de movimiento,
+   se ve la foto en color y quieta. */
+.barrido {
+  position: relative;
+  overflow: hidden;
+}
+.barrido-capa {
+  display: none;
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+.barrido-capa::before {
+  content: "";
+  position: absolute;
+  inset-block: 0;
+  left: 0;
+  z-index: 1;
+  width: 3px;
+  background: var(--color-amarillo-vivo);
+}
+.barrido-foto {
+  position: absolute;
+  inset: 0;
+}
+.barrido-foto img { filter: grayscale(1); }
+
+@keyframes barrido-capa {
+  from { transform: translateX(0); }
+  to { transform: translateX(100%); }
+}
+@keyframes barrido-foto {
+  from { transform: translateX(0); }
+  to { transform: translateX(-100%); }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  /* Portada: una vez, cuando la foto ya está pintada (el script añade .barre). */
+  .js .barrido-portada .barrido-capa { display: block; }
+  .js .barrido-portada.barre .barrido-capa { animation: barrido-capa 860ms var(--ease-barrido) both; }
+  .js .barrido-portada.barre .barrido-foto { animation: barrido-foto 860ms var(--ease-barrido) both; }
+
+  /* Fotos de sección: el mismo barrido, atado al scroll al entrar en pantalla. */
+  @supports (animation-timeline: view()) {
+    .barrido-scroll { view-timeline: --foto block; }
+    .barrido-scroll .barrido-capa,
+    .barrido-scroll .barrido-foto {
+      animation-timing-function: var(--ease-barrido);
+      animation-fill-mode: both;
+      animation-duration: auto;
+      animation-timeline: --foto;
+      animation-range: entry 30% cover 55%;
+    }
+    .barrido-scroll .barrido-capa { display: block; animation-name: barrido-capa; }
+    .barrido-scroll .barrido-foto { animation-name: barrido-foto; }
+  }
+}

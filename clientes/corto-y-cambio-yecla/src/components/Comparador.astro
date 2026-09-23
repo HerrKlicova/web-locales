@@ -1,0 +1,369 @@
+---
+import { getImage } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
+import Marca from './Marca.astro';
+import despuesRubio from '../../fotos/comparador-despues.jpg';
+import antesRubio from '../../fotos/comparador-antes.jpg';
+
+/* EL COMPARADOR: el elemento memorable de la web. Una foto de antes y otra de después,
+   separadas por la línea amarilla, con su C de cuatro trazos de tirador.
+
+   - Se arrastra con el dedo o el ratón, y al tocar en cualquier punto la línea salta allí.
+   - Por debajo hay un <input type="range"> de verdad, etiquetado y manejable con el teclado.
+   - En el móvil no secuestra el scroll: touch-action pan-y en el marco (y pinch-zoom, para
+     no quitar el zoom a quien lo necesita). El arrastre solo empieza si el dedo va más en
+     horizontal que en vertical.
+   - Sin JavaScript se ven las dos fotos, una debajo de la otra, con sus etiquetas.
+   - Admite varias parejas: en producción irán sus antes y después reales. La demo lleva una.
+
+   A la izquierda de la línea, DESPUÉS; a la derecha, ANTES. Es el mismo gesto del barrido:
+   la línea va de izquierda a derecha y lo que deja detrás es el cambio. Por eso la capa que
+   se mueve es la de ANTES (transform, como el barrido; aquí la mueve el usuario, no una
+   animación). */
+
+interface Pareja {
+  id: string;
+  /** Nombre del botón si hay más de una pareja. */
+  nombre: string;
+  antes: ImageMetadata;
+  despues: ImageMetadata;
+  altAntes: string;
+  altDespues: string;
+  /** Imagen generada: lleva «Imagen de muestra» encima, bien visible. */
+  muestra: boolean;
+}
+
+const PAREJAS: Pareja[] = [
+  {
+    id: 'rubio',
+    nombre: 'Rubio natural',
+    antes: antesRubio,
+    despues: despuesRubio,
+    altAntes: 'Antes: melena larga de espaldas en castaño oscuro, plano y sin brillo, con la raíz crecida y las puntas encrespadas',
+    altDespues: 'Después: la misma melena en un rubio natural luminoso, con la base algo más oscura y las puntas sanas',
+    muestra: true,
+  },
+];
+
+const ANCHOS_45 = [480, 720, 960, 1080];
+const ANCHOS_169 = [800, 1200, 1600, 2000, 2560];
+const TAM_169 = '100vw';
+
+async function fuentes(src: ImageMetadata) {
+  const [a45, w45, a169, w169] = await Promise.all([
+    getImage({ src, format: 'avif', widths: ANCHOS_45, width: 1080, height: 1350, fit: 'cover', position: 'center', quality: 52 }),
+    getImage({ src, format: 'webp', widths: ANCHOS_45, width: 1080, height: 1350, fit: 'cover', position: 'center', quality: 64 }),
+    getImage({ src, format: 'avif', widths: ANCHOS_169, width: 2560, quality: 52 }),
+    getImage({ src, format: 'webp', widths: ANCHOS_169, width: 2560, quality: 64 }),
+  ]);
+  return { a45, w45, a169, w169, ancho: src.width, alto: src.height };
+}
+
+const parejas = await Promise.all(
+  PAREJAS.map(async (p) => ({ ...p, fa: await fuentes(p.antes), fd: await fuentes(p.despues) })),
+);
+---
+
+<section id="cambio" class="pt-4 pb-16 md:pb-24" aria-labelledby="cambio-titulo">
+  <div class="contenedor cabeza">
+    <h2 id="cambio-titulo" class="rotulo m-0 text-[clamp(2.6rem,6.4vw,5.25rem)] text-sol">Luz, movimiento y dimensión.</h2>
+    <div class="grid gap-4 text-[1.125rem] leading-[1.55]">
+      <p class="prosa m-0">Respetando siempre tu base natural, para que el color se vea tuyo y sea fácil de mantener.</p>
+      <p class="prosa m-0 text-sombra">
+        ¿Te hicieron unas mechas que no te gustan, o un tinte que quedó demasiado oscuro? Se arregla. Lo miramos contigo
+        antes de tocar nada, porque cada cabello es un mundo.
+      </p>
+    </div>
+  </div>
+
+  {parejas.length > 1 && (
+    <div class="contenedor mt-8 flex flex-wrap gap-2" role="group" aria-label="Elegir un cambio" data-selector>
+      {parejas.map((p, i) => (
+        <button type="button" class="boton boton-secundario" aria-pressed={i === 0 ? 'true' : 'false'} data-ver={p.id}>
+          {p.nombre}
+        </button>
+      ))}
+    </div>
+  )}
+
+  {parejas.map((p) => (
+    <figure class="comparador m-0 mt-10 md:mt-14" data-comparador data-pareja={p.id}>
+      <div class="marco" data-marco style="--pos: 0.5">
+        <div class="lado lado-antes">
+          <div class="lado-foto">
+            <picture>
+              <source media="(min-width: 768px)" type="image/avif" srcset={p.fa.a169.srcSet.attribute} sizes={TAM_169} width={p.fa.ancho} height={p.fa.alto} />
+              <source media="(min-width: 768px)" type="image/webp" srcset={p.fa.w169.srcSet.attribute} sizes={TAM_169} width={p.fa.ancho} height={p.fa.alto} />
+              <source type="image/avif" srcset={p.fa.a45.srcSet.attribute} sizes="100vw" width="1080" height="1350" />
+              <img src={p.fa.w45.src} srcset={p.fa.w45.srcSet.attribute} sizes="100vw" width="1080" height="1350" alt={p.altAntes} loading="lazy" decoding="async" draggable="false" />
+            </picture>
+            <span class="etiqueta etiqueta-antes">Antes</span>
+          </div>
+        </div>
+        <div class="lado lado-despues">
+          <div class="lado-foto">
+            <picture>
+              <source media="(min-width: 768px)" type="image/avif" srcset={p.fd.a169.srcSet.attribute} sizes={TAM_169} width={p.fd.ancho} height={p.fd.alto} />
+              <source media="(min-width: 768px)" type="image/webp" srcset={p.fd.w169.srcSet.attribute} sizes={TAM_169} width={p.fd.ancho} height={p.fd.alto} />
+              <source type="image/avif" srcset={p.fd.a45.srcSet.attribute} sizes="100vw" width="1080" height="1350" />
+              <img src={p.fd.w45.src} srcset={p.fd.w45.srcSet.attribute} sizes="100vw" width="1080" height="1350" alt={p.altDespues} loading="lazy" decoding="async" draggable="false" />
+            </picture>
+            <span class="etiqueta etiqueta-despues">Después</span>
+          </div>
+        </div>
+        <div class="carril" aria-hidden="true">
+          <span class="tirador"><Marca class="tirador-c" /></span>
+        </div>
+        {p.muestra && <p class="muestra">Imagen de muestra</p>}
+      </div>
+      <label class="sr-only" for={`rango-${p.id}`}>Comparar antes y después</label>
+      <input
+        id={`rango-${p.id}`}
+        class="rango"
+        type="range"
+        min="0"
+        max="100"
+        step="1"
+        value="50"
+        aria-valuetext="50 % antes, 50 % después"
+        data-rango
+      />
+      <figcaption class="contenedor mt-4 text-[0.9375rem] text-sombra">
+        <span class="solo-js">Arrastra la línea y observa el cambio.</span>
+        <span class="sin-js">Antes y después.</span>
+      </figcaption>
+    </figure>
+  ))}
+</section>
+
+<script>
+  function texto(pct: number) {
+    if (pct <= 0) return 'Todo antes';
+    if (pct >= 100) return 'Todo después';
+    return `${100 - pct} % antes, ${pct} % después`;
+  }
+
+  for (const figura of document.querySelectorAll<HTMLElement>('[data-comparador]')) {
+    const marco = figura.querySelector<HTMLElement>('[data-marco]');
+    const rango = figura.querySelector<HTMLInputElement>('[data-rango]');
+    if (!marco || !rango) continue;
+
+    const poner = (v: number) => {
+      const p = Math.min(1, Math.max(0, v));
+      marco.style.setProperty('--pos', String(p));
+      const pct = Math.round(p * 100);
+      rango.value = String(pct);
+      rango.setAttribute('aria-valuetext', texto(pct));
+    };
+    const desdeX = (x: number) => {
+      const r = marco.getBoundingClientRect();
+      poner((x - r.left) / r.width);
+    };
+
+    rango.addEventListener('input', () => poner(Number(rango.value) / 100));
+
+    // Ratón: arrastra desde que se pulsa. Dedo: solo si el gesto es horizontal; si es vertical,
+    // el navegador hace scroll (touch-action: pan-y) y llega pointercancel. Un toque sin
+    // arrastre lleva la línea a ese punto.
+    let arrastrando = false;
+    let toque: { x: number; y: number; id: number } | null = null;
+
+    marco.addEventListener('pointerdown', (e) => {
+      if (e.pointerType === 'mouse') {
+        if (e.button !== 0) return;
+        e.preventDefault();
+        arrastrando = true;
+        marco.setPointerCapture(e.pointerId);
+        desdeX(e.clientX);
+      } else {
+        toque = { x: e.clientX, y: e.clientY, id: e.pointerId };
+      }
+    });
+    marco.addEventListener('pointermove', (e) => {
+      if (arrastrando) {
+        desdeX(e.clientX);
+        return;
+      }
+      if (toque && e.pointerId === toque.id) {
+        const dx = Math.abs(e.clientX - toque.x);
+        const dy = Math.abs(e.clientY - toque.y);
+        if (dx > 8 && dx > dy * 1.2) {
+          arrastrando = true;
+          marco.setPointerCapture(e.pointerId);
+          desdeX(e.clientX);
+        }
+      }
+    });
+    // Solo es un toque si el dedo apenas se ha movido: un deslizamiento vertical que el
+    // navegador no llegue a cancelar no puede acabar moviendo la línea.
+    const soltar = (e: PointerEvent) => {
+      const quieto = toque && Math.hypot(e.clientX - toque.x, e.clientY - toque.y) < 10;
+      if (!arrastrando && toque && e.pointerId === toque.id && e.type === 'pointerup' && quieto) desdeX(e.clientX);
+      arrastrando = false;
+      toque = null;
+    };
+    marco.addEventListener('pointerup', soltar);
+    marco.addEventListener('pointercancel', soltar);
+  }
+
+  // Varias parejas: un botón por pareja y solo se ve una a la vez.
+  const selector = document.querySelector<HTMLElement>('[data-selector]');
+  if (selector) {
+    const figuras = [...document.querySelectorAll<HTMLElement>('[data-comparador]')];
+    const botones = [...selector.querySelectorAll<HTMLButtonElement>('[data-ver]')];
+    const ver = (id: string) => {
+      figuras.forEach((f) => (f.hidden = f.dataset.pareja !== id));
+      botones.forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.ver === id)));
+    };
+    botones.forEach((b) => b.addEventListener('click', () => ver(b.dataset.ver ?? '')));
+    ver(botones[0]?.dataset.ver ?? '');
+  }
+</script>
+
+<style>
+  .cabeza {
+    display: grid;
+    gap: 1.5rem;
+  }
+  @media (min-width: 1024px) {
+    .cabeza {
+      grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+      gap: 3rem;
+      align-items: end;
+    }
+  }
+
+  /* ---- Sin JavaScript: las dos fotos, una debajo de la otra ---- */
+  .marco {
+    position: relative;
+    display: grid;
+    gap: 0.75rem;
+  }
+  .lado-foto {
+    position: relative;
+    aspect-ratio: 4 / 5;
+    background: var(--color-placa);
+  }
+  @media (min-width: 768px) {
+    .lado-foto { aspect-ratio: 16 / 9; }
+  }
+  .lado-foto img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    user-select: none;
+    -webkit-user-drag: none;
+  }
+  .etiqueta {
+    position: absolute;
+    top: 1rem;
+    left: 1rem;
+    padding: 0.3rem 0.7rem;
+    border-radius: 2px;
+    background: rgb(13 5 5 / 0.82);
+    color: var(--color-sol);
+    font-size: 0.9375rem;
+    font-weight: 600;
+    line-height: 1.3;
+  }
+  .muestra {
+    position: absolute;
+    left: 1rem;
+    bottom: 1rem;
+    z-index: 3;
+    margin: 0;
+    padding: 0.45rem 0.8rem;
+    border-radius: 2px;
+    background: var(--color-sol);
+    color: var(--color-fachada);
+    font-size: 0.9375rem;
+    font-weight: 600;
+    line-height: 1.2;
+    pointer-events: none;
+  }
+  .carril,
+  .rango,
+  .solo-js { display: none; }
+
+  /* ---- Con JavaScript: una sobre otra y la línea en medio ---- */
+  :global(.js) .solo-js { display: inline; }
+  :global(.js) .sin-js { display: none; }
+  :global(.js) .marco {
+    display: grid;
+    gap: 0;
+    overflow: hidden;
+    touch-action: pan-y pinch-zoom;
+    cursor: ew-resize;
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+  @media (min-width: 768px) {
+    /* A todo el ancho, pero sin pasarse del alto de la pantalla. */
+    :global(.js) .lado-foto { max-height: 88svh; width: 100%; }
+  }
+  :global(.js) .lado,
+  :global(.js) .carril { grid-area: 1 / 1; }
+  :global(.js) .lado-antes {
+    z-index: 1;
+    overflow: hidden;
+    transform: translateX(calc(var(--pos) * 100%));
+  }
+  :global(.js) .lado-antes > .lado-foto {
+    transform: translateX(calc(var(--pos) * -100%));
+  }
+  :global(.js) .etiqueta-antes { left: auto; right: 1rem; }
+
+  :global(.js) .carril {
+    display: block;
+    position: relative;
+    z-index: 2;
+    pointer-events: none;
+    transform: translateX(calc(var(--pos) * 100%));
+  }
+  :global(.js) .carril::before {
+    content: "";
+    position: absolute;
+    inset-block: 0;
+    left: -1.5px;
+    width: 3px;
+    background: var(--color-amarillo-vivo);
+  }
+  /* El tirador: su C amarilla sobre un disco negro, como la del cristal de la puerta.
+     4 rem de diámetro: por encima de los 44 px de objetivo táctil. */
+  .tirador {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    display: grid;
+    place-items: center;
+    width: 4rem;
+    height: 4rem;
+    border-radius: 50%;
+    background: var(--color-fachada);
+    color: var(--color-amarillo-vivo);
+    transform: translate(-50%, -50%);
+    box-shadow: 0 0 0 1.5px var(--color-amarillo-vivo);
+  }
+  .tirador :global(.tirador-c) { width: 2.9rem; height: 2.9rem; }
+
+  /* El range de verdad: invisible, pero se puede enfocar con el tabulador y mover con las
+     flechas. Cuando tiene el foco, el anillo se ve en el tirador. */
+  :global(.js) .rango {
+    display: block;
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: 0;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+    opacity: 0;
+  }
+  .comparador { position: relative; }
+  .comparador:has(.rango:focus-visible) .tirador {
+    outline: 3px solid var(--color-sol);
+    outline-offset: 4px;
+  }
+</style>

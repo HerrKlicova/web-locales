@@ -1,0 +1,58 @@
+---
+import '@fontsource-variable/bodoni-moda/opsz.css';
+import '@fontsource/albert-sans/latin-400.css';
+import '@fontsource/albert-sans/latin-600.css';
+import '../styles/global.css';
+import bodoni from '@fontsource-variable/bodoni-moda/files/bodoni-moda-latin-opsz-normal.woff2?url';
+import albert400 from '@fontsource/albert-sans/files/albert-sans-latin-400-normal.woff2?url';
+import { ORIGEN_DEMO } from '../lib/datos';
+
+interface Props {
+  titulo: string;
+  descripcion: string;
+  /** Demo: noindex, sin sitemap, sin formulario (§9). */
+  demo?: boolean;
+  schema?: Record<string, unknown>;
+}
+const { titulo, descripcion, demo = true, schema } = Astro.props;
+// En demo la web cuelga de /<slug>-<token>; los estáticos de public/ necesitan ese prefijo.
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+// La tarjeta de WhatsApp necesita la imagen con URL absoluta: el dominio del cliente en
+// producción y el del Worker de las demos si no.
+const origen = Astro.site?.origin ?? ORIGEN_DEMO;
+const imagenOg = new URL(`${base}/og.png`, origen).href;
+---
+
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{titulo}</title>
+    <meta name="description" content={descripcion} />
+    {demo && <meta name="robots" content="noindex, nofollow" />}
+    <meta name="theme-color" content="#0d0505" />
+    <link rel="icon" href={`${base}/favicon.svg`} type="image/svg+xml" />
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="es_ES" />
+    <meta property="og:title" content={titulo} />
+    <meta property="og:description" content={descripcion} />
+    <meta property="og:image" content={imagenOg} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="La C amarilla de cuatro trazos de Corto Y Cambio sobre su fachada negra" />
+    <link rel="preload" as="font" type="font/woff2" href={bodoni} crossorigin />
+    <link rel="preload" as="font" type="font/woff2" href={albert400} crossorigin />
+    <!-- Antes de pintar: con JavaScript la portada lleva la capa del barrido; sin él, foto en color. -->
+    <script is:inline>document.documentElement.classList.add('js')</script>
+    {schema && <script type="application/ld+json" set:html={JSON.stringify(schema)} />}
+  </head>
+  <body class="min-h-dvh">
+    <a
+      href="#contenido"
+      class="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-50 focus:inline-flex focus:min-h-11 focus:items-center focus:rounded-[3px] focus:bg-amarillo focus:px-4 focus:py-2 focus:font-semibold focus:text-fachada"
+      >Ir al contenido</a
+    >
+    <slot />
+  </body>
+</html>

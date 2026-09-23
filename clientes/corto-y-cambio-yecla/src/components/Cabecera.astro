@@ -1,0 +1,44 @@
+---
+import Marca from './Marca.astro';
+import { ficha, telefonoVisible } from '../lib/datos';
+import { enlaceTelefono } from '@plantilla/lib/ficha';
+
+/* El rótulo de su fachada: la C amarilla del cristal de la puerta y «corto & cambio» en
+   minúsculas, con «Alberto Rico» debajo. En su rótulo el nombre va en letra manuscrita; aquí
+   va con la letra de texto hasta tener su logo en vectorial (Víctor ya usa cursiva). */
+---
+
+<header class="contenedor flex items-center justify-between gap-6 py-4 md:py-6">
+  <p class="m-0 flex items-center gap-3">
+    <Marca class="size-11 shrink-0 text-amarillo-vivo md:size-12" />
+    <span class="flex flex-col leading-none">
+      <span class="text-[1.3125rem] font-semibold tracking-[-0.01em] text-sol md:text-[1.4375rem]">corto &amp; cambio</span>
+      <span class="mt-1.5 text-[0.875rem] text-sombra">Alberto Rico</span>
+    </span>
+  </p>
+
+  <nav aria-label="Secciones" class="hidden items-center gap-1 md:flex">
+    <a class="enlace-cabecera" href="#servicios">Servicios</a>
+    <a class="enlace-cabecera" href="#horario">Horario</a>
+    <a class="enlace-cabecera" href="#donde">Dónde estamos</a>
+    <a class="enlace-cabecera ml-2 font-semibold text-sol" href={enlaceTelefono(ficha)}>{telefonoVisible(ficha.telefono)}</a>
+  </nav>
+</header>
+
+<style>
+  .enlace-cabecera {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.75rem;
+    padding-inline: 0.75rem;
+    color: var(--color-sombra);
+    text-decoration: underline;
+    text-decoration-color: transparent;
+    text-underline-offset: 0.35em;
+    text-decoration-thickness: 1.5px;
+  }
+  .enlace-cabecera:hover {
+    color: var(--color-sol);
+    text-decoration-color: var(--color-amarillo-vivo);
+  }
+</style>

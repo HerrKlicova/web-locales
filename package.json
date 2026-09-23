@@ -11,7 +11,10 @@
   },
   "dependencies": {
     "@astrojs/sitemap": "^3.7.4",
+    "@fontsource-variable/bodoni-moda": "^5.3.0",
+    "@fontsource/albert-sans": "^5.3.0",
     "@fontsource/alegreya-sans": "^5.3.0",
+    "@fontsource/bodoni-moda": "^5.3.0",
     "@fontsource/fraunces": "^5.3.0",
     "@fontsource/hanken-grotesk": "^5.3.0",
     "@fontsource/manrope": "^5.3.0",

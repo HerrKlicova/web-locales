@@ -1,0 +1,101 @@
+---
+import Icono from './Icono.astro';
+import { ficha, INSTAGRAM, telefonoVisible } from '../lib/datos';
+import { enlaceWhatsapp, enlaceTelefono, direccionCompleta } from '@plantilla/lib/ficha';
+
+interface Props { demo?: boolean }
+const { demo = true } = Astro.props;
+/* En producción se rellenan titular y NIF con los datos reales del cliente (§9). */
+const titular = '[TITULAR]';
+const nif = '[NIF]';
+const whatsapp = enlaceWhatsapp(ficha, 'Hola, quería pedir cita en Corto y Cambio.');
+---
+
+<footer class="contenedor pt-16 pb-[calc(6.5rem+env(safe-area-inset-bottom))] md:pt-20 md:pb-14">
+  <!-- La despedida, una sola vez. -->
+  <p class="titulo-piedra m-0 text-[clamp(2.6rem,7vw,5rem)]">Corto y cambio.</p>
+
+  <div class="rejilla mt-10 border-t border-[rgb(13_5_5/0.22)] pt-8">
+    <div>
+      <!-- Nombre y dirección idénticos a su ficha de Google. -->
+      <p class="m-0 font-semibold">{ficha.nombre}</p>
+      <p class="m-0 mt-1 text-tinta-2">{direccionCompleta(ficha)}</p>
+      <div class="mt-5 flex flex-wrap gap-3">
+        <a class="boton boton-tinta" href={whatsapp} target="_blank" rel="noopener">
+          <Icono nombre="whatsapp" class="size-5" />
+          WhatsApp
+        </a>
+        <a class="boton boton-contorno" href={enlaceTelefono(ficha)}>
+          <Icono nombre="telefono" class="size-5" />
+          {telefonoVisible(ficha.telefono)}
+        </a>
+        <a class="boton boton-contorno" href={INSTAGRAM} target="_blank" rel="noopener">
+          <Icono nombre="instagram" class="size-5" />
+          Instagram
+        </a>
+      </div>
+    </div>
+
+    <div class="text-[0.9375rem] text-tinta-2">
+      <p class="m-0 font-semibold text-tinta">Horario</p>
+      {ficha.horario.map((h) => <p class="m-0 mt-1">{h.dias}: {h.horas}</p>)}
+    </div>
+  </div>
+
+  <div class="mt-10 border-t border-[rgb(13_5_5/0.22)] pt-5 text-[0.9375rem] text-tinta-2">
+    <div class="flex flex-wrap gap-x-6 gap-y-1">
+      <details>
+        <summary class="legal">Aviso legal</summary>
+        <div class="prosa mt-2 mb-4 space-y-2">
+          <p>Titular de esta web: {titular}, con NIF {nif} y domicilio en {direccionCompleta(ficha)}. Teléfono: {ficha.telefono}.</p>
+          <p>Los textos, las fotos y la marca de esta web pertenecen a su titular. No se permite copiarlos sin permiso.</p>
+        </div>
+      </details>
+      <details>
+        <summary class="legal">Privacidad</summary>
+        <div class="prosa mt-2 mb-4 space-y-2">
+          <p>
+            Esta web no tiene formularios ni guarda datos personales. Si escribes por WhatsApp o Instagram, o llamas, tus
+            datos los trata {titular} solo para atender tu petición y darte cita, según el Reglamento (UE) 2016/679.
+          </p>
+          <p>Puedes pedir acceso, corrección o borrado de tus datos por los mismos canales.</p>
+        </div>
+      </details>
+      <details>
+        <summary class="legal">Cookies</summary>
+        <div class="prosa mt-2 mb-4 space-y-2">
+          <p>Esta web no usa cookies propias ni de seguimiento. Si pulsas «Ver el mapa», se carga un mapa de Google y Google puede usar las suyas.</p>
+        </div>
+      </details>
+    </div>
+    {demo && (
+      <p class="m-0 mt-4">Imágenes de muestra: las fotos de esta página no son del salón.</p>
+    )}
+    {/* §10: el crédito de la marca solo va en producción y si el cliente lo acepta. */}
+  </div>
+</footer>
+
+<style>
+  .rejilla {
+    display: grid;
+    gap: 2rem;
+  }
+  @media (min-width: 900px) {
+    .rejilla {
+      grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+      gap: 4rem;
+    }
+  }
+  .legal {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.75rem;
+    cursor: pointer;
+    list-style: none;
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.25em;
+  }
+  .legal::-webkit-details-marker { display: none; }
+  .legal:hover { color: var(--color-tinta); }
+</style>

@@ -1,0 +1,30 @@
+---
+/**
+ * Su marca: una C de cuatro trazos concéntricos (y en la versión en blanco y negro, dos: «CC»).
+ * Medidas en src/lib/marca.ts. Es su logo: pendiente de pedirles el vectorial y permiso.
+ */
+import { trazoC, GROSOR, DESPLAZAMIENTO_CC } from '../lib/marca';
+
+interface Props {
+  doble?: boolean;
+  class?: string;
+  /** Si se da, el SVG se anuncia como imagen con este nombre; si no, es decorativo. */
+  titulo?: string;
+}
+const { doble = false, class: clase, titulo } = Astro.props;
+---
+
+<svg
+  class={clase}
+  viewBox={doble ? `0 0 ${100 + DESPLAZAMIENTO_CC} 100` : '0 0 100 100'}
+  fill="none"
+  stroke="currentColor"
+  stroke-width={GROSOR}
+  stroke-linecap="butt"
+  role={titulo ? 'img' : undefined}
+  aria-label={titulo}
+  aria-hidden={titulo ? undefined : 'true'}
+  focusable="false"
+>
+  <path d={trazoC(doble)}></path>
+</svg>
