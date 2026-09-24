@@ -59,7 +59,7 @@ const fotos = [
 ];
 
 const precarga = [
-  { srcset: preMovil.srcSet.attribute, sizes: 'min(100vw, calc((100svh - 22rem) * 0.8))', tipo: 'image/avif', media: '(max-aspect-ratio: 1/1)' },
+  { srcset: preMovil.srcSet.attribute, sizes: '(max-width: 600px) 100vw, min(100vw, calc((100svh - 22rem) * 0.8))', tipo: 'image/avif', media: '(max-aspect-ratio: 1/1)' },
   { srcset: preEscritorio.srcSet.attribute, sizes: 'max(112vw, 199svh)', tipo: 'image/avif', media: '(min-aspect-ratio: 1001/1000)' },
 ];
 ---

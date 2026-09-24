@@ -55,7 +55,7 @@ const finalMovilAvif = await imagen(final.movil, 'avif', ANCHOS_MOVIL);
 
 // Los mismos tamaños que la precarga de index.astro: si no casan, el navegador baja dos veces.
 const SIZES_ESCRITORIO = 'max(112vw, 199svh)';
-const SIZES_MOVIL = 'min(100vw, calc((100svh - 22rem) * 0.8))';
+const SIZES_MOVIL = '(max-width: 600px) 100vw, min(100vw, calc((100svh - 22rem) * 0.8))';
 ---
 
 <section class="capo" aria-labelledby="capo-titulo" data-capo>
@@ -337,8 +337,8 @@ const SIZES_MOVIL = 'min(100vw, calc((100svh - 22rem) * 0.8))';
      negro; abajo el marco 4:5 del coche a todo lo ancho. Un 16:9 cubriendo una pantalla vertical
      tendría que ampliarse tanto que cortaría el coche. */
   @media (max-aspect-ratio: 1/1) {
-    /* El marco deja 22 rem arriba para la cabecera y el texto. En un móvil sigue siendo todo el
-       ancho (390 × 844 da 394 px); en una tablet de pie, el coche se centra más pequeño. */
+    /* En una tablet de pie el marco deja 22 rem arriba para la cabecera y el texto, y el coche se
+       centra más pequeño. En el móvil va a todo lo ancho (el bloque siguiente). */
     .capo-escena { --mw: min(100vw, calc((100svh - 22rem) * 0.8)); }
     .capo-marco {
       left: 50%;
@@ -362,8 +362,43 @@ const SIZES_MOVIL = 'min(100vw, calc((100svh - 22rem) * 0.8))';
     .capo-cierre-titulo { font-size: clamp(1.8rem, 8.2vw, 3.2rem); }
   }
 
-  /* Con el coche muy pequeño (móviles bajos, de 320 a 375 px) los nombres de las piezas se pisarían
-     entre sí: se quedan solo los puntos de luz. */
+  /* Móvil de pie: el coche va siempre a todo lo ancho, nunca en recuadro. Con la barra del
+     navegador a la vista quedan 550-750 px de alto y el 4:5 a todo lo ancho no cabe entero debajo
+     del titular: el marco se apoya abajo y el velo tapa de negro lo que queda detrás del texto, y
+     se funde hacia abajo. Al bajar, primero se va el titular, sobre negro; luego el velo se
+     deshace mientras el coche sube entero al centro (el script). */
+  @media (max-aspect-ratio: 1/1) and (max-width: 600px) {
+    /* --zona: dónde acaba el texto del hero (cabecera, titular en tres líneas a 8,6vw, entradilla,
+       botones y nota), medido de 320 a 430 px de ancho. */
+    .capo-escena { --mw: 100vw; --zona: calc(16.5rem + 26vw); }
+    /* Si el coche no cabe debajo del texto, se hunde hasta un 8 % de su alto: se pierde suelo y
+       se gana capó. */
+    .capo-marco { bottom: calc(-1 * clamp(0px, var(--mw) * 1.25 - 100svh + var(--zona), 10vw)); }
+    .capo-velo {
+      background: linear-gradient(to bottom, var(--color-negro) 0, var(--color-negro) var(--zona), rgb(0 0 0 / 0.5) calc(var(--zona) + 1.8rem), transparent calc(var(--zona) + 4rem));
+    }
+    /* El remate trae su propio negro: si en un móvil bajo el coche no cabe entero debajo, le tapa
+       el borde de arriba en vez de quedar escrito encima del capó. */
+    .capo-cierre::before, .capo-cierre::after {
+      content: '';
+      position: absolute;
+      z-index: -1;
+      left: 0;
+      width: 100vw;
+      pointer-events: none;
+    }
+    .capo-cierre::before { bottom: 0; height: 100svh; background: var(--color-negro); }
+    .capo-cierre::after {
+      top: 100%;
+      height: 4rem;
+      background: linear-gradient(to bottom, var(--color-negro), rgb(0 0 0 / 0.5) 45%, transparent);
+    }
+    /* Al final la cabecera ya se ha ido: el remate sube y deja más sitio al coche. */
+    .capo-cierre { top: 1.75rem; }
+  }
+
+  /* Con el coche muy pequeño (una ventana vertical muy baja; en el móvil va a todo lo ancho y no
+     baja de 320 px) los nombres de las piezas se pisarían entre sí: se quedan solo los puntos de luz. */
   @container (max-width: 300px) {
     .capo-linea, .capo-rotulo { display: none; }
   }
@@ -413,13 +448,23 @@ const SIZES_MOVIL = 'min(100vw, calc((100svh - 22rem) * 0.8))';
     const marco = capo.querySelector<HTMLElement>('[data-marco]')!;
     const velo = capo.querySelector<HTMLElement>('.capo-velo');
     const barra = document.querySelector<HTMLElement>('[data-barra-fija]');
-    // Lo que ocupa la barra fija de abajo (en móvil y tablet), para no bajar el coche debajo de ella.
+    // Lo que ocupa la barra fija de abajo (en móvil y tablet), para no bajar el coche debajo de ella,
+    // y hasta dónde bajan los nombres de las piezas desde el borde de arriba del marco.
     let holgura = 0;
-    const medirBarra = () => { holgura = barra && getComputedStyle(barra).display !== 'none' ? barra.offsetHeight + 8 : 0; };
+    let piezasAbajo = 0;
+    const medir = () => {
+      holgura = barra && getComputedStyle(barra).display !== 'none' ? barra.offsetHeight + 8 : 0;
+      piezasAbajo = Math.max(0, ...piezas.map((pieza) => {
+        const rotulo = pieza.querySelector<HTMLElement>('.capo-rotulo');
+        return pieza.offsetTop + Math.max(12, rotulo ? rotulo.offsetTop + rotulo.offsetHeight : 0);
+      }));
+    };
     // «Vertical» y no «móvil»: una tablet de pie también usa el marco 4:5 (mismo criterio que el CSS).
     // Si la pantalla cambia de orientación (tablet que se gira, ventana que se estrecha), se cambia
     // de vídeo: el recorte 4:5 estirado a 16:9 se vería enorme.
     const vertical = window.matchMedia('(max-aspect-ratio: 1/1)');
+    // En el móvil de pie el marco va a todo lo ancho (mismo criterio que el CSS).
+    const telefono = window.matchMedia('(max-aspect-ratio: 1/1) and (max-width: 600px)');
     let movil = vertical.matches;
     const clamp = (x: number) => Math.min(1, Math.max(0, x));
     const tramo = (p: number, desde: number, hasta: number) => clamp((p - desde) / (hasta - desde));
@@ -447,7 +492,7 @@ const SIZES_MOVIL = 'min(100vw, calc((100svh - 22rem) * 0.8))';
     vertical.addEventListener('change', () => {
       movil = vertical.matches;
       marco.style.transform = '';
-      if (velo) velo.style.transform = '';
+      if (velo) { velo.style.transform = ''; velo.style.opacity = ''; }
       videoListo = false;
       video.classList.remove('lista');
       video.addEventListener('loadeddata', () => { videoListo = true; video.classList.add('lista'); programar(); }, { once: true });
@@ -464,19 +509,36 @@ const SIZES_MOVIL = 'min(100vw, calc((100svh - 22rem) * 0.8))';
     const pintar = () => {
       pendiente = false;
       const p = objetivo;
+      // En el móvil de pie el titular se va antes: el coche sube a todo lo ancho detrás de él.
+      const anchoCompleto = movil && telefono.matches;
+      const finTitular = anchoCompleto ? 0.2 : 0.3;
 
-      // 1. El titular sube y se apaga en el primer tercio.
-      const t = salida(tramo(p, 0.04, 0.3));
+      // 1. El titular sube y se apaga en el primer tercio (en el primer quinto, en el móvil). La
+      //    barra fija entra cuando se van los botones del hero.
+      const t = salida(tramo(p, 0.04, finTitular));
       texto.style.transform = `translateY(${-t * 3}rem)`;
       texto.style.opacity = String(1 - t);
       texto.style.visibility = t >= 1 ? 'hidden' : '';
-      document.documentElement.dataset.barra = p > 0.28 ? 'si' : 'no';
+      document.documentElement.dataset.barra = p > finTitular - 0.02 ? 'si' : 'no';
       if (aviso) aviso.style.opacity = String(1 - tramo(p, 0.02, 0.1));
 
       // 1b. En vertical el marco va abajo y el titular arriba. Cuando el titular se va, el coche
       //     sube al centro de la pantalla para abrir el capó ahí, y al final baja otra vez para
       //     dejar sitio al remate.
-      if (movil) {
+      if (anchoCompleto) {
+        // Móvil: el coche, a todo lo ancho, sube hasta quedar entero y centrado encima de la barra
+        // fija; al final baja lo justo para que el remate quepa encima, sin meter los nombres de
+        // las piezas detrás de la barra. Sube cuando el titular ya se ha ido, y a la vez se
+        // deshace el negro que lo tapaba: así el texto nunca se ve encima del coche.
+        const alto = escena.clientHeight - holgura;
+        const centro = (alto - marco.offsetHeight) / 2;
+        const tope = alto - piezasAbajo - 8;
+        const fin = cierre ? Math.max(centro, Math.min(cierre.offsetTop + cierre.offsetHeight, tope)) : centro;
+        const sube = salida(tramo(p, 0.16, 0.32));
+        const baja = salida(tramo(p, 0.82, 0.95));
+        marco.style.transform = `translateY(${(centro - marco.offsetTop) * sube + (fin - centro) * baja}px)`;
+        if (velo) velo.style.opacity = String(1 - sube);
+      } else if (movil) {
         const hueco = Math.max(0, escena.clientHeight - marco.offsetHeight);
         const sube = salida(tramo(p, 0.04, 0.3));
         const baja = salida(tramo(p, 0.82, 0.95));
@@ -515,12 +577,18 @@ const SIZES_MOVIL = 'min(100vw, calc((100svh - 22rem) * 0.8))';
       requestAnimationFrame(pintar);
     }
     const alScroll = () => { objetivo = avance(); programar(); };
-    window.addEventListener('resize', medirBarra, { passive: true });
+    telefono.addEventListener('change', () => {
+      marco.style.transform = '';
+      if (velo) { velo.style.transform = ''; velo.style.opacity = ''; }
+      medir();
+      alScroll();
+    });
+    window.addEventListener('resize', medir, { passive: true });
     video.addEventListener('seeked', programar);
     window.addEventListener('scroll', alScroll, { passive: true });
     window.addEventListener('resize', alScroll, { passive: true });
     // La primera lectura, en el siguiente fotograma: leer medidas nada más cargar obligaría al
     // navegador a maquetar antes de tiempo.
-    requestAnimationFrame(() => { medirBarra(); alScroll(); });
+    requestAnimationFrame(() => { medir(); alScroll(); });
   }
 </script>

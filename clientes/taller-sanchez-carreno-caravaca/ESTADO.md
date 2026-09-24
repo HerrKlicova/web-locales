@@ -29,7 +29,8 @@ mantiene la escena del capó y el cuadro; cambia todo lo demás.
 1. **Cabecera** (`Cabecera.astro`): insignia y nombre; en escritorio, fija, con anclas, teléfono y
    «Pedir cita» (su frase de la bio), en línea sobre el capó y en rojo al salir de él.
 2. **El capó** (`Capo.astro`): igual que antes, en B/N; marco vertical u horizontal según la
-   **orientación** (no el ancho); con el coche pequeño solo quedan los puntos de luz.
+   **orientación** (no el ancho). En el móvil de pie el coche va siempre a todo lo ancho (ver
+   «Móvil: el capó a todo lo ancho»); en la tablet de pie, centrado y más pequeño.
 3. **El cuadro** (`Cuadro.astro`): testigos rojos, el de motor en ámbar.
 4. **Lo que hacemos** (`Trabajos.astro`): foto con la persiana que sube (solo transform).
 5. **Horario** (`Horario.astro`): esfera de 24 h, tramo 7-15 encendido y aguja con la hora de
@@ -90,6 +91,27 @@ idénticas a lo publicado antes de subir y siguen bien a 390 y 1440 px)
 - Fotos: el título pasa de «La nave» a «El taller» y el aviso queda en «Fotografías de muestra.»
 - Preguntas: fuera la pregunta en inglés (reseña de Dominic Olds).
 - Instagram: «…y lo que va pasando por el taller» (antes, «por la nave»).
+
+### Móvil: el capó a todo lo ancho (24/09/2026) — sin publicar todavía
+Eugenio lo veía en recuadro. El ancho del marco salía de lo que cabía debajo del texto, y con la
+barra del navegador a la vista (550-750 px de alto útil) el coche se quedaba en 160-340 px de ancho,
+con franjas negras a los lados y, por debajo de 300 px, sin los nombres de las piezas.
+- Móvil de pie (hasta 600 px de ancho): el marco 4:5 va siempre a todo lo ancho, apoyado abajo. El
+  velo tapa de negro lo que cae detrás del texto (`--zona`) y se funde hacia abajo.
+- Al bajar, el titular se va antes que en escritorio (hasta el 20 % del recorrido), sobre negro;
+  del 16 % al 32 % el velo se deshace y el coche sube entero al centro, encima de la barra fija, que
+  entra cuando se van los botones del hero. El texto nunca se ve encima del coche.
+- Al final baja lo justo para que quepa el remate encima sin meter los nombres de las piezas detrás
+  de la barra; en los móviles más bajos (SE) el negro del remate le tapa el borde de arriba.
+- Movimiento reducido y sin JS: el mismo hero, también a todo lo ancho. Tablet de pie y
+  escritorio, sin cambios.
+- Comprobado en 320 × 500, 360 × 672, 375 × 548, 390 × 664, 412 × 780 y 430 × 746 (alto útil con la
+  barra del navegador), en tablet 768 × 1024 y en escritorio: sin errores de consola y con los
+  nombres de las piezas siempre por encima de la barra. Lighthouse móvil servido con gzip:
+  rendimiento 100, LCP 1,8 s (ahora es la foto del hero, 29 KB), CLS 0.
+- El vídeo de móvil es de 720 × 900: a todo lo ancho, en un móvil de 3x, se amplía ×1,6. Si se ve
+  blando, se saca a 864 × 1080 (el recorte sin reducir) quitando `,scale=720:900:flags=lanczos` en
+  `fotos/capo/procesar.sh` y volviendo a pasarlo con `--bn`.
 
 ---
 
