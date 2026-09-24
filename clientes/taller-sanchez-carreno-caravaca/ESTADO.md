@@ -92,7 +92,11 @@ idénticas a lo publicado antes de subir y siguen bien a 390 y 1440 px)
 - Preguntas: fuera la pregunta en inglés (reseña de Dominic Olds).
 - Instagram: «…y lo que va pasando por el taller» (antes, «por la nave»).
 
-### Móvil: el capó a todo lo ancho (24/09/2026) — sin publicar todavía
+### Móvil: el capó a todo lo ancho (24/09/2026) — publicado el 24/09/2026 a las 14:18
+(versión del Worker `9bc7c692…`; solo cambió la página del taller y las otras cinco demos se
+comprobaron idénticas a lo publicado antes de subir. Revisado en la demo: a 390 × 664 el coche va a
+390 px de ancho en el hero, al subir, arriba y con el capó abierto, con los nombres de las piezas
+entre 58 y 200 px por encima de la barra; a 1440 px, igual que antes. Consola limpia.)
 Eugenio lo veía en recuadro. El ancho del marco salía de lo que cabía debajo del texto, y con la
 barra del navegador a la vista (550-750 px de alto útil) el coche se quedaba en 160-340 px de ancho,
 con franjas negras a los lados y, por debajo de 300 px, sin los nombres de las piezas.
