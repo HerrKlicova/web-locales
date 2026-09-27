@@ -1,0 +1,45 @@
+---
+import Icono from './Icono.astro';
+import { ficha } from '../lib/datos';
+import { enlaceWhatsapp } from '@plantilla/lib/ficha';
+
+/** En móvil, botón de WhatsApp fijo abajo a partir de la primera pantalla (§8): un trozo de
+ *  fachada negra con el botón amarillo. Escondido mientras se ve la portada, que ya lo tiene. */
+const enlace = enlaceWhatsapp(ficha, 'Hola, quería pedir cita en Corto y Cambio.');
+---
+
+<div class="barra md:hidden" data-barra-whatsapp>
+  <a class="boton boton-principal w-full" href={enlace} target="_blank" rel="noopener">
+    <Icono nombre="whatsapp" class="size-6" />
+    Pedir cita por WhatsApp
+  </a>
+</div>
+
+<script>
+  const barra = document.querySelector<HTMLElement>('[data-barra-whatsapp]');
+  const portada = document.querySelector<HTMLElement>('[data-portada]');
+  if (barra && portada && 'IntersectionObserver' in window) {
+    // isIntersecting sigue a true mientras asome un píxel de la portada; lo que cuenta es la
+    // proporción: la barra sale cuando queda menos de una quinta parte de portada a la vista.
+    barra.classList.add('escondida');
+    new IntersectionObserver(([e]) => barra.classList.toggle('escondida', e.intersectionRatio >= 0.2), {
+      threshold: [0, 0.2],
+    }).observe(portada);
+  }
+</script>
+
+<style>
+  .barra {
+    position: fixed;
+    inset-inline: 0;
+    bottom: 0;
+    z-index: 40;
+    padding: 0.75rem 1rem max(0.75rem, env(safe-area-inset-bottom));
+    background: var(--color-fachada);
+    border-top: 1px solid var(--color-placa);
+  }
+  .barra.escondida { transform: translateY(110%); }
+  @media (prefers-reduced-motion: no-preference) {
+    .barra { transition: transform 320ms var(--ease-salida); }
+  }
+</style>

@@ -1,0 +1,71 @@
+---
+import Icono from './Icono.astro';
+import { ficha } from '../lib/datos';
+
+/* Reseñas reales de su ficha de Google, copiadas tal cual: con sus faltas, sus saltos de
+   línea y sus dobles espacios (white-space: pre-wrap los respeta). No se añade ninguna.
+   No llevan schema: Google no admite reseñas sobre uno mismo en la web de uno mismo. */
+const valoracion = ficha.valoracion.toLocaleString('es-ES', { minimumFractionDigits: 1 });
+---
+
+<section id="resenas" class="contenedor py-14 md:py-20" aria-labelledby="resenas-titulo">
+  <div class="cabeza">
+    <h2 id="resenas-titulo" class="titulo-piedra m-0 text-[clamp(2.1rem,4.6vw,3.25rem)]">Lo que dicen en Google</h2>
+    <p class="m-0 flex flex-wrap items-center gap-x-2 gap-y-1 text-[1.125rem]">
+      <span class="font-semibold">{valoracion} de 5</span>
+      <span class="text-tinta-2">en {ficha.num_resenas} reseñas.</span>
+      <a class="enlace" href={ficha.maps_url} target="_blank" rel="noopener">Verlas en Google</a>
+    </p>
+  </div>
+
+  <ul class="lista m-0 mt-10 list-none p-0">
+    {ficha.resenas.map((r) => (
+      <li class="resena">
+        <p class="m-0 flex gap-0.5" role="img" aria-label={`${r.estrellas} de 5 estrellas`}>
+          {Array.from({ length: r.estrellas }).map(() => <Icono nombre="estrella" class="size-3.5" />)}
+        </p>
+        <blockquote class="texto m-0 mt-3">{r.texto}</blockquote>
+        <p class="m-0 mt-3 font-semibold text-tinta-2">{r.autor}</p>
+      </li>
+    ))}
+  </ul>
+</section>
+
+<style>
+  .cabeza {
+    display: grid;
+    gap: 1rem;
+  }
+  @media (min-width: 900px) {
+    .cabeza {
+      grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+      gap: 4rem;
+      align-items: end;
+    }
+  }
+  .enlace {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.75rem;
+    font-weight: 600;
+    text-decoration: underline;
+    text-decoration-thickness: 1.5px;
+    text-underline-offset: 0.3em;
+  }
+  .enlace:hover { text-decoration-thickness: 3px; }
+
+  /* Columnas de texto, no tarjetas: cada reseña con su filete arriba. */
+  .lista { columns: 1; column-gap: 3rem; }
+  @media (min-width: 768px) { .lista { columns: 2; } }
+  .resena {
+    break-inside: avoid;
+    padding-block: 1.5rem;
+    border-top: 1px solid rgb(13 5 5 / 0.22);
+  }
+  .texto {
+    font-size: 1.0625rem;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    max-width: 62ch;
+  }
+</style>

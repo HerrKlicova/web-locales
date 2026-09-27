@@ -1,0 +1,49 @@
+{
+  "slug": "corto-y-cambio-yecla",
+  "nombre": "Corto Y Cambio",
+  "tipo": "HairSalon",
+  "pueblo": "Yecla",
+  "direccion": "C. de S. Ramón, 172",
+  "cp": "30510",
+  "telefono": "+34 688 91 05 51",
+  "whatsapp": "+34 688 91 05 51",
+  "maps_url": "https://maps.google.com/?cid=13063694449594035460",
+  "coordenadas": [38.6119986, -1.107164],
+  "horario": [
+    { "dias": "Lunes", "horas": "Cerrado" },
+    { "dias": "Martes a jueves", "horas": "9:00–13:30 y 17:00–21:00" },
+    { "dias": "Viernes", "horas": "9:00–13:30 y 16:00–21:00" },
+    { "dias": "Sábado", "horas": "8:00–14:00" },
+    { "dias": "Domingo", "horas": "Cerrado" }
+  ],
+  "servicios": [
+    { "nombre": "Corte de mujer", "precio": "[PRECIO]" },
+    { "nombre": "Corte de hombre", "precio": "[PRECIO]" },
+    { "nombre": "Corte infantil", "precio": "[PRECIO]" },
+    { "nombre": "Mechas: babylight, balayage, melting", "precio": "[PRECIO]" },
+    { "nombre": "Color y baño de color", "precio": "[PRECIO]" },
+    { "nombre": "Corrección de color", "precio": "[PRECIO]" },
+    { "nombre": "Peinados y recogidos de evento", "precio": "[PRECIO]" },
+    { "nombre": "Novias: peinado y maquillaje", "precio": "[PRECIO]" },
+    { "nombre": "Mantillas y tocados", "precio": "[PRECIO]" },
+    { "nombre": "Keratina y alisado con reconstrucción", "precio": "[PRECIO]" },
+    { "nombre": "Tratamientos capilares", "precio": "[PRECIO]" },
+    { "nombre": "Estética", "precio": "[SERVICIOS DE ESTÉTICA]" }
+  ],
+  "resenas": [
+    { "texto": "Peluqueria 10, personal 10.\nA parte de realizar un trabajo fantástico, Alberto y sus compañeras te harán sentir como en casa, atentos de tus necesidades y propuestas, no fallan!\nCon más de 3 cambios en menos de 2 años, puedo asegurar que realizan un trabajo excelente, tanto en cambios de color, mechas, peinados para eventos, colocación a la perfección de tocados, mantillas, etc.\nRelación calidad precio de 10.\nMi enhorabuena a todo el equipo de corto y cambio, no podéis ser mejores!", "autor": "Lucia Molina Ibañez", "estrellas": 5 },
+    { "texto": "Excelentes profesionales. El trato es muy cercano, se nota que tienen mucha experiencia y siempre están innovando. Lo recomiendo 100%.", "autor": "Elena Ortega Rico", "estrellas": 5 },
+    { "texto": "Después de buscar una peluquería de calidad,y con grandes profesionales por fin la encontré. Corto y Cambio se ajustaron totalmente a mis necesidades; el peinado, mi Keratina quedó justo como quería, incluso superó mis expectativas. Además, el trato fue excelente. Sin duda, después de tanto buscar, me quedo con ellos. Gracias", "autor": "Leydi lorena Mejia villegas", "estrellas": 5 },
+    { "texto": "Muy contenta con todos los servicios que me he realizado en corto y cambio, trato muy amable y sobre todo grandes profesionales. Recomendable 200%", "autor": "Elvira Candela Fernández", "estrellas": 5 },
+    { "texto": "Muy profesional y eficaz. Muy buena  técnica, siempre te escucha y asesora.", "autor": "Ricardo Mesa", "estrellas": 5 },
+    { "texto": "Son muy amables todos, calidad precio muy bien, y puntualidad en su cita perfecto", "autor": "Jose Alfredo Rivero", "estrellas": 5 },
+    { "texto": "Una peluquería muy moderna a la vez que acogedora, la peluquera se porto extremadamente bien con mi hijo ya que era su primer corte de pelo con solo 2 añitos una atencion buenisima y placentera recomondada 100%", "autor": "Jovany Andrade", "estrellas": 5 },
+    { "texto": "Corte rápido y barato. El resultado es exactamente lo que buscaba.", "autor": "Pedro Gálvez", "estrellas": 5 }
+  ],
+  "anio_apertura": null,
+  "fotos_cedidas": false,
+  "notas": "Datos de su ficha de Google, 23-09-2026. Nombre en Google: 'Corto Y Cambio' (así en el schema); en su logo 'corto & cambio' y en Instagram 'Corto y Cambio'. Dueño: Alberto Rico (logo, reseñas, correo de Facebook). Google: se recomienda pedir cita; tarjeta de crédito y débito y pago con móvil; acceso para silla de ruedas; aseos. Instagram @cortoycambioyecla (2.224 seguidores, más de 500 publicaciones, activo en 2026): peluquería y estética, color, novias, mantillas, tratamientos Cotril. Fijo que aparece en sus posts: 968 75 06 56 (no está en Google: no usar sin confirmar). Reseñas desde hace 9 años, pero no hay año de apertura confirmado. Fotos de Google: las del propietario son su fachada, su logo y una cabina de estética; no se usan sin permiso.",
+  "valoracion": 4.8,
+  "num_resenas": 80,
+  "demo_token": "r46mx7"
+}

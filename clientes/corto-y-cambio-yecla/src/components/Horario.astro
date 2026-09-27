@@ -1,0 +1,122 @@
+---
+import { ficha, horarioPorDia } from '../lib/datos';
+
+/* Horario de su ficha de Google. Con JavaScript se marca la fila de hoy (hora de Madrid):
+   por debajo pasa la línea amarilla (scaleX), atada al scroll donde hay soporte. Sobre la
+   piedra el amarillo solo es línea, nunca texto: lo que dice «hoy» va en negro. */
+const dias = horarioPorDia();
+---
+
+<section id="horario" class="contenedor pt-16 pb-14 md:pt-24 md:pb-20" aria-labelledby="horario-titulo">
+  <div class="rejilla">
+    <div>
+      <h2 id="horario-titulo" class="titulo-piedra m-0 text-[clamp(2.1rem,4.6vw,3.25rem)]">Horario</h2>
+      <p class="prosa m-0 mt-4 text-[1.125rem]">Mejor con cita. Pídela por WhatsApp o llamando.</p>
+      <p class="m-0 mt-3 min-h-[1.55em] font-semibold text-tinta-2" data-estado aria-live="polite"></p>
+    </div>
+
+    <dl class="m-0 text-[1.0625rem]" data-horario={JSON.stringify(dias)}>
+      {ficha.horario.map((h, i) => (
+        <div class="fila" data-fila={i}>
+          <dt class="font-semibold">{h.dias}<span class="hoy" hidden>{' · hoy'}</span></dt>
+          <dd class:list={['m-0 text-right', h.horas === 'Cerrado' && 'text-tinta-2']}>
+            {h.horas.split(' y ').map((t, j) => (
+              <>{j > 0 && ' y '}<span class="whitespace-nowrap">{t}</span></>
+            ))}
+          </dd>
+        </div>
+      ))}
+    </dl>
+  </div>
+</section>
+
+<script>
+  type Dia = { fila: number; tramos: [string, string][] };
+  const lista = document.querySelector<HTMLElement>('[data-horario]');
+  const estado = document.querySelector<HTMLElement>('[data-estado]');
+  if (lista) {
+    const dias: Dia[] = JSON.parse(lista.dataset.horario ?? '[]');
+    // Día y hora en Yecla, aunque quien mira esté en otro huso.
+    const partes = new Intl.DateTimeFormat('en-GB', {
+      timeZone: 'Europe/Madrid',
+      weekday: 'short',
+      hour: '2-digit',
+      minute: '2-digit',
+      hourCycle: 'h23',
+    }).formatToParts(new Date());
+    const valor = (t: string) => partes.find((p) => p.type === t)?.value ?? '';
+    const hoy = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].indexOf(valor('weekday'));
+    const ahora = `${valor('hour')}:${valor('minute')}`;
+    const dia = dias[hoy];
+    if (dia && dia.fila >= 0) {
+      const fila = lista.querySelector<HTMLElement>(`[data-fila="${dia.fila}"]`);
+      fila?.classList.add('fila-hoy');
+      fila?.querySelector<HTMLElement>('.hoy')?.removeAttribute('hidden');
+    }
+    if (estado && dia) {
+      const abierto = dia.tramos.find(([a, c]) => ahora >= a && ahora < c);
+      const siguiente = dia.tramos.find(([a]) => ahora < a);
+      const quita0 = (h: string) => h.replace(/^0/, '');
+      if (abierto) estado.textContent = `Ahora abierto, hasta las ${quita0(abierto[1])}.`;
+      else if (siguiente) estado.textContent = `Ahora cerrado. Hoy abre a las ${quita0(siguiente[0])}.`;
+      else if (dia.tramos.length) estado.textContent = 'Por hoy, cerrado.';
+      else estado.textContent = 'Hoy no abrimos.';
+    }
+  }
+</script>
+
+<style>
+  .rejilla {
+    display: grid;
+    gap: 2rem;
+  }
+  @media (min-width: 900px) {
+    .rejilla {
+      grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+      gap: 4rem;
+      align-items: start;
+    }
+  }
+  /* Si no cabe en una línea (martes a jueves, en el móvil), las horas bajan a la siguiente,
+     a la derecha, y cada tramo se queda entero. */
+  .fila {
+    position: relative;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    column-gap: 1.5rem;
+    row-gap: 0.15rem;
+    padding-block: 0.85rem;
+    border-bottom: 1px solid rgb(13 5 5 / 0.22);
+  }
+  .fila:first-child { border-top: 1px solid rgb(13 5 5 / 0.22); }
+  .fila dd { margin-left: auto; }
+  .hoy { font-weight: 400; }
+
+  /* La fila de hoy: la línea amarilla le pasa por debajo. */
+  :global(.fila-hoy)::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -3px;
+    height: 5px;
+    background: var(--color-amarillo-vivo);
+    transform-origin: left center;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    @supports (animation-timeline: view()) {
+      :global(.fila-hoy) { view-timeline: --hoy block; }
+      :global(.fila-hoy)::after {
+        animation: raya linear both;
+        animation-timeline: --hoy;
+        animation-range: entry 40% cover 45%;
+      }
+    }
+  }
+  @keyframes raya {
+    from { transform: scaleX(0); }
+    to { transform: scaleX(1); }
+  }
+</style>

@@ -1,0 +1,81 @@
+---
+import { ficha, INSTAGRAM } from '../lib/datos';
+import { enlaceWhatsapp, enlaceTelefono } from '@plantilla/lib/ficha';
+
+/* Las dudas de antes de venir, sacadas de su ficha de Google y de sus reseñas. Solo se
+   responde lo que se sabe: la prueba de peinado de novia no consta en ningún sitio y va
+   como hueco, [CONFIRMAR]. Filas con filete, no tarjetas. */
+const whatsapp = enlaceWhatsapp(ficha, 'Hola, quería pedir cita en Corto y Cambio.');
+---
+
+<section id="dudas" class="contenedor py-14 md:py-20" aria-labelledby="dudas-titulo">
+  <div class="rejilla">
+    <h2 id="dudas-titulo" class="titulo-piedra m-0 text-[clamp(2.1rem,4.6vw,3.25rem)]">Antes de venir</h2>
+
+    <dl class="m-0">
+      <div class="duda">
+        <dt>¿Hace falta cita?</dt>
+        <dd>
+          Mejor con cita, y te atendemos a tu hora. Pídela por <a href={whatsapp} target="_blank" rel="noopener">WhatsApp</a>, por <a href={enlaceTelefono(ficha)}>teléfono</a> o con un mensaje en <a href={INSTAGRAM} target="_blank" rel="noopener">Instagram</a>.
+        </dd>
+      </div>
+      <div class="duda">
+        <dt>¿Se puede pagar con tarjeta?</dt>
+        <dd>Sí, con tarjeta de crédito o de débito, y también con el móvil.</dd>
+      </div>
+      <div class="duda">
+        <dt>¿Cortáis a hombres y a niños?</dt>
+        <dd>Sí. Corte de mujer, de hombre e infantil.</dd>
+      </div>
+      <div class="duda">
+        <dt>¿Se puede entrar con silla de ruedas?</dt>
+        <dd>Sí, el local tiene acceso para silla de ruedas.</dd>
+      </div>
+      <div class="duda">
+        <dt>¿Hacéis prueba de peinado para novias?</dt>
+        <dd><span class="hueco">[CONFIRMAR]</span></dd>
+      </div>
+    </dl>
+  </div>
+</section>
+
+<style>
+  .rejilla {
+    display: grid;
+    gap: 2rem;
+  }
+  @media (min-width: 900px) {
+    .rejilla {
+      grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+      gap: 4rem;
+      align-items: start;
+    }
+  }
+  .duda {
+    padding-block: 1.25rem;
+    border-bottom: 1px solid rgb(13 5 5 / 0.22);
+  }
+  .duda:first-child { border-top: 1px solid rgb(13 5 5 / 0.22); }
+  dt {
+    font-size: 1.1875rem;
+    font-weight: 600;
+    line-height: 1.3;
+  }
+  dd {
+    margin: 0.5rem 0 0;
+    max-width: 60ch;
+    font-size: 1.0625rem;
+    line-height: 1.55;
+    color: var(--color-tinta-2);
+  }
+  dd a {
+    font-weight: 600;
+    color: var(--color-tinta);
+    text-decoration: underline;
+    text-decoration-thickness: 1.5px;
+    text-underline-offset: 0.25em;
+    /* Enlaces en línea: el objetivo táctil lo da la altura de línea más el relleno. */
+    padding-block: 0.6rem;
+  }
+  dd a:hover { text-decoration-thickness: 3px; }
+</style>

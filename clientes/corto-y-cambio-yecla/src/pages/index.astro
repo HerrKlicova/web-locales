@@ -1,0 +1,74 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Cabecera from '../components/Cabecera.astro';
+import Portada from '../components/Portada.astro';
+import Comparador from '../components/Comparador.astro';
+import Servicios from '../components/Servicios.astro';
+import Horario from '../components/Horario.astro';
+import Resenas from '../components/Resenas.astro';
+import Dudas from '../components/Dudas.astro';
+import Donde from '../components/Donde.astro';
+import Pie from '../components/Pie.astro';
+import BarraWhatsapp from '../components/BarraWhatsapp.astro';
+import { ficha, GRUPOS, INSTAGRAM, telefonoVisible } from '../lib/datos';
+import { schemaLocalBusiness } from '@plantilla/lib/schema';
+
+const demo = !import.meta.env.PRODUCCION;
+
+/* Schema HairSalon (§7) con el nombre y la dirección tal cual están en Google («Corto Y
+   Cambio», «C. de S. Ramón, 172»). Se quita el priceRange del ayudante común: no hay precios
+   confirmados. La carta va sin precios. Las fotos no entran: son de muestra, no del salón.
+   Las reseñas tampoco: Google no admite reseñas sobre uno mismo en la web de uno mismo. */
+const base = schemaLocalBusiness(ficha as never, Astro.site?.href, []);
+delete (base as Record<string, unknown>).priceRange;
+const schema = {
+  ...base,
+  '@type': 'HairSalon',
+  areaServed: { '@type': 'City', name: 'Yecla' },
+  paymentAccepted: 'Tarjeta de crédito, tarjeta de débito, pago con el móvil',
+  amenityFeature: [{ '@type': 'LocationFeatureSpecification', name: 'Acceso para silla de ruedas', value: true }],
+  sameAs: [INSTAGRAM],
+  hasOfferCatalog: {
+    '@type': 'OfferCatalog',
+    name: 'Servicios',
+    itemListElement: GRUPOS.map((g) => ({
+      '@type': 'OfferCatalog',
+      name: g.titulo,
+      itemListElement: g.servicios.map((s) => ({
+        '@type': 'Offer',
+        itemOffered: { '@type': 'Service', name: s.nombre },
+      })),
+    })),
+  },
+};
+
+const titulo = `${ficha.nombre} — Peluquería y estética en ${ficha.pueblo}`;
+const descripcion =
+  `Peluquería y estética en ${ficha.pueblo}: color, mechas, corte, novias, keratina y tratamientos. ` +
+  `Pide cita por WhatsApp o al ${telefonoVisible(ficha.telefono)}. ${ficha.direccion}.`;
+---
+
+<Layout titulo={titulo} descripcion={descripcion} demo={demo} schema={schema}>
+  <div class="fachada">
+    <Cabecera />
+  </div>
+  <main id="contenido">
+    <!-- Negro arriba: la fachada. -->
+    <div class="fachada">
+      <Portada />
+      <Comparador />
+      <Servicios />
+    </div>
+    <!-- Piedra abajo: el zócalo. La junta es el único cambio de material de la página. -->
+    <div class="zocalo junta">
+      <Horario />
+      <Resenas />
+      <Dudas />
+      <Donde />
+    </div>
+  </main>
+  <div class="zocalo">
+    <Pie demo={demo} />
+  </div>
+  <BarraWhatsapp />
+</Layout>

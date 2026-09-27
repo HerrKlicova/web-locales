@@ -1,0 +1,155 @@
+---
+import { getImage } from 'astro:assets';
+import Icono from './Icono.astro';
+import { ficha, telefonoVisible } from '../lib/datos';
+import { enlaceWhatsapp, enlaceTelefono } from '@plantilla/lib/ficha';
+import foto from '../../fotos/hero-16x9.jpg';
+
+/* La portada es la fachada: el rótulo arriba, a todo el ancho («Empieza el cambio.», su
+   frase de vuelta de vacaciones), y debajo el escaparate: la foto, con la puerta al lado
+   (el texto y los botones).
+
+   La foto es la misma en móvil y en escritorio: 16:9 desde 768 px y en móvil el recorte
+   4:5 del 45 % central, que es donde va la acción (fotos/prompts.md). Es el LCP: eager,
+   fetchpriority high y visible desde el primer fotograma. Encima va la capa del barrido
+   (global.css), con la misma imagen en blanco y negro: mismo srcset, así que no hay una
+   segunda descarga. */
+
+// 780 cubre el móvil de 412 px a 1,75 de densidad (721 px) sin saltar a 960.
+const ANCHOS_45 = [480, 640, 780, 960, 1080];
+const ANCHOS_169 = [700, 1000, 1300, 1600, 2000];
+const recorte = (w: number) => ({ width: w, height: Math.round((w * 5) / 4) });
+
+const [avif45, webp45, avif169, webp169] = await Promise.all([
+  getImage({ src: foto, format: 'avif', widths: ANCHOS_45, ...recorte(1080), fit: 'cover', position: 'center', quality: 50 }),
+  getImage({ src: foto, format: 'webp', widths: ANCHOS_45, ...recorte(1080), fit: 'cover', position: 'center', quality: 62 }),
+  getImage({ src: foto, format: 'avif', widths: ANCHOS_169, width: 2000, quality: 50 }),
+  getImage({ src: foto, format: 'webp', widths: ANCHOS_169, width: 2000, quality: 62 }),
+]);
+const TAM_169 = '(min-width: 1240px) 668px, (min-width: 1024px) 54vw, calc(100vw - 4rem)';
+
+const alt =
+  'Unas manos levantan con un cepillo redondo un mechón de una clienta de espaldas: melena ondulada con balayage de raíz castaña a rubio miel';
+const valoracion = ficha.valoracion.toLocaleString('es-ES', { minimumFractionDigits: 1 });
+const whatsapp = enlaceWhatsapp(ficha, 'Hola, quería pedir cita en Corto y Cambio.');
+---
+
+<section class="contenedor pt-6 pb-16 md:pt-10 md:pb-24" aria-labelledby="portada-h1" data-portada>
+  <h1 id="portada-h1" class="m-0 text-[1.0625rem] font-semibold text-sombra md:text-[1.1875rem]">
+    Peluquería y estética en Yecla
+  </h1>
+  <p class="rotulo titular m-0 mt-3 text-sol md:mt-4">Empieza el cambio.</p>
+
+  <div class="escaparate mt-8 md:mt-12">
+    <div class="puerta">
+      <p class="prosa m-0 text-[1.125rem] leading-[1.5] md:text-[1.25rem]">
+        Color, mechas, novias y tratamientos. Te esperamos Alberto y el equipo en San Ramón, 172.
+      </p>
+      <div class="mt-7 flex flex-wrap gap-3">
+        <a class="boton boton-principal w-full sm:w-auto" href={whatsapp} target="_blank" rel="noopener">
+          <Icono nombre="whatsapp" class="size-5" />
+          Pedir cita por WhatsApp
+        </a>
+        <a class="boton boton-secundario w-full sm:w-auto" href={enlaceTelefono(ficha)}>
+          <Icono nombre="telefono" class="size-5" />
+          <span><span class="sr-only">Llamar al </span>{telefonoVisible(ficha.telefono)}</span>
+        </a>
+      </div>
+      <p class="m-0 mt-6">
+        <a class="nota-google" href="#resenas">
+          <Icono nombre="estrella" class="size-4 text-sol" />
+          <span><strong class="font-semibold text-sol">{valoracion}</strong> en Google · {ficha.num_resenas} reseñas</span>
+        </a>
+      </p>
+    </div>
+
+    <figure class="barrido barrido-portada foto-portada m-0" data-barrido-portada>
+      <picture>
+        <source media="(min-width: 768px)" type="image/avif" srcset={avif169.srcSet.attribute} sizes={TAM_169} width={foto.width} height={foto.height} />
+        <source media="(min-width: 768px)" type="image/webp" srcset={webp169.srcSet.attribute} sizes={TAM_169} width={foto.width} height={foto.height} />
+        <source type="image/avif" srcset={avif45.srcSet.attribute} sizes="100vw" width="1080" height="1350" />
+        <img
+          src={webp45.src}
+          srcset={webp45.srcSet.attribute}
+          sizes="100vw"
+          width="1080"
+          height="1350"
+          alt={alt}
+          loading="eager"
+          fetchpriority="high"
+          decoding="async"
+        />
+      </picture>
+      <div class="barrido-capa" aria-hidden="true">
+        <div class="barrido-foto">
+          <picture>
+            <source media="(min-width: 768px)" type="image/avif" srcset={avif169.srcSet.attribute} sizes={TAM_169} width={foto.width} height={foto.height} />
+            <source media="(min-width: 768px)" type="image/webp" srcset={webp169.srcSet.attribute} sizes={TAM_169} width={foto.width} height={foto.height} />
+            <source type="image/avif" srcset={avif45.srcSet.attribute} sizes="100vw" width="1080" height="1350" />
+            <img src={webp45.src} srcset={webp45.srcSet.attribute} sizes="100vw" width="1080" height="1350" alt="" loading="eager" decoding="async" />
+          </picture>
+        </div>
+      </div>
+    </figure>
+  </div>
+</section>
+
+<script>
+  // El barrido de la portada arranca cuando la foto ya está descodificada: así se ve la
+  // línea cruzarla entera. Sin JavaScript no hay capa (global.css) y la foto sale en color.
+  const portada = document.querySelector<HTMLElement>('[data-barrido-portada]');
+  if (portada && matchMedia('(prefers-reduced-motion: no-preference)').matches) {
+    const fotos = [...portada.querySelectorAll('img')].map((img) => img.decode().catch(() => undefined));
+    Promise.all(fotos).then(() => requestAnimationFrame(() => portada.classList.add('barre')));
+  }
+</script>
+
+<style>
+  /* El rótulo: una línea desde tableta (a 132 px ocupa unos 1100 px), dos en móvil. */
+  .titular {
+    font-size: clamp(3.4rem, 9.4vw, 8.25rem);
+  }
+
+  .escaparate {
+    display: grid;
+    gap: 2.5rem;
+  }
+  @media (min-width: 1024px) {
+    .escaparate {
+      grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+      gap: 3rem;
+      align-items: start;
+    }
+  }
+
+  /* En móvil la foto va a sangre, de borde a borde, en 4:5. */
+  .foto-portada {
+    aspect-ratio: 4 / 5;
+    margin-inline: -1.25rem;
+    background: var(--color-placa);
+  }
+  @media (min-width: 640px) {
+    .foto-portada { margin-inline: -2rem; }
+  }
+  @media (min-width: 768px) {
+    .foto-portada { aspect-ratio: 16 / 9; margin-inline: 0; }
+  }
+  .foto-portada img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .nota-google {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-height: 2.75rem;
+    color: var(--color-sombra);
+    text-decoration: underline;
+    text-decoration-color: var(--color-placa);
+    text-underline-offset: 0.3em;
+  }
+  .nota-google:hover { text-decoration-color: var(--color-amarillo-vivo); }
+</style>

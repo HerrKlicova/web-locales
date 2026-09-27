@@ -1,0 +1,147 @@
+---
+import FotoBarrido from './FotoBarrido.astro';
+import { ficha, GRUPOS } from '../lib/datos';
+import { enlaceWhatsapp, esHueco } from '@plantilla/lib/ficha';
+import mechas from '../../fotos/color-mechas.jpg';
+import novia from '../../fotos/novia-recogido.jpg';
+import mantilla from '../../fotos/mantilla.jpg';
+
+/* La carta, en cuatro grupos. Cada servicio es un enlace a WhatsApp con el mensaje ya escrito.
+   En escritorio, al pasar el ratón por un servicio la misma línea amarilla pasa por debajo
+   (scaleX). Los precios que faltan van como hueco limpio, [PRECIO]: se ve que falta un dato,
+   no que algo se ha roto. Filas con filete, no tarjetas (§3). */
+const fotos = [
+  { src: mechas, alt: 'Manos con guantes negros aplicando decolorante con una paletina sobre un mechón apoyado en papel de aluminio, con el resto del pelo recogido con pinzas', pie: 'Mechas con papel' },
+  { src: novia, alt: 'Recogido bajo de novia visto de espaldas, con un detalle de trenza, ondas sueltas y dos horquillas de perla', pie: 'Recogido de novia' },
+  { src: mantilla, alt: 'Mujer de espaldas con mantilla negra de encaje sobre peineta alta de carey y moño bajo', pie: 'Mantilla y peineta' },
+];
+const TAM = '(min-width: 1240px) 373px, (min-width: 768px) 30vw, 78vw';
+const mensaje = (nombre: string) => enlaceWhatsapp(ficha, `Hola, quería pedir cita en Corto y Cambio: ${nombre}.`);
+---
+
+<section id="servicios" class="pb-20 md:pb-28" aria-labelledby="servicios-titulo">
+  <div class="contenedor">
+    <div class="cabeza">
+      <h2 id="servicios-titulo" class="rotulo m-0 text-[clamp(2.6rem,6.4vw,5.25rem)] text-sol">Servicios.</h2>
+      <p class="prosa m-0 text-[1.125rem] text-sombra">Te escuchamos y te asesoramos antes de empezar.</p>
+    </div>
+
+    <div class="carta mt-10 md:mt-14">
+      {GRUPOS.map((g) => (
+        <section class="grupo" aria-labelledby={`grupo-${g.id}`}>
+          <h3 id={`grupo-${g.id}`} class="rotulo m-0 text-[2rem] text-sol md:text-[2.25rem]">{g.titulo}</h3>
+          <p class="m-0 mt-2 text-sombra">{g.nota}</p>
+          <ul class="m-0 mt-5 list-none p-0">
+            {g.servicios.map((s) => {
+              const sinCarta = esHueco(s.precio) && s.precio !== '[PRECIO]';
+              return (
+                <li>
+                  <a class="servicio" href={mensaje(s.nombre)} target="_blank" rel="noopener">
+                    <span class="nombre">
+                      {s.nombre}
+                      {sinCarta && <span class="mt-1.5 block"><span class="hueco">{s.precio}</span></span>}
+                    </span>
+                    {!sinCarta && (esHueco(s.precio) ? <span class="hueco">{s.precio}</span> : <span class="precio">{s.precio}</span>)}
+                    <span class="sr-only"> (pedir cita por WhatsApp)</span>
+                  </a>
+                </li>
+              );
+            })}
+          </ul>
+        </section>
+      ))}
+    </div>
+  </div>
+
+  <div class="tira contenedor mt-16 md:mt-20" role="region" aria-label="Fotos de muestra" tabindex="0">
+    {fotos.map((f) => (
+      <FotoBarrido src={f.src} alt={f.alt} pie={f.pie} sizes={TAM} class="tira-foto" />
+    ))}
+  </div>
+</section>
+
+<style>
+  .cabeza {
+    display: grid;
+    gap: 1rem;
+  }
+  @media (min-width: 1024px) {
+    .cabeza {
+      grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+      gap: 3rem;
+      align-items: end;
+    }
+  }
+
+  .carta {
+    display: grid;
+    gap: 3rem;
+  }
+  @media (min-width: 900px) {
+    .carta {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      column-gap: 4rem;
+      row-gap: 3.5rem;
+    }
+  }
+
+  .servicio {
+    position: relative;
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1.25rem;
+    min-height: 3.25rem;
+    padding-block: 0.8rem;
+    border-bottom: 1px solid var(--color-placa);
+    color: var(--color-sol);
+  }
+  li:first-child .servicio { border-top: 1px solid var(--color-placa); }
+  .nombre { font-size: 1.0625rem; line-height: 1.35; }
+  .precio { white-space: nowrap; font-weight: 600; }
+  .servicio .hueco { flex-shrink: 0; }
+
+  /* Escritorio: la línea amarilla por debajo del servicio al pasar el ratón (y con el foco). */
+  .servicio::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -1px;
+    height: 3px;
+    background: var(--color-amarillo-vivo);
+    transform: scaleX(0);
+    transform-origin: left center;
+  }
+  .servicio:focus-visible::after { transform: scaleX(1); }
+  @media (hover: hover) and (pointer: fine) {
+    .servicio:hover::after { transform: scaleX(1); }
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .servicio::after { transition: transform 460ms var(--ease-salida); }
+  }
+
+  /* La tira de fotos: en el móvil se desliza de lado (scroll-snap), en escritorio van las tres. */
+  .tira {
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: 78%;
+    gap: 1rem;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scroll-snap-type: x mandatory;
+    scroll-padding-inline: 1.25rem;
+    scrollbar-width: none;
+  }
+  .tira::-webkit-scrollbar { display: none; }
+  .tira :global(.tira-foto) { scroll-snap-align: start; }
+  @media (min-width: 768px) {
+    .tira {
+      grid-auto-flow: row;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      grid-auto-columns: auto;
+      gap: 1.5rem;
+      overflow: visible;
+    }
+  }
+</style>
