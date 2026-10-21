@@ -77,9 +77,9 @@ const whatsapp = enlaceWhatsapp(ficha, `Hola, quiero información sobre ${ficha.
       NOVEDAD && (
         <a
           href="#novedad"
-          class="mb-6 inline-flex min-h-11 items-center gap-2.5 rounded-full border border-ambar/60 bg-noche/70 px-4 font-bold text-hueso transition-colors hover:border-ambar"
+          class="novedad mb-6 inline-flex min-h-11 items-center gap-2.5 rounded-full border-2 border-ambar bg-noche/70 px-4 font-bold text-hueso transition-colors hover:bg-ambar hover:text-noche"
         >
-          <span class="inline-block size-2.5 rounded-full bg-ambar" aria-hidden="true" />
+          <span class="punto-novedad inline-block size-2.5 rounded-full bg-ambar" aria-hidden="true" />
           {NOVEDAD.etiqueta}: {NOVEDAD.titulo}, 30 minutos
         </a>
       )
@@ -119,6 +119,29 @@ const whatsapp = enlaceWhatsapp(ficha, `Hola, quiero información sobre ${ficha.
 </header>
 
 <style>
+  /* Aviso de novedad: parpadea para llamar la atención (un halo que se expande y el punto que se
+     enciende y apaga). Solo transform y opacity; con movimiento reducido queda quieto. */
+  .novedad { position: relative; }
+  .novedad::after {
+    content: '';
+    position: absolute;
+    inset: -2px;
+    border-radius: inherit;
+    border: 2px solid var(--color-ambar);
+    opacity: 0;
+    pointer-events: none;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .novedad::after { animation: halo-novedad 1.6s ease-out infinite; }
+    .punto-novedad { animation: parpadeo-novedad 0.8s steps(1, end) infinite; }
+  }
+  @keyframes halo-novedad {
+    0% { opacity: 0.9; transform: scale(1); }
+    100% { opacity: 0; transform: scale(1.12, 1.5); }
+  }
+  @keyframes parpadeo-novedad {
+    50% { opacity: 0.15; }
+  }
   /* Estado inicial: se ve la primera foto (izquierda) y la segunda espera oculta.
      Con movimiento reducido no hay paneo y se muestra directamente el neón. */
   .paneo-a { will-change: transform; }

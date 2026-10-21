@@ -78,7 +78,7 @@ export const NOVEDAD: null | {
   etiqueta: 'Novedad',
   titulo: 'Pilates Flash',
   texto: 'Pilates en clases de media hora: todo el trabajo del método, en menos tiempo y a un precio más accesible.',
-  detalles: ['30 minutos', '60 €/mes', '7 plazas por grupo', 'Martes y jueves, 16:10'],
+  detalles: ['Clases de 30 minutos', '2 días a la semana: 60 €/mes', '7 plazas por grupo', 'Martes y jueves, 16:10'],
   actividad: 'pilates',
   mensaje: 'Hola, me interesa Pilates Flash. ¿Queda plaza?',
 };
