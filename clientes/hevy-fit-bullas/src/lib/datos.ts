@@ -40,7 +40,8 @@ export interface FichaHevy extends Ficha {
    Un grupo puede estar activo (punto verde: se entrena, puedes entrar) o inactivo
    (punto rojo: no está en marcha, pero se abre si hay gente interesada). */
 export type Estado = 'activo' | 'inactivo';
-export type Celda = null | { nota?: string; estado?: Estado };
+/** `duracion` en minutos, si la clase no dura los 50 de siempre (Pilates Flash: 30). */
+export type Celda = null | { nota?: string; estado?: Estado; duracion?: number };
 
 export interface HorarioActividad {
   id: Actividad['id'];
@@ -62,6 +63,25 @@ const no: Celda = null;
 const off: Celda = { estado: 'inactivo' };
 const flexOff: Celda = { nota: 'Pilates Flex', estado: 'inactivo' };
 const sueloOff: Celda = { nota: 'Pilates suelo', estado: 'inactivo' };
+/** Pilates Flash (novedad de octubre de 2026): clases de media hora, 7 plazas. */
+const flash: Celda = { nota: 'Pilates Flash', duracion: 30 };
+
+/** Novedad destacada en la portada. Se quita dejando `NOVEDAD = null`. */
+export const NOVEDAD: null | {
+  etiqueta: string;
+  titulo: string;
+  texto: string;
+  detalles: string[];
+  actividad: Actividad['id'];
+  mensaje: string;
+} = {
+  etiqueta: 'Novedad',
+  titulo: 'Pilates Flash',
+  texto: 'Pilates en clases de media hora: todo el trabajo del método, en menos tiempo y a un precio más accesible.',
+  detalles: ['30 minutos', '60 €/mes', '7 plazas por grupo', 'Martes y jueves, 16:10'],
+  actividad: 'pilates',
+  mensaje: 'Hola, me interesa Pilates Flash. ¿Queda plaza?',
+};
 
 export const DIAS = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes'] as const;
 export const DIAS_CORTOS = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie'] as const;
@@ -71,12 +91,13 @@ export const HORARIOS: HorarioActividad[] = [
     id: 'pilates',
     nombre: 'Pilates',
     luz: 'ambar',
+    aviso: 'Pilates Flash: muy pronto, también un grupo por la noche (horario por confirmar).',
     filas: [
       { hora: '7:00', dias: [off, si, off, si, no] },
       { hora: '8:10', dias: [si, si, si, si, no] },
       { hora: '9:10', dias: [si, si, si, si, no] },
       { hora: '10:20', dias: [sueloOff, no, sueloOff, no, no] },
-      { hora: '16:10', dias: [si, si, si, si, sueloOff] },
+      { hora: '16:10', dias: [si, flash, si, flash, sueloOff] },
       { hora: '17:30', dias: [si, flexOff, si, flexOff, off] },
       { hora: '18:30', dias: [si, si, si, si, si] },
       { hora: '19:30', dias: [si, si, si, si, off] },

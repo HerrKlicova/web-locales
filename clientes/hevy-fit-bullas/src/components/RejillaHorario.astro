@@ -10,23 +10,24 @@ import { DIAS, LEYENDA, type Celda, type FichaHevy, type HorarioActividad } from
 interface Props { ficha: FichaHevy; horario: HorarioActividad; duracion?: number }
 const { ficha, horario: h, duracion = 50 } = Astro.props;
 
-const fin = (hora: string) => {
+const fin = (hora: string, c: NonNullable<Celda>) => {
   const [hh, mm] = hora.split(':').map(Number);
-  const total = hh * 60 + mm + duracion;
+  const total = hh * 60 + mm + (c.duracion ?? duracion);
   return `${Math.floor(total / 60)}:${String(total % 60).padStart(2, '0')}`;
 };
 const activo = (c: NonNullable<Celda>) => c.estado !== 'inactivo';
+const nombre = (c: NonNullable<Celda>) => c.nota ?? h.nombre;
 const enlace = (c: NonNullable<Celda>, dia: string, hora: string) =>
   enlaceWhatsapp(
     ficha,
     activo(c)
-      ? `Hola, me interesa ${h.nombre} el ${dia.toLowerCase()} a las ${hora}. ¿Queda plaza?`
-      : `Hola, me interesa ${h.nombre} el ${dia.toLowerCase()} a las ${hora}. Ese grupo no está activo, ¿podríais abrirlo?`,
+      ? `Hola, me interesa ${nombre(c)} el ${dia.toLowerCase()} a las ${hora}. ¿Queda plaza?`
+      : `Hola, me interesa ${nombre(c)} el ${dia.toLowerCase()} a las ${hora}. Ese grupo no está activo, ¿podríais abrirlo?`,
   );
 /* El contexto va como texto solo para lectores, detrás de la hora, y no como aria-label:
    así el nombre accesible del enlace contiene su texto visible (WCAG 2.5.3, «Label in Name»). */
 const contexto = (c: NonNullable<Celda>, dia: string) =>
-  `${h.nombre}, ${dia.toLowerCase()}. ${activo(c) ? 'Grupo activo' : 'Grupo inactivo, se abre si hay interés'}. Preguntar por WhatsApp`;
+  `${nombre(c)}, ${dia.toLowerCase()}. ${activo(c) ? 'Grupo activo' : 'Grupo inactivo, se abre si hay interés'}. Preguntar por WhatsApp`;
 const clase = (c: NonNullable<Celda>) =>
   activo(c) ? 'bg-(--luz)/25 hover:bg-(--luz)/40' : 'border border-(--borde) bg-(--fondo-alto) hover:border-hueso-tenue';
 const punto = (c: NonNullable<Celda>) => (activo(c) ? 'bg-activo' : 'bg-inactivo');
@@ -59,7 +60,7 @@ const punto = (c: NonNullable<Celda>) => (activo(c) ? 'bg-activo' : 'bg-inactivo
                     <span class="flex items-center gap-2 font-bold tabular-nums">
                       <span class:list={['size-2 shrink-0 rounded-full', punto(c)]} aria-hidden="true" />
                       {f.hora}
-                      <span class="font-normal text-hueso-tenue">– {fin(f.hora)}</span>
+                      <span class="font-normal text-hueso-tenue">– {fin(f.hora, c)}</span>
                     </span>
                     {c.nota && <span class:list={['pl-4 text-sm', activo(c) ? 'texto-luz' : 'text-hueso-tenue']}>{c.nota}</span>}
                     <span class="sr-only">{contexto(c, DIAS[di])}</span>
@@ -93,7 +94,7 @@ const punto = (c: NonNullable<Celda>) => (activo(c) ? 'bg-activo' : 'bg-inactivo
                   <span class="flex items-center gap-2 font-bold tabular-nums">
                     <span class:list={['size-2 shrink-0 rounded-full', punto(c)]} aria-hidden="true" />
                     {hora}
-                    <span class="font-normal text-hueso-tenue">– {fin(hora)}</span>
+                    <span class="font-normal text-hueso-tenue">– {fin(hora, c)}</span>
                   </span>
                   {c.nota && <span class:list={['pl-4 text-sm', activo(c) ? 'texto-luz' : 'text-hueso-tenue']}>{c.nota}</span>}
                   <span class="sr-only">{contexto(c, d)}</span>

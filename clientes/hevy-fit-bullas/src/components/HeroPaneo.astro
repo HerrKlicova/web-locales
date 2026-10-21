@@ -2,7 +2,7 @@
 import { getImage } from 'astro:assets';
 import type { ImageMetadata } from 'astro';
 import { enlaceWhatsapp } from '@plantilla/lib/ficha';
-import type { FichaHevy } from '../lib/datos';
+import { NOVEDAD, type FichaHevy } from '../lib/datos';
 import Icono from './Icono.astro';
 import Cabecera from './Cabecera.astro';
 
@@ -73,6 +73,17 @@ const whatsapp = enlaceWhatsapp(ficha, `Hola, quiero información sobre ${ficha.
   <div class="relative"><Cabecera ficha={ficha} /></div>
 
   <div class="relative mx-auto mt-auto w-full max-w-6xl px-4 pb-10 pt-24 sm:px-8 md:pb-14">
+    {
+      NOVEDAD && (
+        <a
+          href="#novedad"
+          class="mb-6 inline-flex min-h-11 items-center gap-2.5 rounded-full border border-ambar/60 bg-noche/70 px-4 font-bold text-hueso transition-colors hover:border-ambar"
+        >
+          <span class="inline-block size-2.5 rounded-full bg-ambar" aria-hidden="true" />
+          {NOVEDAD.etiqueta}: {NOVEDAD.titulo}, 30 minutos
+        </a>
+      )
+    }
     <h1 class="rotulo m-0 max-w-[16ch] text-[2.5rem] sm:text-6xl lg:text-[4.25rem]">Fuerza, Barre y Pilates en Bullas.</h1>
     <div class="mt-6 grid gap-6 md:grid-cols-[1fr_auto] md:items-end lg:mt-8">
       <p class="m-0 max-w-[48ch] text-lg leading-snug sm:text-xl" data-entra>

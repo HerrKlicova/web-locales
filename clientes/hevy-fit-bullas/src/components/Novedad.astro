@@ -1,0 +1,53 @@
+---
+import { enlaceWhatsapp } from '@plantilla/lib/ficha';
+import { NOVEDAD, type FichaHevy } from '../lib/datos';
+import Icono from './Icono.astro';
+
+/**
+ * Novedad destacada justo debajo del hero (hoy, Pilates Flash). Lleva la luz de su sala y
+ * enlaza al horario de esa sala. Si `NOVEDAD` es null no se pinta nada.
+ */
+interface Props { ficha: FichaHevy }
+const { ficha } = Astro.props;
+const n = NOVEDAD;
+const actividad = n && ficha.actividades.find((a) => a.id === n.actividad);
+---
+
+{
+  n && actividad && (
+    <section id="novedad" data-sala={actividad.id} aria-labelledby="novedad-titulo" class={`luz-${actividad.luz} px-4 pt-12 sm:px-8 md:pt-16`}>
+      <div class="reveal mx-auto grid max-w-6xl gap-6 rounded-2xl border border-(--luz)/50 bg-(--fondo-alto) p-6 sm:p-8 md:grid-cols-[1fr_auto] md:items-end md:gap-10 md:p-10">
+        <div>
+          <p class="texto-luz m-0 inline-flex items-center gap-2 font-bold">
+            <span class="inline-block size-2.5 rounded-full bg-(--luz)" aria-hidden="true" />
+            {n.etiqueta} en {actividad.nombre}
+          </p>
+          <h2 id="novedad-titulo" class="rotulo m-0 mt-3 text-3xl sm:text-5xl">{n.titulo}</h2>
+          <p class="mt-4 max-w-[52ch] text-lg leading-snug text-hueso-tenue">{n.texto}</p>
+          <ul class="m-0 mt-5 flex list-none flex-wrap gap-2 p-0">
+            {n.detalles.map((d) => (
+              <li class="rounded-full border border-(--borde) px-4 py-1.5 font-bold">{d}</li>
+            ))}
+          </ul>
+        </div>
+        <div class="flex flex-col gap-3">
+          <a
+            href={enlaceWhatsapp(ficha, n.mensaje)}
+            class="inline-flex min-h-13 items-center justify-center gap-2.5 rounded-full bg-neon px-7 text-lg font-bold text-noche transition-colors hover:bg-hueso"
+            target="_blank"
+            rel="noopener"
+          >
+            <Icono nombre="whatsapp" class="size-6" />
+            Pedir plaza
+          </a>
+          <a
+            href={`#${actividad.id}`}
+            class="texto-luz inline-flex min-h-13 items-center justify-center rounded-full border-2 border-current px-7 text-lg font-bold transition-colors hover:bg-(--luz) hover:text-noche"
+          >
+            Ver el horario
+          </a>
+        </div>
+      </div>
+    </section>
+  )
+}

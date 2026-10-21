@@ -3,6 +3,7 @@
 import Layout from '../layouts/Layout.astro';
 import HeroPaneo from '../components/HeroPaneo.astro';
 import Cifras from '../components/Cifras.astro';
+import Novedad from '../components/Novedad.astro';
 import Sala from '../components/Sala.astro';
 import Resenas from '../components/Resenas.astro';
 import Donde from '../components/Donde.astro';
@@ -39,6 +40,7 @@ const demo = import.meta.env.PRODUCCION !== 'true';
   <HeroPaneo ficha={ficha} izquierda={fotoRecepcionIzquierda} derecha={fotoRecepcionDerecha} />
 
   <main id="contenido">
+    <Novedad ficha={ficha} />
     <Cifras ficha={ficha} />
 
     {

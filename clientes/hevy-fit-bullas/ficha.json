@@ -53,6 +53,11 @@
       "texto": "Método clásico en grupos reducidos, sobre colchoneta o con aparatos: reformer, tower, cadillac, wunda chair y spine corrector.",
       "tarifas": [
         {
+          "nombre": "Pilates Flash, clases de 30 minutos",
+          "precio": "60 €/mes",
+          "nota": "Novedad · martes y jueves, grupos de 7"
+        },
+        {
           "nombre": "Pilates mat, 1 día a la semana",
           "precio": "25 €/mes"
         },
