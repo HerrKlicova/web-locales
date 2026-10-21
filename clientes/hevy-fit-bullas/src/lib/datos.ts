@@ -95,7 +95,8 @@ export const HORARIOS: HorarioActividad[] = [
     filas: [
       { hora: '7:00', dias: [off, si, off, si, no] },
       { hora: '8:10', dias: [si, si, si, si, no] },
-      { hora: '9:10', dias: [si, si, si, si, no] },
+      { hora: '9:10', dias: [si, no, si, no, no] },
+      { hora: '9:20', dias: [no, si, no, si, no] },
       { hora: '10:20', dias: [sueloOff, no, sueloOff, no, no] },
       { hora: '16:10', dias: [si, flash, si, flash, sueloOff] },
       { hora: '17:30', dias: [si, flexOff, si, flexOff, off] },
