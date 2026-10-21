@@ -78,7 +78,7 @@ export const NOVEDAD: null | {
   etiqueta: 'Novedad',
   titulo: 'Pilates Flash',
   texto: 'Pilates en clases de media hora: todo el trabajo del método, en menos tiempo y a un precio más accesible.',
-  detalles: ['Clases de 30 minutos', '2 días a la semana: 60 €/mes', '7 plazas por grupo', 'Martes y jueves, 16:10'],
+  detalles: ['Clases de 30 minutos', '2 días a la semana: 60 €/mes', '7 plazas por grupo', 'Martes y jueves, 16:00'],
   actividad: 'pilates',
   mensaje: 'Hola, me interesa Pilates Flash. ¿Queda plaza?',
 };
@@ -98,7 +98,8 @@ export const HORARIOS: HorarioActividad[] = [
       { hora: '9:10', dias: [si, no, si, no, no] },
       { hora: '9:20', dias: [no, si, no, si, no] },
       { hora: '10:20', dias: [sueloOff, no, sueloOff, no, no] },
-      { hora: '16:10', dias: [si, flash, si, flash, sueloOff] },
+      { hora: '16:00', dias: [no, flash, no, flash, no] },
+      { hora: '16:10', dias: [si, no, si, no, sueloOff] },
       { hora: '17:30', dias: [si, flexOff, si, flexOff, off] },
       { hora: '18:30', dias: [si, si, si, si, si] },
       { hora: '19:30', dias: [si, si, si, si, off] },
