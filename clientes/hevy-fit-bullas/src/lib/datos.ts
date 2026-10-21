@@ -65,7 +65,6 @@ const no: Celda = null;
 /** Grupo parado: se puede abrir si se apunta gente. */
 const off: Celda = { estado: 'inactivo' };
 const flexOff: Celda = { nota: 'Pilates Flex', estado: 'inactivo' };
-const sueloOff: Celda = { nota: 'Pilates suelo', estado: 'inactivo' };
 /** Pilates Flash (novedad de octubre de 2026): clases de media hora, 7 plazas. */
 const flash: Celda = { nota: 'Pilates Flash', duracion: 30 };
 
@@ -100,9 +99,8 @@ export const HORARIOS: HorarioActividad[] = [
       { hora: '9:10', dias: [si, no, si, no, no] },
       { hora: '9:20', dias: [no, si, no, si, no] },
       { hora: '10:10', dias: [flash, no, flash, no, no] },
-      { hora: '10:20', dias: [sueloOff, no, sueloOff, no, no] },
       { hora: '16:00', dias: [no, flash, no, flash, no] },
-      { hora: '16:10', dias: [si, no, si, no, sueloOff] },
+      { hora: '16:10', dias: [si, no, si, no, no] },
       { hora: '17:10', dias: [si, no, si, no, no] },
       { hora: '17:30', dias: [no, flexOff, no, flexOff, off] },
       { hora: '18:30', dias: [si, si, si, si, si] },
