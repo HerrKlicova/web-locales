@@ -63,7 +63,16 @@ const whatsappBase = enlaceWhatsapp(ficha, 'Hola, me acabo de inscribir en la we
         </div>
         <div class="grid gap-6 sm:grid-cols-2">
           <label class={etiqueta}>Fecha de nacimiento
-            <input class={campo} name="fecha_nacimiento" type="date" autocomplete="bday" required min="1920-01-01" />
+            <input
+              class={campo}
+              name="fecha_nacimiento"
+              inputmode="numeric"
+              autocomplete="bday"
+              required
+              placeholder="dd/mm/aaaa"
+              maxlength="10"
+              pattern="\d{1,2}/\d{1,2}/\d{4}"
+            />
           </label>
           <label class={etiqueta}>Sexo
             <select class={campo} name="sexo" required>
@@ -161,16 +170,33 @@ const whatsappBase = enlaceWhatsapp(ficha, 'Hola, me acabo de inscribir en la we
   };
   const lista = (campos) => campos.map((c) => NOMBRES[c] ?? c).join(', ');
 
+  // Fecha de nacimiento como texto dd/mm/aaaa (un campo de fecha nativo se descuadra en iPhone).
+  // Las barras se ponen solas al escribir; se envía como AAAA-MM-DD.
+  const fecha = form.fecha_nacimiento;
+  fecha.addEventListener('input', () => {
+    const d = fecha.value.replace(/\D/g, '').slice(0, 8);
+    fecha.value = [d.slice(0, 2), d.slice(2, 4), d.slice(4)].filter(Boolean).join('/');
+  });
+  const fechaIso = (texto) => {
+    const m = /^(\d{1,2})\/(\d{1,2})\/(\d{4})$/.exec(texto.trim());
+    if (!m) return null;
+    const [dia, mes, anio] = [Number(m[1]), Number(m[2]), Number(m[3])];
+    const f = new Date(Date.UTC(anio, mes - 1, dia));
+    if (f.getUTCFullYear() !== anio || f.getUTCMonth() !== mes - 1 || f.getUTCDate() !== dia) return null;
+    return `${anio}-${String(mes).padStart(2, '0')}-${String(dia).padStart(2, '0')}`;
+  };
+
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
     error.classList.add('hidden');
     const faltan = [...form.elements].filter((el) => el.required && !el.checkValidity()).map((el) => el.name);
+    if (!faltan.includes('fecha_nacimiento') && !fechaIso(fecha.value)) faltan.push('fecha_nacimiento');
     if (faltan.length) return mostrarError(`Revisa ${lista(faltan)}.`, faltan);
 
     const d = new FormData(form);
     const datos = {
       nombre: d.get('nombre'), apellidos: d.get('apellidos'), email: d.get('email'), telefono: d.get('telefono'),
-      fecha_nacimiento: d.get('fecha_nacimiento'), sexo: d.get('sexo'), actividad: d.get('actividad'),
+      fecha_nacimiento: fechaIso(fecha.value), sexo: d.get('sexo'), actividad: d.get('actividad'),
       acepta_privacidad: d.get('acepta_privacidad') === 'on', acepta_emails: d.get('acepta_emails') === 'on',
       web: d.get('web'), t: Date.now() - abierto,
     };
