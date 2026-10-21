@@ -2,7 +2,9 @@
   "slug": "hevy-fit-bullas",
   "demo_token": "k7m2qx",
   "dominio": "https://hevyfit.com",
-  "paginas_ocultas": ["prueba-reservas"],
+  "paginas_ocultas": [
+    "prueba-reservas"
+  ],
   "paginas_internas": [
     "clasica"
   ],
@@ -44,7 +46,7 @@
       "horas": "Cerrado"
     }
   ],
-  "matricula": "10 € de matrícula, pago único. Una vez abonada vale para todas las actividades.",
+  "matricula": "10 € de matrícula, pago único, en Pilates Flash, Barre y Training Club. Una vez abonada vale para las tres.",
   "actividades": [
     {
       "id": "pilates",
@@ -56,7 +58,7 @@
         {
           "nombre": "Pilates Flash, 2 días a la semana (30 min)",
           "precio": "60 €/mes",
-          "nota": "Novedad · martes y jueves, grupos de 7"
+          "nota": "Novedad · L y X 10:10, M y J 16:00, X 20:30 y V 19:30 · grupos de 7 · matrícula de 10 €"
         },
         {
           "nombre": "Pilates mat, 1 día a la semana",
@@ -110,6 +112,11 @@
           "nombre": "Acceso ilimitado",
           "precio": "85 €/mes",
           "nota": "229,50 € el trimestre"
+        },
+        {
+          "nombre": "Matrícula, pago único",
+          "precio": "10 €",
+          "nota": "se paga una vez y vale para Pilates Flash, Barre y Training Club"
         }
       ]
     },
@@ -140,6 +147,11 @@
         {
           "nombre": "Pack movimiento: 2 días de Barre y acceso ilimitado al centro de fuerza",
           "precio": "75 €/mes"
+        },
+        {
+          "nombre": "Matrícula, pago único",
+          "precio": "10 €",
+          "nota": "se paga una vez y vale para Pilates Flash, Barre y Training Club"
         }
       ]
     },
