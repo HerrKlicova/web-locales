@@ -27,6 +27,8 @@ if (produccion && !ficha.dominio) {
   throw new Error(`Falta dominio en clientes/${cliente}/ficha.json (por ejemplo "https://ejemplo.es").`);
 }
 const internas = ficha.paginas_internas ?? [];
+// Páginas que se publican pero no se anuncian (pruebas que el cliente mira desde el móvil): fuera del sitemap.
+const ocultas = ficha.paginas_ocultas ?? [];
 
 export default defineConfig({
   output: 'static',
@@ -39,7 +41,7 @@ export default defineConfig({
   // interno (ficha.paginas_internas, p. ej. una versión antigua para comparar) se quedan fuera;
   // scripts/produccion.mjs además las borra de dist antes de publicar.
   integrations: produccion
-    ? [sitemap({ filter: (url) => !internas.some((p) => url.includes(`/${p}/`)) })]
+    ? [sitemap({ filter: (url) => ![...internas, ...ocultas].some((p) => url.includes(`/${p}/`)) })]
     : [],
   build: { inlineStylesheets: 'always' },
   vite: {

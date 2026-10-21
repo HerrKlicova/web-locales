@@ -1,0 +1,204 @@
+---
+// Inscripción en la propia web: los datos van al conector, que da de alta a la persona en Trainingym
+// como potencial. La cuota se elige y se paga después en recepción (casi nadie paga online).
+import Layout from '../../layouts/Layout.astro';
+import Cabecera from '../../components/Cabecera.astro';
+import Footer from '../../components/Footer.astro';
+import Icono from '../../components/Icono.astro';
+import { enlaceWhatsapp } from '@plantilla/lib/ficha';
+import { CONECTOR, type FichaHevy } from '../../lib/datos';
+import fichaJson from '../../../ficha.json';
+
+const ficha = fichaJson as unknown as FichaHevy;
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+const titulo = `Inscríbete — ${ficha.marca}, ${ficha.pueblo}`;
+const descripcion = `Inscríbete en Hevy Fit (Bullas) en un minuto: Pilates, Pilates Flash, Barre, Training Club o sala de fuerza. Después eliges tu cuota en recepción.`;
+const demo = import.meta.env.PRODUCCION !== 'true';
+
+const actividades = [
+  ['pilates', 'Pilates'],
+  ['pilates-flash', 'Pilates Flash (clases de 30 minutos)'],
+  ['barre', 'Barre'],
+  ['training', 'Training Club'],
+  ['fuerza', 'Centro de fuerza (acceso libre)'],
+  ['no-se', 'Aún no lo sé'],
+] as const;
+const campo = 'mt-2 block min-h-12 w-full rounded-lg border border-(--borde) bg-noche px-4 text-lg text-hueso placeholder:text-humo focus:border-hueso focus:outline-none aria-[invalid=true]:border-inactivo';
+const etiqueta = 'block font-bold';
+const whatsappBase = enlaceWhatsapp(ficha, 'Hola, me acabo de inscribir en la web y quiero contratar mi cuota.');
+---
+
+<Layout titulo={titulo} descripcion={descripcion} demo={demo}>
+  <Cabecera ficha={ficha} />
+
+  <main id="contenido" class="luz-magenta px-4 pb-24 pt-4 sm:px-8">
+    <p class="mx-auto max-w-2xl">
+      <a href={`${base}/`} class="inline-flex min-h-11 items-center text-hueso-tenue hover:text-hueso">Volver a la portada</a>
+    </p>
+
+    <div class="mx-auto mt-6 max-w-2xl">
+      <div class="led w-16" aria-hidden="true"></div>
+      <h1 class="rotulo m-0 mt-5 text-4xl sm:text-5xl">Inscríbete en Hevy Fit</h1>
+      <p class="mt-5 text-lg leading-snug text-hueso-tenue">
+        Déjanos tus datos y te damos de alta en un minuto. La cuota la eliges y la pagas después en recepción, en efectivo o con
+        tarjeta. Matrícula única de 10 €.
+      </p>
+
+      <form class="mt-10 grid gap-6 rounded-2xl border border-(--borde) bg-(--fondo-alto) p-6 sm:p-8" data-inscripcion novalidate>
+        <div class="grid gap-6 sm:grid-cols-2">
+          <label class={etiqueta}>Nombre
+            <input class={campo} name="nombre" autocomplete="given-name" required maxlength="60" />
+          </label>
+          <label class={etiqueta}>Apellidos
+            <input class={campo} name="apellidos" autocomplete="family-name" maxlength="100" />
+          </label>
+        </div>
+        <div class="grid gap-6 sm:grid-cols-2">
+          <label class={etiqueta}>Teléfono móvil
+            <input class={campo} name="telefono" type="tel" inputmode="tel" autocomplete="tel" required placeholder="600 000 000" />
+          </label>
+          <label class={etiqueta}>Email
+            <input class={campo} name="email" type="email" autocomplete="email" required maxlength="150" />
+          </label>
+        </div>
+        <div class="grid gap-6 sm:grid-cols-2">
+          <label class={etiqueta}>Fecha de nacimiento
+            <input class={campo} name="fecha_nacimiento" type="date" autocomplete="bday" required min="1920-01-01" />
+          </label>
+          <label class={etiqueta}>Sexo
+            <select class={campo} name="sexo" required>
+              <option value="" selected disabled>Elige una opción</option>
+              <option value="mujer">Mujer</option>
+              <option value="hombre">Hombre</option>
+              <option value="otro">Otro o prefiero no decirlo</option>
+            </select>
+          </label>
+        </div>
+        <label class={etiqueta}>¿Qué te interesa?
+          <select class={campo} name="actividad" required>
+            {actividades.map(([v, t]) => <option value={v}>{t}</option>)}
+          </select>
+        </label>
+
+        <!-- Campo trampa para robots: las personas no lo ven. -->
+        <div class="absolute -left-[9999px] h-px w-px overflow-hidden" aria-hidden="true">
+          <label>Tu web <input name="web" tabindex="-1" autocomplete="off" /></label>
+        </div>
+
+        <div class="grid gap-3">
+          <label class="flex items-start gap-3 leading-snug">
+            <input type="checkbox" name="acepta_privacidad" required class="mt-1 size-5 shrink-0 accent-neon" />
+            <span>
+              Acepto que {ficha.marca} use mis datos para darme de alta y contactar conmigo, según la{' '}
+              <a href="#privacidad" class="underline">política de privacidad</a>.
+            </span>
+          </label>
+          <label class="flex items-start gap-3 leading-snug text-hueso-tenue">
+            <input type="checkbox" name="acepta_emails" class="mt-1 size-5 shrink-0 accent-neon" />
+            <span>Quiero recibir novedades y ofertas por email (opcional).</span>
+          </label>
+        </div>
+
+        <p class="m-0 hidden rounded-lg border border-inactivo/60 px-4 py-3" role="alert" data-error></p>
+
+        <button
+          type="submit"
+          class="inline-flex min-h-13 items-center justify-center rounded-full bg-neon px-7 text-lg font-bold text-noche transition-colors hover:bg-hueso disabled:opacity-60"
+          data-enviar
+        >
+          Inscribirme
+        </button>
+        <p class="m-0 text-sm text-hueso-tenue">
+          ¿Prefieres elegir tu tarifa y pagarla online? Hazlo en{' '}
+          <a href={ficha.web_reservas} class="underline" target="_blank" rel="noopener">nuestra plataforma de reservas</a>.
+        </p>
+      </form>
+
+      <section class="mt-10 hidden rounded-2xl border border-(--luz)/60 bg-(--fondo-alto) p-6 sm:p-8" data-gracias tabindex="-1" aria-live="polite">
+        <h2 class="rotulo m-0 text-3xl sm:text-4xl" data-gracias-titulo>¡Gracias por inscribirte!</h2>
+        <p class="mt-4 text-lg leading-snug text-hueso-tenue">
+          Ya tienes tu ficha en {ficha.marca}. Para elegir tu cuota, pásate por recepción o escríbenos por WhatsApp y te la dejamos
+          preparada para tu primer día.
+        </p>
+        <a
+          href={whatsappBase}
+          class="mt-6 inline-flex min-h-13 items-center justify-center gap-2.5 rounded-full bg-neon px-7 text-lg font-bold text-noche transition-colors hover:bg-hueso"
+          target="_blank"
+          rel="noopener"
+          data-gracias-whatsapp
+        >
+          <Icono nombre="whatsapp" class="size-6" />
+          Contratar mi cuota por WhatsApp
+        </a>
+      </section>
+    </div>
+  </main>
+
+  <Footer ficha={ficha} titular={ficha.titular} nif={ficha.nif} />
+</Layout>
+
+<script define:vars={{ api: `${CONECTOR}/inscripcion`, whatsapp: whatsappBase }}>
+  const form = document.querySelector('[data-inscripcion]');
+  const error = document.querySelector('[data-error]');
+  const boton = document.querySelector('[data-enviar]');
+  const gracias = document.querySelector('[data-gracias]');
+  const abierto = Date.now();
+
+  // ?actividad=pilates-flash preselecciona la actividad (los botones de cada sala la pasan).
+  const pedida = new URLSearchParams(location.search).get('actividad');
+  if (pedida && form.actividad.querySelector(`option[value="${CSS.escape(pedida)}"]`)) form.actividad.value = pedida;
+
+  const NOMBRES = {
+    nombre: 'el nombre', email: 'el email', telefono: 'el teléfono', fecha_nacimiento: 'la fecha de nacimiento',
+    sexo: 'el sexo', actividad: 'la actividad', acepta_privacidad: 'la casilla de privacidad',
+  };
+  const mostrarError = (texto, campos = []) => {
+    form.querySelectorAll('[aria-invalid]').forEach((el) => el.removeAttribute('aria-invalid'));
+    campos.forEach((c) => form.elements[c]?.setAttribute('aria-invalid', 'true'));
+    error.textContent = texto;
+    error.classList.remove('hidden');
+    (form.elements[campos[0]] ?? error).focus?.();
+  };
+  const lista = (campos) => campos.map((c) => NOMBRES[c] ?? c).join(', ');
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    error.classList.add('hidden');
+    const faltan = [...form.elements].filter((el) => el.required && !el.checkValidity()).map((el) => el.name);
+    if (faltan.length) return mostrarError(`Revisa ${lista(faltan)}.`, faltan);
+
+    const d = new FormData(form);
+    const datos = {
+      nombre: d.get('nombre'), apellidos: d.get('apellidos'), email: d.get('email'), telefono: d.get('telefono'),
+      fecha_nacimiento: d.get('fecha_nacimiento'), sexo: d.get('sexo'), actividad: d.get('actividad'),
+      acepta_privacidad: d.get('acepta_privacidad') === 'on', acepta_emails: d.get('acepta_emails') === 'on',
+      web: d.get('web'), t: Date.now() - abierto,
+    };
+    boton.disabled = true;
+    boton.textContent = 'Enviando…';
+    try {
+      const r = await fetch(api, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(datos) });
+      const cuerpo = await r.json().catch(() => ({}));
+      if (r.ok && cuerpo.ok) {
+        const actividad = form.actividad.selectedOptions[0]?.textContent ?? '';
+        document.querySelector('[data-gracias-titulo]').textContent = `¡Gracias por inscribirte, ${datos.nombre.trim()}!`;
+        document.querySelector('[data-gracias-whatsapp]').href = whatsapp.replace(
+          encodeURIComponent('web y quiero'),
+          encodeURIComponent(`web (${actividad}) y quiero`),
+        );
+        form.classList.add('hidden');
+        gracias.classList.remove('hidden');
+        gracias.focus();
+        return;
+      }
+      if (r.status === 400 && cuerpo.campos) mostrarError(`Revisa ${lista(cuerpo.campos)}.`, cuerpo.campos);
+      else if (r.status === 429) mostrarError(`Has hecho demasiados intentos. Prueba dentro de ${cuerpo.minutos ?? 15} minutos o escríbenos por WhatsApp.`);
+      else mostrarError('No hemos podido enviar tu inscripción. Inténtalo de nuevo en un rato o escríbenos por WhatsApp.');
+    } catch {
+      mostrarError('No hay conexión. Inténtalo de nuevo o escríbenos por WhatsApp.');
+    } finally {
+      boton.disabled = false;
+      boton.textContent = 'Inscribirme';
+    }
+  });
+</script>

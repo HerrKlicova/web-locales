@@ -58,14 +58,19 @@ const resumen = 'inline-flex min-h-11 cursor-pointer list-none items-center unde
             <p>El contenido de esta web (textos, fotos y marca) pertenece a su titular. No se permite copiarlo sin permiso.</p>
           </div>
         </details>
-        <details>
+        <details id="privacidad" data-abre-privacidad>
           <summary class={resumen}>Privacidad</summary>
           <div class="mt-3 max-w-[70ch] space-y-2">
             <p>
-              Esta web no tiene formularios ni guarda datos personales. Si nos escribes por WhatsApp o por correo, tus datos los trata
-              {titular} solo para atender tu petición, según el Reglamento (UE) 2016/679.
+              Responsable: {titular}. Si te inscribes en el formulario de esta web o nos escribes por WhatsApp o por correo, tratamos tus
+              datos solo para darte de alta como interesado, contactar contigo y gestionar tu inscripción, con tu consentimiento y según
+              el Reglamento (UE) 2016/679.
             </p>
-            <p>Las inscripciones se gestionan en hevyfitbullas.es, la plataforma del centro, que tiene su propia política de privacidad.</p>
+            <p>
+              Los datos del formulario se guardan en Trainingym, el programa de gestión del centro, y en nuestro servidor de Cloudflare,
+              donde se borran pasado un año. No se ceden a nadie más. Solo te enviaremos novedades por email si marcas esa casilla.
+            </p>
+            <p>Si te inscribes en hevyfitbullas.es, la plataforma de reservas del centro, se aplica también su propia política de privacidad.</p>
             <p>Puedes pedir acceso, corrección o borrado de tus datos escribiendo a {ficha.email}.</p>
           </div>
         </details>
@@ -88,3 +93,10 @@ const resumen = 'inline-flex min-h-11 cursor-pointer list-none items-center unde
     </p>
   </div>
 </footer>
+
+<script>
+  // Los enlaces a #privacidad (p. ej. desde el formulario) abren el desplegable.
+  const abrir = () => { if (location.hash === '#privacidad') document.querySelector<HTMLDetailsElement>('#privacidad')?.setAttribute('open', ''); };
+  addEventListener('hashchange', abrir);
+  abrir();
+</script>

@@ -1,6 +1,6 @@
 ---
 import { enlaceWhatsapp } from '@plantilla/lib/ficha';
-import { DIAS, LEYENDA, type Celda, type FichaHevy, type HorarioActividad } from '../lib/datos';
+import { CONECTOR, DIAS, LEYENDA, type Celda, type FichaHevy, type HorarioActividad } from '../lib/datos';
 
 /**
  * Horario semanal de una actividad: rejilla de horas por días en escritorio, lista por día en móvil.
@@ -31,6 +31,9 @@ const contexto = (c: NonNullable<Celda>, dia: string) =>
 const clase = (c: NonNullable<Celda>) =>
   activo(c) ? 'bg-(--luz)/25 hover:bg-(--luz)/40' : 'border border-(--borde) bg-(--fondo-alto) hover:border-hueso-tenue';
 const punto = (c: NonNullable<Celda>) => (activo(c) ? 'bg-activo' : 'bg-inactivo');
+// Pilates: plazas libres de cada grupo según el cuadrante (las pinta el script de abajo).
+const conPlazas = h.id === 'pilates';
+const plaza = (c: NonNullable<Celda>, hora: string, di: number) => (conPlazas && activo(c) && !c.duracion ? `${hora}|${di}` : undefined);
 ---
 
 <div class={`luz-${h.luz}`}>
@@ -53,6 +56,7 @@ const punto = (c: NonNullable<Celda>) => (activo(c) ? 'bg-activo' : 'bg-inactivo
                 {c && (
                   <a
                     href={enlace(c, DIAS[di], f.hora)}
+                    data-plaza={plaza(c, f.hora, di)}
                     class:list={['flex min-h-14 flex-col justify-center rounded-md px-3 py-1.5 leading-tight text-hueso transition-colors', clase(c)]}
                     target="_blank"
                     rel="noopener"
@@ -63,6 +67,7 @@ const punto = (c: NonNullable<Celda>) => (activo(c) ? 'bg-activo' : 'bg-inactivo
                       <span class="font-normal text-hueso-tenue">– {fin(f.hora, c)}</span>
                     </span>
                     {c.nota && <span class:list={['pl-4 text-sm', activo(c) ? 'texto-luz' : 'text-hueso-tenue']}>{c.nota}</span>}
+                    {plaza(c, f.hora, di) && <span class="hidden pl-4 text-sm font-bold" data-plazas />}
                     <span class="sr-only">{contexto(c, DIAS[di])}</span>
                   </a>
                 )}
@@ -87,6 +92,7 @@ const punto = (c: NonNullable<Celda>) => (activo(c) ? 'bg-activo' : 'bg-inactivo
               {clases.map(({ hora, c }) => (
                 <a
                   href={enlace(c, d, hora)}
+                  data-plaza={plaza(c, hora, di)}
                   class:list={['flex min-h-11 flex-col justify-center rounded-md px-3 py-1 leading-tight text-hueso', clase(c)]}
                   target="_blank"
                   rel="noopener"
@@ -97,6 +103,7 @@ const punto = (c: NonNullable<Celda>) => (activo(c) ? 'bg-activo' : 'bg-inactivo
                     <span class="font-normal text-hueso-tenue">– {fin(hora, c)}</span>
                   </span>
                   {c.nota && <span class:list={['pl-4 text-sm', activo(c) ? 'texto-luz' : 'text-hueso-tenue']}>{c.nota}</span>}
+                  {plaza(c, hora, di) && <span class="hidden pl-4 text-sm font-bold" data-plazas />}
                   <span class="sr-only">{contexto(c, d)}</span>
                 </a>
               ))}
@@ -122,3 +129,26 @@ const punto = (c: NonNullable<Celda>) => (activo(c) ? 'bg-activo' : 'bg-inactivo
     {h.aviso && <p class="m-0">{h.aviso}</p>}
   </div>
 </div>
+
+{
+  conPlazas && (
+    <script is:inline define:vars={{ api: `${CONECTOR}/pilates/plazas` }}>
+      // Plazas libres de cada grupo de Pilates (solo números, del cuadrante). Si no responde, no se pinta nada.
+      fetch(api)
+        .then((r) => (r.ok ? r.json() : null))
+        .then((d) => {
+          for (const g of d?.grupos ?? []) {
+            const texto = g.libres === 0 ? 'Completo' : g.libres === 1 ? 'Queda 1 plaza' : `Quedan ${g.libres} plazas`;
+            for (const dia of g.dias) {
+              document.querySelectorAll(`[data-plaza="${g.hora}|${dia}"] [data-plazas]`).forEach((el) => {
+                el.textContent = texto;
+                el.classList.remove('hidden');
+                el.classList.add(g.libres === 0 ? 'text-inactivo' : 'text-activo');
+              });
+            }
+          }
+        })
+        .catch(() => {});
+    </script>
+  )
+}

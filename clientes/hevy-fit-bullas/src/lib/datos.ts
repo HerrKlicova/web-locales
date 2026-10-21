@@ -35,6 +35,9 @@ export interface FichaHevy extends Ficha {
   actividades: Actividad[];
 }
 
+/** Conector de Hevy Fit con Trainingym (Worker hevyfit-trainingym-mcp): formulario de inscripción y plazas de Pilates. */
+export const CONECTOR = 'https://hevyfit-trainingym-mcp.webs-locales.workers.dev';
+
 /* Horarios de clases. Índice de día: 0 = lunes … 4 = viernes.
    Cada fila es una franja; cada celda es null (no hay clase) o un grupo.
    Un grupo puede estar activo (punto verde: se entrena, puedes entrar) o inactivo

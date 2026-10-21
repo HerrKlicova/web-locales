@@ -1,0 +1,28 @@
+---
+// Prueba: la plataforma de reservas (hevyfitbullas.es) dentro de la web, sin salir de hevyfit.com.
+// No está enlazada ni en el sitemap, y lleva noindex: es para que Eugenio la pruebe desde el móvil
+// (sobre todo en iPhone, donde Safari puede bloquear el inicio de sesión dentro de un marco).
+import Layout from '../../layouts/Layout.astro';
+import Cabecera from '../../components/Cabecera.astro';
+import type { FichaHevy } from '../../lib/datos';
+import fichaJson from '../../../ficha.json';
+
+const ficha = fichaJson as unknown as FichaHevy;
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+---
+
+<Layout titulo={`Reservas — ${ficha.marca}`} descripcion="Prueba de la plataforma de reservas integrada." demo={true}>
+  <Cabecera ficha={ficha} />
+  <main id="contenido" class="px-4 pb-8 sm:px-8">
+    <p class="mx-auto max-w-6xl text-hueso-tenue">
+      <a href={`${base}/`} class="inline-flex min-h-11 items-center hover:text-hueso">Volver a la portada</a>
+      · Si no carga o no te deja entrar, <a href={ficha.web_reservas} class="underline" target="_blank" rel="noopener">ábrela aparte</a>.
+    </p>
+    <iframe
+      src={ficha.web_reservas}
+      title="Plataforma de reservas de Hevy Fit"
+      class="mx-auto mt-2 block h-[calc(100dvh-10rem)] min-h-[36rem] w-full max-w-6xl rounded-xl border border-noche-borde bg-hueso"
+      allow="payment"
+    ></iframe>
+  </main>
+</Layout>

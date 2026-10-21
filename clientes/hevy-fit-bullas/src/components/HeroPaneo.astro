@@ -33,6 +33,7 @@ const derAvif = await foto(derecha, 'avif');
 const derWebp = await foto(derecha, 'webp');
 
 const whatsapp = enlaceWhatsapp(ficha, `Hola, quiero información sobre ${ficha.marca}.`);
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 ---
 
 <header class="relative flex min-h-dvh flex-col overflow-hidden text-hueso" data-hero data-sala="noche">
@@ -92,10 +93,8 @@ const whatsapp = enlaceWhatsapp(ficha, `Hola, quiero información sobre ${ficha.
       </p>
       <div class="flex flex-col gap-3 sm:flex-row sm:flex-wrap" data-entra>
         <a
-          href={ficha.web_reservas}
+          href={`${base}/inscripcion/`}
           class="inline-flex min-h-13 items-center justify-center rounded-full bg-neon px-7 text-lg font-bold text-noche transition-colors hover:bg-hueso"
-          target="_blank"
-          rel="noopener"
         >
           Inscribirme
         </a>

@@ -2,6 +2,7 @@
   "slug": "hevy-fit-bullas",
   "demo_token": "k7m2qx",
   "dominio": "https://hevyfit.com",
+  "paginas_ocultas": ["prueba-reservas"],
   "paginas_internas": [
     "clasica"
   ],

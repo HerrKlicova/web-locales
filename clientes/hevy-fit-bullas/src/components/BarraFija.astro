@@ -7,6 +7,7 @@ import Icono from './Icono.astro';
 interface Props { ficha: FichaHevy }
 const { ficha } = Astro.props;
 const whatsapp = enlaceWhatsapp(ficha, `Hola, quiero información sobre ${ficha.marca}.`);
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 ---
 
 <div
@@ -14,10 +15,8 @@ const whatsapp = enlaceWhatsapp(ficha, `Hola, quiero información sobre ${ficha.
   data-barra-fija
 >
   <a
-    href={ficha.web_reservas}
+    href={`${base}/inscripcion/`}
     class="flex min-h-13 flex-1 items-center justify-center rounded-full bg-neon text-lg font-bold text-noche"
-    target="_blank"
-    rel="noopener"
   >
     Inscribirme
   </a>
