@@ -62,3 +62,7 @@
 - Variable `GOOGLE_MAPS_API_KEY` (solo para consultar Google Places).
 - Wrangler autenticado en la cuenta de Cloudflare para desplegar.
 - MCP de `.mcp.json`: chrome-devtools (capturas y Lighthouse), gmaps, astro-docs, higgsfield.
+
+## Despliegue (24/10/2026)
+- Cloudflare Builds conectado a este repo, rama `claude/project-thread-9n2u92`: cada push a esa rama construye y publica `hevy-fit-bullas` en hevyfit.com.
+- Compilación: `CLIENTE=hevy-fit-bullas PRODUCCION=true npm run build`. Despliegue: `npx wrangler deploy -c clientes/hevy-fit-bullas/wrangler.jsonc`. Sin compilaciones de vista previa.
