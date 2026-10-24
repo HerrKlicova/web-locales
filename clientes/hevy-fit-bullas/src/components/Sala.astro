@@ -169,16 +169,31 @@ const tarjeta = a.id === 'pilates' ? 'listones' : '';
 
     {
       horario && (
-        <div class="reveal mt-12 md:mt-16" data-horario>
-          <h3 class="m-0 text-xl font-bold">Horario semanal de {a.nombre}</h3>
+        <details class="horario-plegable reveal mt-12 md:mt-16" data-horario>
+          <summary class="inline-flex min-h-13 cursor-pointer list-none items-center justify-center gap-2.5 rounded-full border-2 border-current px-7 text-lg font-bold texto-luz transition-colors">
+            <span class="cuando-cerrado">Ver horarios</span>
+            <span class="cuando-abierto">Ocultar horarios</span>
+            <span class="flecha" aria-hidden="true">▾</span>
+          </summary>
+          <h3 class="m-0 mt-8 text-xl font-bold">Horario semanal de {a.nombre}</h3>
           <div class="mt-5">
             <RejillaHorario ficha={ficha} horario={horario} />
           </div>
-        </div>
+        </details>
       )
     }
   </div>
 </section>
+
+<style>
+  .horario-plegable > summary::-webkit-details-marker { display: none; }
+  .horario-plegable .cuando-abierto { display: none; }
+  .horario-plegable[open] .cuando-abierto { display: inline; }
+  .horario-plegable[open] .cuando-cerrado { display: none; }
+  .horario-plegable > summary:hover { background: color-mix(in srgb, var(--luz) 20%, transparent); }
+  .horario-plegable .flecha { transition: transform 0.2s; }
+  .horario-plegable[open] .flecha { transform: rotate(180deg); }
+</style>
 
 <script>
   // Pase de fotos de cada marco, con fundido y los dos marcos desfasados. Solo corre con la sección
