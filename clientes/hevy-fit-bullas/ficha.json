@@ -3,7 +3,8 @@
   "demo_token": "k7m2qx",
   "dominio": "https://hevyfit.com",
   "paginas_ocultas": [
-    "prueba-reservas"
+    "prueba-reservas",
+    "encuesta"
   ],
   "paginas_internas": [
     "clasica"

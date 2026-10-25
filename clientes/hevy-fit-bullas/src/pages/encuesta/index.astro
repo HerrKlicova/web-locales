@@ -1,0 +1,313 @@
+---
+// Encuesta anónima de clientes. El QR y el enlace público llevan aquí; al entrar, el conector da a
+// cada persona su propio enlace de un solo uso (?c=...), que deja de valer al enviar la encuesta.
+// Las respuestas son anónimas: el conector no guarda el código, la hora ni la IP (src/web/encuesta.ts
+// del repo TRAININGYM-API-PROJECT). No está en el sitemap y lleva noindex.
+import Layout from '../../layouts/Layout.astro';
+import Logo from '../../components/Logo.astro';
+import { CONECTOR, type FichaHevy } from '../../lib/datos';
+import fichaJson from '../../../ficha.json';
+
+const ficha = fichaJson as unknown as FichaHevy;
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+
+type Paso =
+  | { id: string; titulo: string; tipo: 'opciones'; opciones: [string, string][]; nota?: string }
+  | { id: string; titulo: string; tipo: 'estrellas' | 'escala' | 'texto'; nota?: string };
+
+// Las claves deben coincidir con OPCIONES de src/web/encuesta.ts en el conector.
+const pasos: Paso[] = [
+  {
+    id: 'actividad', titulo: '¿Qué haces en Hevy Fit?', tipo: 'opciones',
+    opciones: [['fuerza', 'Sala de musculación'], ['pilates', 'Pilates'], ['barre', 'Barre'], ['training', 'Training Club'], ['varias', 'Varias']],
+  },
+  {
+    id: 'antiguedad', titulo: '¿Cuánto tiempo llevas con nosotros?', tipo: 'opciones',
+    opciones: [['menos-3m', 'Menos de 3 meses'], ['3-12m', 'De 3 a 12 meses'], ['mas-1a', 'Más de 1 año']],
+  },
+  {
+    id: 'origen', titulo: '¿Cómo nos conociste?', tipo: 'opciones',
+    opciones: [['amigos', 'Amigos o familia'], ['redes', 'Instagram o Facebook'], ['google', 'Google o la web'], ['puerta', 'Pasando por la puerta'], ['otro', 'Otro']],
+  },
+  { id: 'satisfaccion', titulo: '¿Cómo de contento estás en general?', tipo: 'estrellas', nota: '1 = nada · 5 = encantado' },
+  {
+    id: 'horarios', titulo: '¿Los horarios te encajan?', tipo: 'opciones',
+    opciones: [['perfectos', 'Perfectos'], ['mas-o-menos', 'Más o menos'], ['no', 'No, necesito otra franja']],
+  },
+  {
+    id: 'franja', titulo: '¿Qué franja te vendría mejor?', tipo: 'opciones',
+    opciones: [['manana', 'Mañana'], ['mediodia', 'Mediodía'], ['tarde', 'Tarde'], ['noche', 'Noche']],
+  },
+  {
+    id: 'precio', titulo: 'El precio que pagas te parece...', tipo: 'opciones',
+    opciones: [['barato', 'Barato'], ['justo', 'Justo'], ['algo-caro', 'Algo caro'], ['caro', 'Caro']],
+  },
+  {
+    id: 'mejora', titulo: '¿Qué mejorarías primero?', tipo: 'opciones',
+    opciones: [['horarios', 'Horarios'], ['material', 'Material e instalaciones'], ['limpieza', 'Limpieza'], ['monitores', 'Atención de monitores'], ['clases', 'Más clases o actividades'], ['precio', 'Precio'], ['nada', 'Nada, todo genial']],
+  },
+  { id: 'recomienda', titulo: '¿Nos recomendarías a un amigo?', tipo: 'escala', nota: '0 = nunca · 10 = seguro que sí' },
+  { id: 'comentario', titulo: '¿Algo más que quieras decirnos?', tipo: 'texto', nota: 'Opcional. Es anónimo: no pongas tu nombre si no quieres.' },
+];
+// La franja solo aparece si los horarios no son perfectos y comparte número con «horarios».
+const totalNumerado = pasos.filter((p) => p.id !== 'franja').length;
+
+const opcion =
+  'flex min-h-14 w-full items-center rounded-xl border border-(--borde) bg-noche px-5 text-left text-lg font-bold text-hueso transition-colors hover:border-hueso aria-pressed:border-neon aria-pressed:bg-neon aria-pressed:text-noche';
+const boton = 'inline-flex min-h-13 items-center justify-center rounded-full bg-neon px-7 text-lg font-bold text-noche transition-colors hover:bg-hueso disabled:opacity-60';
+const botonSecundario = 'inline-flex min-h-13 items-center text-hueso-tenue hover:text-hueso';
+---
+
+<Layout titulo={`Encuesta — ${ficha.marca}`} descripcion="Encuesta anónima de 1 minuto para los clientes de Hevy Fit." demo={true}>
+  <main id="contenido" class="luz-magenta flex min-h-dvh flex-col px-4 pb-16 pt-6 sm:px-8">
+    <div class="mx-auto w-full max-w-xl">
+      <a href={`${base}/`} class="inline-flex min-h-11 items-center" aria-label="Hevy Fit, inicio">
+        <Logo class="h-14 w-auto" neon />
+      </a>
+      <div class="mt-5 h-1.5 overflow-hidden rounded-full bg-noche-borde" aria-hidden="true">
+        <div class="h-full w-0 rounded-full bg-neon transition-[width] duration-300" data-progreso></div>
+      </div>
+    </div>
+
+    <div class="mx-auto mt-8 w-full max-w-xl" data-encuesta>
+      <!-- Mensajes (cargando, ya usada, error) -->
+      <section data-pantalla="cargando" class="text-lg text-hueso-tenue" aria-live="polite">Preparando tu encuesta…</section>
+
+      <section data-pantalla="inicio" hidden>
+        <div class="led w-16" aria-hidden="true"></div>
+        <h1 class="rotulo m-0 mt-5 text-4xl sm:text-5xl">Tu opinión nos hace mejores</h1>
+        <p class="mt-5 text-lg leading-snug text-hueso-tenue">
+          {totalNumerado - 1} preguntas rápidas y un comentario opcional: menos de 1 minuto. Es <strong class="text-hueso">anónima</strong>: no te pedimos nombre ni
+          teléfono. Este enlace es solo para ti y vale para una respuesta.
+        </p>
+        <button type="button" class={`${boton} mt-8 w-full sm:w-auto`} data-empezar>Empezar</button>
+      </section>
+
+      {pasos.map((p) => (
+        <section data-paso={p.id} hidden>
+          <p class="m-0 text-sm font-bold uppercase tracking-wider text-neon" data-numero></p>
+          <h2 class="rotulo m-0 mt-3 text-3xl sm:text-4xl" tabindex="-1">{p.titulo}</h2>
+          {p.nota && <p class="mt-3 text-hueso-tenue">{p.nota}</p>}
+          {p.tipo === 'opciones' && (
+            <div class="mt-7 grid gap-3" role="group" aria-label={p.titulo}>
+              {p.opciones.map(([v, t]) => (
+                <button type="button" class={opcion} data-valor={v} aria-pressed="false">{t}</button>
+              ))}
+            </div>
+          )}
+          {p.tipo === 'estrellas' && (
+            <div class="mt-7 grid grid-cols-5 gap-2" role="group" aria-label={p.titulo}>
+              {[1, 2, 3, 4, 5].map((n) => (
+                <button
+                  type="button"
+                  class="flex aspect-square items-center justify-center rounded-xl border border-(--borde) bg-noche text-3xl text-humo transition-colors hover:border-hueso data-[lleno]:border-neon data-[lleno]:text-neon"
+                  data-valor={n}
+                  data-estrella
+                  aria-pressed="false"
+                  aria-label={`${n} de 5`}
+                >★</button>
+              ))}
+            </div>
+          )}
+          {p.tipo === 'escala' && (
+            <div class="mt-7 grid grid-cols-6 gap-2 sm:grid-cols-11" role="group" aria-label={p.titulo}>
+              {Array.from({ length: 11 }, (_, n) => (
+                <button
+                  type="button"
+                  class="flex aspect-square items-center justify-center rounded-xl border border-(--borde) bg-noche text-lg font-bold text-hueso transition-colors hover:border-hueso aria-pressed:border-neon aria-pressed:bg-neon aria-pressed:text-noche"
+                  data-valor={n}
+                  aria-pressed="false"
+                >{n}</button>
+              ))}
+            </div>
+          )}
+          {p.tipo === 'texto' && (
+            <>
+              <label class="mt-7 block">
+                <span class="sr-only">{p.titulo}</span>
+                <textarea
+                  class="block min-h-36 w-full rounded-xl border border-(--borde) bg-noche p-4 text-lg text-hueso placeholder:text-humo focus:border-hueso focus:outline-none"
+                  maxlength="500"
+                  placeholder="Escribe aquí (opcional)"
+                  data-comentario
+                ></textarea>
+              </label>
+              <!-- Campo trampa para robots: las personas no lo ven. -->
+              <div class="absolute -left-[9999px] h-px w-px overflow-hidden" aria-hidden="true">
+                <label>Tu web <input name="web" tabindex="-1" autocomplete="off" data-trampa /></label>
+              </div>
+              <p class="mt-4 hidden rounded-lg border border-inactivo/60 px-4 py-3" role="alert" data-error></p>
+              <button type="button" class={`${boton} mt-6 w-full`} data-enviar>Enviar encuesta</button>
+            </>
+          )}
+          <div class="mt-6 flex justify-between">
+            <button type="button" class={botonSecundario} data-atras>← Atrás</button>
+          </div>
+        </section>
+      ))}
+
+      <section data-pantalla="gracias" hidden tabindex="-1">
+        <div class="led w-16" aria-hidden="true"></div>
+        <h1 class="rotulo m-0 mt-5 text-4xl sm:text-5xl">¡Gracias!</h1>
+        <p class="mt-5 text-lg leading-snug text-hueso-tenue">
+          Tu respuesta nos ayuda a preparar la nueva temporada. Lo leemos todo, de verdad.
+        </p>
+        <a href={`${base}/`} class={`${boton} mt-8`}>Ir a la web</a>
+      </section>
+
+      <section data-pantalla="usada" hidden tabindex="-1">
+        <h1 class="rotulo m-0 text-3xl sm:text-4xl">Este enlace ya se ha usado</h1>
+        <p class="mt-5 text-lg leading-snug text-hueso-tenue">
+          Cada enlace de la encuesta vale para una sola respuesta. Si eres cliente y aún no la has hecho, abre la encuesta con el QR del
+          gimnasio y tendrás el tuyo.
+        </p>
+      </section>
+
+      <section data-pantalla="error" hidden tabindex="-1">
+        <h1 class="rotulo m-0 text-3xl sm:text-4xl">No hemos podido abrir la encuesta</h1>
+        <p class="mt-5 text-lg leading-snug text-hueso-tenue" data-error-texto>Revisa tu conexión e inténtalo de nuevo.</p>
+        <button type="button" class={`${boton} mt-8`} data-reintentar>Reintentar</button>
+      </section>
+    </div>
+  </main>
+</Layout>
+
+<script define:vars={{ api: `${CONECTOR}/encuesta`, total: totalNumerado }}>
+  const CLAVE_HECHA = 'hf-encuesta-1-enviada';
+  const CLAVE_CODIGO = 'hf-encuesta-1-codigo';
+  const guardar = (k, v) => { try { v === null ? localStorage.removeItem(k) : localStorage.setItem(k, v); } catch {} };
+  const leer = (k) => { try { return localStorage.getItem(k); } catch { return null; } };
+
+  const $ = (s, el = document) => el.querySelector(s);
+  const pantallas = [...document.querySelectorAll('[data-pantalla], [data-paso]')];
+  const progreso = $('[data-progreso]');
+  const orden = [...document.querySelectorAll('[data-paso]')].map((s) => s.dataset.paso);
+  const respuestas = {};
+  let codigo = null;
+  let empezado = 0;
+  let historial = [];
+
+  const mostrar = (el) => {
+    pantallas.forEach((p) => (p.hidden = p !== el));
+    window.scrollTo({ top: 0 });
+    (el.querySelector('h1, h2') ?? el).focus?.({ preventScroll: true });
+  };
+  const pantalla = (nombre) => mostrar($(`[data-pantalla="${nombre}"]`));
+  const numeroDe = (id) => orden.filter((p) => p !== 'franja').indexOf(id === 'franja' ? 'horarios' : id) + 1;
+
+  const irA = (id) => {
+    const seccion = $(`[data-paso="${id}"]`);
+    const n = numeroDe(id);
+    $('[data-numero]', seccion).textContent = `Pregunta ${n} de ${total}`;
+    progreso.style.width = `${((n - 1) / total) * 100}%`;
+    mostrar(seccion);
+  };
+  const siguienteDe = (id) => {
+    let i = orden.indexOf(id) + 1;
+    if (orden[i] === 'franja' && respuestas.horarios === 'perfectos') i++;
+    return orden[i];
+  };
+
+  // Elegir una opción marca el botón y pasa a la siguiente pregunta.
+  document.querySelectorAll('[data-paso] [data-valor]').forEach((b) => {
+    b.addEventListener('click', () => {
+      const seccion = b.closest('[data-paso]');
+      const id = seccion.dataset.paso;
+      const numerico = id === 'satisfaccion' || id === 'recomienda';
+      respuestas[id] = numerico ? Number(b.dataset.valor) : b.dataset.valor;
+      seccion.querySelectorAll('[data-valor]').forEach((o) => {
+        o.setAttribute('aria-pressed', String(o === b));
+        if (o.hasAttribute('data-estrella')) o.toggleAttribute('data-lleno', Number(o.dataset.valor) <= respuestas[id]);
+      });
+      if (id === 'horarios' && respuestas.horarios === 'perfectos') delete respuestas.franja;
+      setTimeout(() => {
+        historial.push(id);
+        irA(siguienteDe(id));
+      }, 220);
+    });
+  });
+  document.querySelectorAll('[data-atras]').forEach((b) =>
+    b.addEventListener('click', () => {
+      const anterior = historial.pop();
+      if (anterior) irA(anterior);
+      else pantalla('inicio');
+    }),
+  );
+  $('[data-empezar]').addEventListener('click', () => {
+    empezado = Date.now();
+    historial = [];
+    irA(orden[0]);
+  });
+
+  const enviar = $('[data-enviar]');
+  const error = $('[data-error]');
+  enviar.addEventListener('click', async () => {
+    const falta = orden.find((id) => id !== 'franja' && id !== 'comentario' && respuestas[id] === undefined);
+    if (falta) return irA(falta);
+    error.classList.add('hidden');
+    enviar.disabled = true;
+    enviar.textContent = 'Enviando…';
+    const cuerpo = {
+      c: codigo, ...respuestas, franja: respuestas.franja ?? null,
+      comentario: $('[data-comentario]').value.trim() || null, web: $('[data-trampa]').value, t: Date.now() - empezado,
+    };
+    try {
+      const r = await fetch(`${api}/respuesta`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(cuerpo) });
+      const datos = await r.json().catch(() => ({}));
+      if (r.ok && datos.ok) {
+        guardar(CLAVE_HECHA, '1');
+        guardar(CLAVE_CODIGO, null);
+        progreso.style.width = '100%';
+        return pantalla('gracias');
+      }
+      if (r.status === 409 || r.status === 404) {
+        guardar(CLAVE_CODIGO, null);
+        return pantalla('usada');
+      }
+      error.textContent = 'No se ha podido enviar. Inténtalo de nuevo en un momento.';
+      error.classList.remove('hidden');
+    } catch {
+      error.textContent = 'No hay conexión. Comprueba tu internet y vuelve a pulsar «Enviar».';
+      error.classList.remove('hidden');
+    } finally {
+      enviar.disabled = false;
+      enviar.textContent = 'Enviar encuesta';
+    }
+  });
+
+  // Enlace personal: ?c=<código>. Sin código, se pide uno nuevo y se pone en la dirección.
+  const valido = (c) => typeof c === 'string' && /^[A-Za-z0-9_-]{20,64}$/.test(c);
+  async function nuevoCodigo() {
+    const r = await fetch(`${api}/enlace`, { method: 'POST' });
+    const datos = await r.json().catch(() => ({}));
+    if (!r.ok || !valido(datos.codigo)) throw new Error(r.status === 429 ? 'tope' : 'fallo');
+    guardar(CLAVE_CODIGO, datos.codigo);
+    return datos.codigo;
+  }
+  async function preparar() {
+    pantalla('cargando');
+    const url = new URL(location.href);
+    const deUrl = url.searchParams.get('c');
+    try {
+      if (!valido(deUrl) && leer(CLAVE_HECHA)) return pantalla('gracias');
+      codigo = valido(deUrl) ? deUrl : valido(leer(CLAVE_CODIGO)) ? leer(CLAVE_CODIGO) : await nuevoCodigo();
+      let estado = (await (await fetch(`${api}/estado?c=${encodeURIComponent(codigo)}`)).json()).estado;
+      if (estado === 'no_existe' && !valido(deUrl)) {
+        // Código guardado en el móvil que ya caducó: se pide otro.
+        codigo = await nuevoCodigo();
+        estado = 'disponible';
+      }
+      if (estado === 'usado') return leer(CLAVE_HECHA) ? pantalla('gracias') : pantalla('usada');
+      if (estado !== 'disponible') return pantalla('usada');
+      url.searchParams.set('c', codigo);
+      history.replaceState(null, '', url);
+      pantalla('inicio');
+    } catch (e) {
+      $('[data-error-texto]').textContent =
+        e?.message === 'tope' ? 'Hoy se han abierto demasiadas encuestas. Vuelve a probar mañana.' : 'Revisa tu conexión e inténtalo de nuevo.';
+      pantalla('error');
+    }
+  }
+  $('[data-reintentar]').addEventListener('click', preparar);
+  preparar();
+</script>
